@@ -1,0 +1,296 @@
+[
+  {
+    "planning_area": "Ang Mo Kio",
+    "total_adult_pop_2026": 134260,
+    "total_households": 61900,
+    "age_distribution": {
+      "student_pct": 0.06,
+      "early_career_pct": 0.14,
+      "family_career_pct": 0.23,
+      "mature_working_pct": 0.26,
+      "retiree_pct": 0.31
+    },
+    "dwelling_distribution": {
+      "hdb_1_2_room_pct": 0.09,
+      "hdb_3_room_pct": 0.41,
+      "hdb_4_room_pct": 0.24,
+      "hdb_5_room_exec_pct": 0.11,
+      "condo_apt_pct": 0.09,
+      "landed_pct": 0.07
+    },
+    "income_distribution": {
+      "unemployed_pct": 0.21,
+      "below3k_pct": 0.11,
+      "income_3k_to_5999_pct": 0.15,
+      "income_6k_to_9999_pct": 0.12,
+      "income_10k_to_17499_pct": 0.12,
+      "income_17500_plus_pct": 0.21
+    },
+    "household_size": {
+      "hh_size_1_to_2_pct": 0.21,
+      "hh_size_3_to_4_pct": 0.37,
+      "hh_size_5_plus_pct": 0.13,
+      "mean_hh_size": 2.77
+    },
+    "home_language": {
+      "english_pct": 0.57,
+      "mandarin_pct": 0.29,
+      "chinese_dialect_pct": 0.07,
+      "malay_pct": 0.03,
+      "indian_pct": 0.03
+    },
+    "archetype_weights": {
+      "retiree": 0.3069,
+      "student": 0.0594,
+      "working_class": 0.3169,
+      "heartland_family": 0.2178,
+      "affluent_pro": 0.099
+    },
+    "is_alternate_cbd_preset": false
+  },
+  {
+    "planning_area": "Bukit Merah",
+    "total_adult_pop_2026": 121380,
+    "total_households": 52700,
+    "age_distribution": {
+      "student_pct": 0.05,
+      "early_career_pct": 0.14,
+      "family_career_pct": 0.26,
+      "mature_working_pct": 0.26,
+      "retiree_pct": 0.3
+    },
+    "dwelling_distribution": {
+      "hdb_1_2_room_pct": 0.16,
+      "hdb_3_room_pct": 0.27,
+      "hdb_4_room_pct": 0.29,
+      "hdb_5_room_exec_pct": 0.16,
+      "condo_apt_pct": 0.11,
+      "landed_pct": 0.0
+    },
+    "income_distribution": {
+      "unemployed_pct": 0.22,
+      "below3k_pct": 0.11,
+      "income_3k_to_5999_pct": 0.14,
+      "income_6k_to_9999_pct": 0.14,
+      "income_10k_to_17499_pct": 0.14,
+      "income_17500_plus_pct": 0.24
+    },
+    "household_size": {
+      "hh_size_1_to_2_pct": 0.24,
+      "hh_size_3_to_4_pct": 0.37,
+      "hh_size_5_plus_pct": 0.11,
+      "mean_hh_size": 2.69
+    },
+    "home_language": {
+      "english_pct": 0.58,
+      "mandarin_pct": 0.25,
+      "chinese_dialect_pct": 0.1,
+      "malay_pct": 0.03,
+      "indian_pct": 0.03
+    },
+    "archetype_weights": {
+      "retiree": 0.2971,
+      "student": 0.0495,
+      "working_class": 0.2772,
+      "heartland_family": 0.297,
+      "affluent_pro": 0.0792
+    },
+    "is_alternate_cbd_preset": false
+  },
+  {
+    "planning_area": "Bukit Timah",
+    "total_adult_pop_2026": 66080,
+    "total_households": 27000,
+    "age_distribution": {
+      "student_pct": 0.07,
+      "early_career_pct": 0.13,
+      "family_career_pct": 0.3,
+      "mature_working_pct": 0.26,
+      "retiree_pct": 0.24
+    },
+    "dwelling_distribution": {
+      "hdb_1_2_room_pct": 0.0,
+      "hdb_3_room_pct": 0.01,
+      "hdb_4_room_pct": 0.03,
+      "hdb_5_room_exec_pct": 0.03,
+      "condo_apt_pct": 0.57,
+      "landed_pct": 0.34
+    },
+    "income_distribution": {
+      "unemployed_pct": 0.12,
+      "below3k_pct": 0.03,
+      "income_3k_to_5999_pct": 0.05,
+      "income_6k_to_9999_pct": 0.06,
+      "income_10k_to_17499_pct": 0.06,
+      "income_17500_plus_pct": 0.6
+    },
+    "household_size": {
+      "hh_size_1_to_2_pct": 0.6,
+      "hh_size_3_to_4_pct": 0.44,
+      "hh_size_5_plus_pct": 0.31,
+      "mean_hh_size": 3.68
+    },
+    "home_language": {
+      "english_pct": 0.79,
+      "mandarin_pct": 0.18,
+      "chinese_dialect_pct": 0.01,
+      "malay_pct": 0.0,
+      "indian_pct": 0.01
+    },
+    "archetype_weights": {
+      "retiree": 0.24,
+      "student": 0.07,
+      "working_class": 0.01,
+      "heartland_family": 0.05,
+      "affluent_pro": 0.63
+    },
+    "is_alternate_cbd_preset": false
+  },
+  {
+    "planning_area": "Jurong East",
+    "total_adult_pop_2026": 61420,
+    "total_households": 26400,
+    "age_distribution": {
+      "student_pct": 0.06,
+      "early_career_pct": 0.15,
+      "family_career_pct": 0.22,
+      "mature_working_pct": 0.26,
+      "retiree_pct": 0.3
+    },
+    "dwelling_distribution": {
+      "hdb_1_2_room_pct": 0.05,
+      "hdb_3_room_pct": 0.27,
+      "hdb_4_room_pct": 0.31,
+      "hdb_5_room_exec_pct": 0.28,
+      "condo_apt_pct": 0.09,
+      "landed_pct": 0.0
+    },
+    "income_distribution": {
+      "unemployed_pct": 0.16,
+      "below3k_pct": 0.11,
+      "income_3k_to_5999_pct": 0.13,
+      "income_6k_to_9999_pct": 0.18,
+      "income_10k_to_17499_pct": 0.18,
+      "income_17500_plus_pct": 0.17
+    },
+    "household_size": {
+      "hh_size_1_to_2_pct": 0.17,
+      "hh_size_3_to_4_pct": 0.45,
+      "hh_size_5_plus_pct": 0.13,
+      "mean_hh_size": 2.95
+    },
+    "home_language": {
+      "english_pct": 0.54,
+      "mandarin_pct": 0.29,
+      "chinese_dialect_pct": 0.05,
+      "malay_pct": 0.08,
+      "indian_pct": 0.04
+    },
+    "archetype_weights": {
+      "retiree": 0.3,
+      "student": 0.06,
+      "working_class": 0.2,
+      "heartland_family": 0.38,
+      "affluent_pro": 0.06
+    },
+    "is_alternate_cbd_preset": false
+  },
+  {
+    "planning_area": "Outram",
+    "total_adult_pop_2026": 14450,
+    "total_households": 5100,
+    "age_distribution": {
+      "student_pct": 0.04,
+      "early_career_pct": 0.13,
+      "family_career_pct": 0.25,
+      "mature_working_pct": 0.25,
+      "retiree_pct": 0.33
+    },
+    "dwelling_distribution": {
+      "hdb_1_2_room_pct": 0.37,
+      "hdb_3_room_pct": 0.29,
+      "hdb_4_room_pct": 0.22,
+      "hdb_5_room_exec_pct": 0.08,
+      "condo_apt_pct": 0.04,
+      "landed_pct": 0.0
+    },
+    "income_distribution": {
+      "unemployed_pct": 0.27,
+      "below3k_pct": 0.24,
+      "income_3k_to_5999_pct": 0.08,
+      "income_6k_to_9999_pct": 0.1,
+      "income_10k_to_17499_pct": 0.1,
+      "income_17500_plus_pct": 0.16
+    },
+    "household_size": {
+      "hh_size_1_to_2_pct": 0.16,
+      "hh_size_3_to_4_pct": 0.2,
+      "hh_size_5_plus_pct": 0.08,
+      "mean_hh_size": 2.12
+    },
+    "home_language": {
+      "english_pct": 0.54,
+      "mandarin_pct": 0.32,
+      "chinese_dialect_pct": 0.07,
+      "malay_pct": 0.01,
+      "indian_pct": 0.05
+    },
+    "archetype_weights": {
+      "retiree": 0.3235,
+      "student": 0.0392,
+      "working_class": 0.4216,
+      "heartland_family": 0.1863,
+      "affluent_pro": 0.0294
+    },
+    "is_alternate_cbd_preset": true
+  },
+  {
+    "planning_area": "Tampines",
+    "total_adult_pop_2026": 237300,
+    "total_households": 103500,
+    "age_distribution": {
+      "student_pct": 0.06,
+      "early_career_pct": 0.19,
+      "family_career_pct": 0.28,
+      "mature_working_pct": 0.24,
+      "retiree_pct": 0.24
+    },
+    "dwelling_distribution": {
+      "hdb_1_2_room_pct": 0.04,
+      "hdb_3_room_pct": 0.15,
+      "hdb_4_room_pct": 0.37,
+      "hdb_5_room_exec_pct": 0.28,
+      "condo_apt_pct": 0.14,
+      "landed_pct": 0.01
+    },
+    "income_distribution": {
+      "unemployed_pct": 0.12,
+      "below3k_pct": 0.07,
+      "income_3k_to_5999_pct": 0.11,
+      "income_6k_to_9999_pct": 0.17,
+      "income_10k_to_17499_pct": 0.17,
+      "income_17500_plus_pct": 0.26
+    },
+    "household_size": {
+      "hh_size_1_to_2_pct": 0.26,
+      "hh_size_3_to_4_pct": 0.47,
+      "hh_size_5_plus_pct": 0.18,
+      "mean_hh_size": 3.19
+    },
+    "home_language": {
+      "english_pct": 0.61,
+      "mandarin_pct": 0.23,
+      "chinese_dialect_pct": 0.04,
+      "malay_pct": 0.1,
+      "indian_pct": 0.02
+    },
+    "archetype_weights": {
+      "retiree": 0.2353,
+      "student": 0.0588,
+      "working_class": 0.1373,
+      "heartland_family": 0.4608,
+      "affluent_pro": 0.1078
+    },
+    "is_alternate_cbd_preset": false
+  }
+]

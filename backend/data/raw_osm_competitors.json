@@ -1,0 +1,6172 @@
+[
+  {
+    "osm_id": 1699416855,
+    "osm_type": "node",
+    "name": "Kebun Baru Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3671947,
+    "lon": 103.8400089
+  },
+  {
+    "osm_id": 1699579429,
+    "osm_type": "node",
+    "name": "McDonald's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3693658,
+    "lon": 103.8472747
+  },
+  {
+    "osm_id": 2510351303,
+    "osm_type": "node",
+    "name": "Kpt 咖啡店",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3588854,
+    "lon": 103.8441686
+  },
+  {
+    "osm_id": 4712972593,
+    "osm_type": "node",
+    "name": "Mad Cow cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3735278,
+    "lon": 103.8377916
+  },
+  {
+    "osm_id": 4844900844,
+    "osm_type": "node",
+    "name": "South Canteen",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3780771,
+    "lon": 103.8493526
+  },
+  {
+    "osm_id": 4844900845,
+    "osm_type": "node",
+    "name": "Foodgle Hub",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3770148,
+    "lon": 103.8494925
+  },
+  {
+    "osm_id": 5644580948,
+    "osm_type": "node",
+    "name": "Kfc",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.370751,
+    "lon": 103.845872
+  },
+  {
+    "osm_id": 5904499442,
+    "osm_type": "node",
+    "name": "Starbucks",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3690938,
+    "lon": 103.8484354
+  },
+  {
+    "osm_id": 6259785861,
+    "osm_type": "node",
+    "name": "Domino's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3731006,
+    "lon": 103.8375914
+  },
+  {
+    "osm_id": 6815687284,
+    "osm_type": "node",
+    "name": "Toast Box",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3697957,
+    "lon": 103.8481755
+  },
+  {
+    "osm_id": 7669835399,
+    "osm_type": "node",
+    "name": "Aik Leong Eating House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3748722,
+    "lon": 103.8503768
+  },
+  {
+    "osm_id": 7773234655,
+    "osm_type": "node",
+    "name": "TG 339 Eating House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3644965,
+    "lon": 103.8490927
+  },
+  {
+    "osm_id": 7869048006,
+    "osm_type": "node",
+    "name": "Burger King",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3729883,
+    "lon": 103.8376375
+  },
+  {
+    "osm_id": 8556122308,
+    "osm_type": "node",
+    "name": "KOI Express",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3694984,
+    "lon": 103.8497628
+  },
+  {
+    "osm_id": 8556122309,
+    "osm_type": "node",
+    "name": "The Coffee Bean & Tea Leaf",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691039,
+    "lon": 103.8481625
+  },
+  {
+    "osm_id": 8556122314,
+    "osm_type": "node",
+    "name": "Dunkin'",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3692582,
+    "lon": 103.8486983
+  },
+  {
+    "osm_id": 8556122316,
+    "osm_type": "node",
+    "name": "Jollibee",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3695472,
+    "lon": 103.8490916
+  },
+  {
+    "osm_id": 8556164717,
+    "osm_type": "node",
+    "name": "绝味",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3694033,
+    "lon": 103.8498013
+  },
+  {
+    "osm_id": 8556164723,
+    "osm_type": "node",
+    "name": "MOS Burger",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691395,
+    "lon": 103.8478114
+  },
+  {
+    "osm_id": 8556164731,
+    "osm_type": "node",
+    "name": "吃茶三千 CHICHA San Chen",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3693926,
+    "lon": 103.8484335
+  },
+  {
+    "osm_id": 8556164733,
+    "osm_type": "node",
+    "name": "Pepper Lunch",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691449,
+    "lon": 103.8477628
+  },
+  {
+    "osm_id": 8556164737,
+    "osm_type": "node",
+    "name": "Heavenly Wang",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3692458,
+    "lon": 103.8485452
+  },
+  {
+    "osm_id": 8556164743,
+    "osm_type": "node",
+    "name": "Kopitiam",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3693538,
+    "lon": 103.8476042
+  },
+  {
+    "osm_id": 8556164750,
+    "osm_type": "node",
+    "name": "Subway",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691494,
+    "lon": 103.8477216
+  },
+  {
+    "osm_id": 8556164758,
+    "osm_type": "node",
+    "name": "Old Chang Kee",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691283,
+    "lon": 103.8479135
+  },
+  {
+    "osm_id": 8556213043,
+    "osm_type": "node",
+    "name": "Ordinary Burgers",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691214,
+    "lon": 103.8476042
+  },
+  {
+    "osm_id": 8556213045,
+    "osm_type": "node",
+    "name": "Gong Cha",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3696918,
+    "lon": 103.8473865
+  },
+  {
+    "osm_id": 8556213049,
+    "osm_type": "node",
+    "name": "S-11",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691777,
+    "lon": 103.8472501
+  },
+  {
+    "osm_id": 8556213053,
+    "osm_type": "node",
+    "name": "KOI Thé",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691293,
+    "lon": 103.8475575
+  },
+  {
+    "osm_id": 8556213062,
+    "osm_type": "node",
+    "name": "Ji De Chi Dessert",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3691823,
+    "lon": 103.8471154
+  },
+  {
+    "osm_id": 8556213063,
+    "osm_type": "node",
+    "name": "Duke Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3699324,
+    "lon": 103.8473549
+  },
+  {
+    "osm_id": 8556333486,
+    "osm_type": "node",
+    "name": "Yan Xi Tang",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.371565,
+    "lon": 103.8470748
+  },
+  {
+    "osm_id": 8556333487,
+    "osm_type": "node",
+    "name": "Fuji Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3711233,
+    "lon": 103.8474245
+  },
+  {
+    "osm_id": 8556333489,
+    "osm_type": "node",
+    "name": "Tip Top",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3717053,
+    "lon": 103.8479663
+  },
+  {
+    "osm_id": 8556333494,
+    "osm_type": "node",
+    "name": "Veggie House & Max See",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.371768,
+    "lon": 103.8476464
+  },
+  {
+    "osm_id": 8556405253,
+    "osm_type": "node",
+    "name": "LiHO",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3716957,
+    "lon": 103.8478763
+  },
+  {
+    "osm_id": 8556405255,
+    "osm_type": "node",
+    "name": "82 Bunsik",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3716905,
+    "lon": 103.8478274
+  },
+  {
+    "osm_id": 9061417524,
+    "osm_type": "node",
+    "name": "Pine Garden’s Cake",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3722834,
+    "lon": 103.8552666
+  },
+  {
+    "osm_id": 9164113358,
+    "osm_type": "node",
+    "name": "Johnson Eatery (Teochew fish soup)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.361955,
+    "lon": 103.8517526
+  },
+  {
+    "osm_id": 9710780959,
+    "osm_type": "node",
+    "name": "AMK 722 Food House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3720186,
+    "lon": 103.8475052
+  },
+  {
+    "osm_id": 9710782190,
+    "osm_type": "node",
+    "name": "Cheng San Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3726769,
+    "lon": 103.8545671
+  },
+  {
+    "osm_id": 9710976518,
+    "osm_type": "node",
+    "name": "Kim San Leng Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3674052,
+    "lon": 103.8395715
+  },
+  {
+    "osm_id": 10758639705,
+    "osm_type": "node",
+    "name": "Bread Code",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3648199,
+    "lon": 103.8491172
+  },
+  {
+    "osm_id": 10945269895,
+    "osm_type": "node",
+    "name": "Food Loft",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3638786,
+    "lon": 103.8484547
+  },
+  {
+    "osm_id": 11294628539,
+    "osm_type": "node",
+    "name": "Food Haus",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3655545,
+    "lon": 103.853212
+  },
+  {
+    "osm_id": 12526812416,
+    "osm_type": "node",
+    "name": "Daun Pandan Rice Dumpling",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3693753,
+    "lon": 103.8486667
+  },
+  {
+    "osm_id": 12526812419,
+    "osm_type": "node",
+    "name": "Auntie Anne's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3692449,
+    "lon": 103.8487443
+  },
+  {
+    "osm_id": 12606919706,
+    "osm_type": "node",
+    "name": "AMK 232 Foodhouse",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3680517,
+    "lon": 103.8373827
+  },
+  {
+    "osm_id": 13003637804,
+    "osm_type": "node",
+    "name": "传统甜品",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3683725,
+    "lon": 103.8371637
+  },
+  {
+    "osm_id": 13120762101,
+    "osm_type": "node",
+    "name": "First Coffeeshop Pte Ltd",
+    "amenity": null,
+    "shop": "coffee",
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3714292,
+    "lon": 103.8376191
+  },
+  {
+    "osm_id": 13149199995,
+    "osm_type": "node",
+    "name": "Rasa Sayang western food",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.3671888,
+    "lon": 103.8485553
+  },
+  {
+    "osm_id": 13344395701,
+    "osm_type": "node",
+    "name": "Froz Bakery - Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Ang Mo Kio",
+    "lat": 1.366183,
+    "lon": 103.8550586
+  },
+  {
+    "osm_id": 2402557619,
+    "osm_type": "node",
+    "name": "Food Junction",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3521031,
+    "lon": 103.9437097
+  },
+  {
+    "osm_id": 2402557630,
+    "osm_type": "node",
+    "name": "Kopitiam",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3521439,
+    "lon": 103.944623
+  },
+  {
+    "osm_id": 3150259197,
+    "osm_type": "node",
+    "name": "Burger King",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3570864,
+    "lon": 103.946686
+  },
+  {
+    "osm_id": 4130032793,
+    "osm_type": "node",
+    "name": "Domino's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3457624,
+    "lon": 103.9380472
+  },
+  {
+    "osm_id": 4837878646,
+    "osm_type": "node",
+    "name": "Yoshinoya",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3534023,
+    "lon": 103.9402585
+  },
+  {
+    "osm_id": 4883490429,
+    "osm_type": "node",
+    "name": "McDonald's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3533328,
+    "lon": 103.9544495
+  },
+  {
+    "osm_id": 5031862855,
+    "osm_type": "node",
+    "name": "Starbucks",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537896,
+    "lon": 103.9408874
+  },
+  {
+    "osm_id": 5813931529,
+    "osm_type": "node",
+    "name": "Hawker Centre @ Our Tampines Hub",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537755,
+    "lon": 103.9398986
+  },
+  {
+    "osm_id": 5813931537,
+    "osm_type": "node",
+    "name": "Subway",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3535523,
+    "lon": 103.9400084
+  },
+  {
+    "osm_id": 6776313814,
+    "osm_type": "node",
+    "name": "The Coffee Bean & Tea Leaf",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3521789,
+    "lon": 103.9439327
+  },
+  {
+    "osm_id": 6798833680,
+    "osm_type": "node",
+    "name": "Ya Kun Kaya Toast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3522513,
+    "lon": 103.9436617
+  },
+  {
+    "osm_id": 6815784786,
+    "osm_type": "node",
+    "name": "Toast Box",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3540931,
+    "lon": 103.9451709
+  },
+  {
+    "osm_id": 7457571851,
+    "osm_type": "node",
+    "name": "Fish & Co.",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3534395,
+    "lon": 103.9404939
+  },
+  {
+    "osm_id": 7968739774,
+    "osm_type": "node",
+    "name": "San Lou Mee Hoon三楼米粉",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3528233,
+    "lon": 103.953767
+  },
+  {
+    "osm_id": 8208607236,
+    "osm_type": "node",
+    "name": "Food Park",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3576426,
+    "lon": 103.9401544
+  },
+  {
+    "osm_id": 8810940499,
+    "osm_type": "node",
+    "name": "Chang Cheng Food Court",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3527768,
+    "lon": 103.9529232
+  },
+  {
+    "osm_id": 9070872420,
+    "osm_type": "node",
+    "name": "829 Food Court",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3491403,
+    "lon": 103.9352034
+  },
+  {
+    "osm_id": 9810591353,
+    "osm_type": "node",
+    "name": "U Taste Express",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3539328,
+    "lon": 103.9433039
+  },
+  {
+    "osm_id": 9810591356,
+    "osm_type": "node",
+    "name": "King Of Braise",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3536372,
+    "lon": 103.9449647
+  },
+  {
+    "osm_id": 9810591359,
+    "osm_type": "node",
+    "name": "KOI The",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3548397,
+    "lon": 103.9442283
+  },
+  {
+    "osm_id": 9810591362,
+    "osm_type": "node",
+    "name": "Dunkin'",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3536655,
+    "lon": 103.9449402
+  },
+  {
+    "osm_id": 9810591364,
+    "osm_type": "node",
+    "name": "NTWU Canteen",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3538726,
+    "lon": 103.9428606
+  },
+  {
+    "osm_id": 9810591365,
+    "osm_type": "node",
+    "name": "R&B巡茶",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537209,
+    "lon": 103.9448914
+  },
+  {
+    "osm_id": 9810686283,
+    "osm_type": "node",
+    "name": "MOS Burger",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537786,
+    "lon": 103.9405698
+  },
+  {
+    "osm_id": 9810686284,
+    "osm_type": "node",
+    "name": "The French American Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Tampines",
+    "lat": 1.3538757,
+    "lon": 103.9406786
+  },
+  {
+    "osm_id": 9810686285,
+    "osm_type": "node",
+    "name": "Dutch Colony Coffee Co.",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3524393,
+    "lon": 103.9410898
+  },
+  {
+    "osm_id": 9810686289,
+    "osm_type": "node",
+    "name": "Encik Tan",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3534471,
+    "lon": 103.9403826
+  },
+  {
+    "osm_id": 11178310826,
+    "osm_type": "node",
+    "name": "929 Desserts & Bites",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3445951,
+    "lon": 103.9415216
+  },
+  {
+    "osm_id": 11180682095,
+    "osm_type": "node",
+    "name": "macdonald's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3487215,
+    "lon": 103.9355783
+  },
+  {
+    "osm_id": 11455416656,
+    "osm_type": "node",
+    "name": "Stuff'd",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3536864,
+    "lon": 103.9406959
+  },
+  {
+    "osm_id": 11950117069,
+    "osm_type": "node",
+    "name": "Nanyang Jia Xiang",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3545875,
+    "lon": 103.9437805
+  },
+  {
+    "osm_id": 11950129069,
+    "osm_type": "node",
+    "name": "Bengawan Solo",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Tampines",
+    "lat": 1.3546289,
+    "lon": 103.9438118
+  },
+  {
+    "osm_id": 12353493400,
+    "osm_type": "node",
+    "name": "Brewprint Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3497358,
+    "lon": 103.9523443
+  },
+  {
+    "osm_id": 12558655504,
+    "osm_type": "node",
+    "name": "Chang Cheng Mee Wah",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3463525,
+    "lon": 103.9380058
+  },
+  {
+    "osm_id": 12565999266,
+    "osm_type": "node",
+    "name": "Mister Donut",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3540359,
+    "lon": 103.9451841
+  },
+  {
+    "osm_id": 12565999267,
+    "osm_type": "node",
+    "name": "Potato Corner",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.354055,
+    "lon": 103.945164
+  },
+  {
+    "osm_id": 12565999268,
+    "osm_type": "node",
+    "name": "Malaysia Boleh",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537985,
+    "lon": 103.945169
+  },
+  {
+    "osm_id": 12565999270,
+    "osm_type": "node",
+    "name": "Hawkers' Street",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3538438,
+    "lon": 103.9450653
+  },
+  {
+    "osm_id": 12565999276,
+    "osm_type": "node",
+    "name": "Délifrance",
+    "amenity": "cafe",
+    "shop": "bakery",
+    "planning_area": "Tampines",
+    "lat": 1.3542643,
+    "lon": 103.9450895
+  },
+  {
+    "osm_id": 12565999278,
+    "osm_type": "node",
+    "name": "4Fingers Crispy Chicken",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3544715,
+    "lon": 103.9448299
+  },
+  {
+    "osm_id": 12565999285,
+    "osm_type": "node",
+    "name": "Boost",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.353717,
+    "lon": 103.9451519
+  },
+  {
+    "osm_id": 12565999295,
+    "osm_type": "node",
+    "name": "Nam Kee Pau",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3544795,
+    "lon": 103.9447373
+  },
+  {
+    "osm_id": 12565999296,
+    "osm_type": "node",
+    "name": "Heytea",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.353886,
+    "lon": 103.9450241
+  },
+  {
+    "osm_id": 12565999300,
+    "osm_type": "node",
+    "name": "Popeyes",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.354224,
+    "lon": 103.9452394
+  },
+  {
+    "osm_id": 12566028908,
+    "osm_type": "node",
+    "name": "Tai Cheong Bakery 太昌餅家",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Tampines",
+    "lat": 1.3544624,
+    "lon": 103.9449023
+  },
+  {
+    "osm_id": 12566028913,
+    "osm_type": "node",
+    "name": "Tori Q",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3544061,
+    "lon": 103.9449053
+  },
+  {
+    "osm_id": 12566028916,
+    "osm_type": "node",
+    "name": "Yamazaki",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Tampines",
+    "lat": 1.3543931,
+    "lon": 103.9449317
+  },
+  {
+    "osm_id": 12573500736,
+    "osm_type": "node",
+    "name": "Jollibee",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3522188,
+    "lon": 103.9440861
+  },
+  {
+    "osm_id": 12573500738,
+    "osm_type": "node",
+    "name": "Mixue",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3522346,
+    "lon": 103.9438996
+  },
+  {
+    "osm_id": 12573500740,
+    "osm_type": "node",
+    "name": "Beard Papa's",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Tampines",
+    "lat": 1.3523166,
+    "lon": 103.9438189
+  },
+  {
+    "osm_id": 12785709203,
+    "osm_type": "node",
+    "name": "Puffs and Peaks",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Tampines",
+    "lat": 1.3458045,
+    "lon": 103.9476437
+  },
+  {
+    "osm_id": 12987721839,
+    "osm_type": "node",
+    "name": "828 Food Court",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3488976,
+    "lon": 103.934521
+  },
+  {
+    "osm_id": 13800406218,
+    "osm_type": "node",
+    "name": "Hugabo",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537096,
+    "lon": 103.9406642
+  },
+  {
+    "osm_id": 14045119237,
+    "osm_type": "node",
+    "name": "A&W",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3519943,
+    "lon": 103.9419502
+  },
+  {
+    "osm_id": 14045119240,
+    "osm_type": "node",
+    "name": "001 Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3522378,
+    "lon": 103.9417986
+  },
+  {
+    "osm_id": 14057727773,
+    "osm_type": "node",
+    "name": "Wok Hey",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537357,
+    "lon": 103.9406263
+  },
+  {
+    "osm_id": 14057727774,
+    "osm_type": "node",
+    "name": "LiHo Tea",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3538949,
+    "lon": 103.9408054
+  },
+  {
+    "osm_id": 14093359471,
+    "osm_type": "node",
+    "name": "Luckin Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3537542,
+    "lon": 103.945114
+  },
+  {
+    "osm_id": 14093359472,
+    "osm_type": "node",
+    "name": "Tiong Bahru Bakery",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3538026,
+    "lon": 103.9450728
+  },
+  {
+    "osm_id": 14273374019,
+    "osm_type": "node",
+    "name": "Wingstop",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Tampines",
+    "lat": 1.3533507,
+    "lon": 103.9402513
+  },
+  {
+    "osm_id": 1711105942,
+    "osm_type": "node",
+    "name": "The Coffee Bean & Tea Leaf",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3306493,
+    "lon": 103.7956809
+  },
+  {
+    "osm_id": 4353385858,
+    "osm_type": "node",
+    "name": "Simply Bread",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3306316,
+    "lon": 103.7957476
+  },
+  {
+    "osm_id": 4538844762,
+    "osm_type": "node",
+    "name": "Baker & Cook",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3238966,
+    "lon": 103.7967709
+  },
+  {
+    "osm_id": 4715290933,
+    "osm_type": "node",
+    "name": "Starbucks",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3236266,
+    "lon": 103.8103227
+  },
+  {
+    "osm_id": 4715369591,
+    "osm_type": "node",
+    "name": "Oaks Coffee Roasters",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3245822,
+    "lon": 103.8091521
+  },
+  {
+    "osm_id": 4747939288,
+    "osm_type": "node",
+    "name": "Brettschneider's Baking & Cooking",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Timah",
+    "lat": 1.331638,
+    "lon": 103.8072816
+  },
+  {
+    "osm_id": 5490184821,
+    "osm_type": "node",
+    "name": "Craftsmen Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3312152,
+    "lon": 103.807145
+  },
+  {
+    "osm_id": 6816849548,
+    "osm_type": "node",
+    "name": "Toast Box",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3311523,
+    "lon": 103.7950498
+  },
+  {
+    "osm_id": 7617857664,
+    "osm_type": "node",
+    "name": "Lana Cakes",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Timah",
+    "lat": 1.3317895,
+    "lon": 103.8064952
+  },
+  {
+    "osm_id": 9631541158,
+    "osm_type": "node",
+    "name": "Kfc",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3235694,
+    "lon": 103.8103166
+  },
+  {
+    "osm_id": 9631541159,
+    "osm_type": "node",
+    "name": "The GOODBURGER (Made with Impossible)",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3237018,
+    "lon": 103.810426
+  },
+  {
+    "osm_id": 12663618228,
+    "osm_type": "node",
+    "name": "Knead Kopi",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3295219,
+    "lon": 103.8083194
+  },
+  {
+    "osm_id": 12797683771,
+    "osm_type": "node",
+    "name": "Benwagan Solo",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Bukit Timah",
+    "lat": 1.3307945,
+    "lon": 103.7956797
+  },
+  {
+    "osm_id": 12797683772,
+    "osm_type": "node",
+    "name": "Patisserie Woo",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Bukit Timah",
+    "lat": 1.3307497,
+    "lon": 103.7957894
+  },
+  {
+    "osm_id": 12797683773,
+    "osm_type": "node",
+    "name": "The Living Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Timah",
+    "lat": 1.3310079,
+    "lon": 103.7964485
+  },
+  {
+    "osm_id": 2402557624,
+    "osm_type": "node",
+    "name": "Kopitiam",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3328014,
+    "lon": 103.7422688
+  },
+  {
+    "osm_id": 2402557627,
+    "osm_type": "node",
+    "name": "Makan Street 福满街",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3340571,
+    "lon": 103.7469416
+  },
+  {
+    "osm_id": 3355441060,
+    "osm_type": "node",
+    "name": "Toast Box",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.332407,
+    "lon": 103.743168
+  },
+  {
+    "osm_id": 3718704343,
+    "osm_type": "node",
+    "name": "McDonald's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3282417,
+    "lon": 103.7516147
+  },
+  {
+    "osm_id": 4837878648,
+    "osm_type": "node",
+    "name": "Hei Sushi",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Jurong East",
+    "lat": 1.3349663,
+    "lon": 103.7459273
+  },
+  {
+    "osm_id": 6259779131,
+    "osm_type": "node",
+    "name": "Domino's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3367172,
+    "lon": 103.7429027
+  },
+  {
+    "osm_id": 6510909287,
+    "osm_type": "node",
+    "name": "An Açai Affair",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3345836,
+    "lon": 103.7429108
+  },
+  {
+    "osm_id": 6669181086,
+    "osm_type": "node",
+    "name": "Koi Express",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.333844,
+    "lon": 103.7419633
+  },
+  {
+    "osm_id": 6669204285,
+    "osm_type": "node",
+    "name": "Tosuta",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Jurong East",
+    "lat": 1.3337418,
+    "lon": 103.7417995
+  },
+  {
+    "osm_id": 6669208285,
+    "osm_type": "node",
+    "name": "Jollibee",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3334533,
+    "lon": 103.7419508
+  },
+  {
+    "osm_id": 6773537855,
+    "osm_type": "node",
+    "name": "Starbucks",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3325334,
+    "lon": 103.7465924
+  },
+  {
+    "osm_id": 6776341612,
+    "osm_type": "node",
+    "name": "The Coffee Bean & Tea Leaf",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3335118,
+    "lon": 103.7435987
+  },
+  {
+    "osm_id": 6814426680,
+    "osm_type": "node",
+    "name": "Ya Kun Kaya Toast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3352884,
+    "lon": 103.7472047
+  },
+  {
+    "osm_id": 6980152821,
+    "osm_type": "node",
+    "name": "Kfc",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3334247,
+    "lon": 103.7431212
+  },
+  {
+    "osm_id": 7617175959,
+    "osm_type": "node",
+    "name": "Choh Dee Place",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3286276,
+    "lon": 103.7522741
+  },
+  {
+    "osm_id": 8199104162,
+    "osm_type": "node",
+    "name": "Khoon Coffeehouse",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3368371,
+    "lon": 103.7512054
+  },
+  {
+    "osm_id": 8274082629,
+    "osm_type": "node",
+    "name": "Burger King",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3351295,
+    "lon": 103.7473397
+  },
+  {
+    "osm_id": 9604730074,
+    "osm_type": "node",
+    "name": "Coffee Shop @ Blk 134",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3343568,
+    "lon": 103.7390516
+  },
+  {
+    "osm_id": 9604734227,
+    "osm_type": "node",
+    "name": "Broadway Food court",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.339295,
+    "lon": 103.7451745
+  },
+  {
+    "osm_id": 9604768142,
+    "osm_type": "node",
+    "name": "Happy Hawkers",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3343454,
+    "lon": 103.7397225
+  },
+  {
+    "osm_id": 9671017619,
+    "osm_type": "node",
+    "name": "Cat & The Fiddle",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Jurong East",
+    "lat": 1.3340413,
+    "lon": 103.7430547
+  },
+  {
+    "osm_id": 9734990357,
+    "osm_type": "node",
+    "name": "BYD by 1826",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3352585,
+    "lon": 103.7463699
+  },
+  {
+    "osm_id": 9754372713,
+    "osm_type": "node",
+    "name": "Pullman Bakery",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3326177,
+    "lon": 103.7397424
+  },
+  {
+    "osm_id": 10961779770,
+    "osm_type": "node",
+    "name": "Shake Shack",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3340277,
+    "lon": 103.742951
+  },
+  {
+    "osm_id": 12144394177,
+    "osm_type": "node",
+    "name": "Heavenly Wang",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3340139,
+    "lon": 103.7451741
+  },
+  {
+    "osm_id": 12144394178,
+    "osm_type": "node",
+    "name": "Ma Mum",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.333922,
+    "lon": 103.7450568
+  },
+  {
+    "osm_id": 12144394180,
+    "osm_type": "node",
+    "name": "Mr Bean",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3339756,
+    "lon": 103.7450038
+  },
+  {
+    "osm_id": 12144394182,
+    "osm_type": "node",
+    "name": "Swee Heng",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Jurong East",
+    "lat": 1.3343772,
+    "lon": 103.7445164
+  },
+  {
+    "osm_id": 12144394183,
+    "osm_type": "node",
+    "name": "Stuff’d",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3345574,
+    "lon": 103.7440581
+  },
+  {
+    "osm_id": 12886629542,
+    "osm_type": "node",
+    "name": "Food Junction",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3340256,
+    "lon": 103.742988
+  },
+  {
+    "osm_id": 12886653375,
+    "osm_type": "node",
+    "name": "Luckin Coffee",
+    "amenity": null,
+    "shop": "coffee",
+    "planning_area": "Jurong East",
+    "lat": 1.3339866,
+    "lon": 103.7430617
+  },
+  {
+    "osm_id": 12886653376,
+    "osm_type": "node",
+    "name": "Redman",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Jurong East",
+    "lat": 1.3339982,
+    "lon": 103.7430812
+  },
+  {
+    "osm_id": 12886763065,
+    "osm_type": "node",
+    "name": "An Acai Affair",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Jurong East",
+    "lat": 1.3339882,
+    "lon": 103.7429235
+  },
+  {
+    "osm_id": 673995526,
+    "osm_type": "node",
+    "name": "Redhill Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2872986,
+    "lon": 103.8183277
+  },
+  {
+    "osm_id": 1122787109,
+    "osm_type": "node",
+    "name": "1080 Eating House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2808194,
+    "lon": 103.8232944
+  },
+  {
+    "osm_id": 1830346317,
+    "osm_type": "node",
+    "name": "Bukit Merah Central Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2836267,
+    "lon": 103.8172335
+  },
+  {
+    "osm_id": 1830473353,
+    "osm_type": "node",
+    "name": "Bukit Merah View Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.285544,
+    "lon": 103.821922
+  },
+  {
+    "osm_id": 2402563788,
+    "osm_type": "node",
+    "name": "Kopitiam",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2865813,
+    "lon": 103.8265398
+  },
+  {
+    "osm_id": 2424588034,
+    "osm_type": "node",
+    "name": "Flock Café",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2835291,
+    "lon": 103.8302138
+  },
+  {
+    "osm_id": 2921955064,
+    "osm_type": "node",
+    "name": "McDonald's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2835358,
+    "lon": 103.81815
+  },
+  {
+    "osm_id": 3038835356,
+    "osm_type": "node",
+    "name": "肯德基",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2838744,
+    "lon": 103.8172063
+  },
+  {
+    "osm_id": 3038835993,
+    "osm_type": "node",
+    "name": "Subway",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2831186,
+    "lon": 103.8163425
+  },
+  {
+    "osm_id": 3038844437,
+    "osm_type": "node",
+    "name": "Coffee Shop",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2833675,
+    "lon": 103.8156713
+  },
+  {
+    "osm_id": 3100404287,
+    "osm_type": "node",
+    "name": "Tiong Bahru Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2844537,
+    "lon": 103.8336496
+  },
+  {
+    "osm_id": 3527776022,
+    "osm_type": "node",
+    "name": "Happy Hawkers",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2857711,
+    "lon": 103.8266235
+  },
+  {
+    "osm_id": 3891446257,
+    "osm_type": "node",
+    "name": "Koufu",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.280453,
+    "lon": 103.827386
+  },
+  {
+    "osm_id": 3913870659,
+    "osm_type": "node",
+    "name": "The Tastemaker Store",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2891012,
+    "lon": 103.8284699
+  },
+  {
+    "osm_id": 4415978139,
+    "osm_type": "node",
+    "name": "The Bakery Chef",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2841293,
+    "lon": 103.816035
+  },
+  {
+    "osm_id": 4711990952,
+    "osm_type": "node",
+    "name": "GHK Food House",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2791337,
+    "lon": 103.8283485
+  },
+  {
+    "osm_id": 4712230310,
+    "osm_type": "node",
+    "name": "Bakery Point",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2893084,
+    "lon": 103.8170825
+  },
+  {
+    "osm_id": 4714378345,
+    "osm_type": "node",
+    "name": "The Nook",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2821093,
+    "lon": 103.8195696
+  },
+  {
+    "osm_id": 4729378191,
+    "osm_type": "node",
+    "name": "Chapter 55",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2842017,
+    "lon": 103.8344071
+  },
+  {
+    "osm_id": 4770641426,
+    "osm_type": "node",
+    "name": "Whisk",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2848484,
+    "lon": 103.8330993
+  },
+  {
+    "osm_id": 4774732459,
+    "osm_type": "node",
+    "name": "Food Paradise",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.28615,
+    "lon": 103.8294952
+  },
+  {
+    "osm_id": 5070719036,
+    "osm_type": "node",
+    "name": "Chang Cheng Foodcourt",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2883958,
+    "lon": 103.8154811
+  },
+  {
+    "osm_id": 5265243683,
+    "osm_type": "node",
+    "name": "Galicier Pastry",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2842908,
+    "lon": 103.8343433
+  },
+  {
+    "osm_id": 5479261708,
+    "osm_type": "node",
+    "name": "Mum’s cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2871859,
+    "lon": 103.8146502
+  },
+  {
+    "osm_id": 5924056451,
+    "osm_type": "node",
+    "name": "Starbucks",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2861428,
+    "lon": 103.8273642
+  },
+  {
+    "osm_id": 5924056453,
+    "osm_type": "node",
+    "name": "BreadTalk",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2862817,
+    "lon": 103.8273845
+  },
+  {
+    "osm_id": 5924056454,
+    "osm_type": "node",
+    "name": "Toast Box",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2862134,
+    "lon": 103.8273742
+  },
+  {
+    "osm_id": 5924056455,
+    "osm_type": "node",
+    "name": "Fore Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2863173,
+    "lon": 103.8272948
+  },
+  {
+    "osm_id": 5924056462,
+    "osm_type": "node",
+    "name": "4Fingers",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2862914,
+    "lon": 103.8276987
+  },
+  {
+    "osm_id": 5924056465,
+    "osm_type": "node",
+    "name": "Fun Toast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.286394,
+    "lon": 103.8278526
+  },
+  {
+    "osm_id": 5924056467,
+    "osm_type": "node",
+    "name": "Koi",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.286486,
+    "lon": 103.8277624
+  },
+  {
+    "osm_id": 5924056469,
+    "osm_type": "node",
+    "name": "Kfc",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2865231,
+    "lon": 103.8274137
+  },
+  {
+    "osm_id": 5924056470,
+    "osm_type": "node",
+    "name": "MOS Burger",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2865125,
+    "lon": 103.8272421
+  },
+  {
+    "osm_id": 5924056471,
+    "osm_type": "node",
+    "name": "Ya Kun Kaya Toast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2865231,
+    "lon": 103.8271802
+  },
+  {
+    "osm_id": 6259556447,
+    "osm_type": "node",
+    "name": "Domino's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2838114,
+    "lon": 103.815955
+  },
+  {
+    "osm_id": 6259576097,
+    "osm_type": "node",
+    "name": "Sarpinos Pizza",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2840259,
+    "lon": 103.816009
+  },
+  {
+    "osm_id": 6261115385,
+    "osm_type": "node",
+    "name": "Merci Marcel",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2844007,
+    "lon": 103.8336915
+  },
+  {
+    "osm_id": 6405142327,
+    "osm_type": "node",
+    "name": "Dohca",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2856212,
+    "lon": 103.8268855
+  },
+  {
+    "osm_id": 6513118686,
+    "osm_type": "node",
+    "name": "Old Tiong Bahru Bak Kut Teh",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2845604,
+    "lon": 103.832752
+  },
+  {
+    "osm_id": 8246669083,
+    "osm_type": "node",
+    "name": "Lao Ban",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2894537,
+    "lon": 103.816884
+  },
+  {
+    "osm_id": 8246669092,
+    "osm_type": "node",
+    "name": "Burger King",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2899321,
+    "lon": 103.8173291
+  },
+  {
+    "osm_id": 8246669093,
+    "osm_type": "node",
+    "name": "Makcik Can Cook",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.289387,
+    "lon": 103.8169729
+  },
+  {
+    "osm_id": 8246669104,
+    "osm_type": "node",
+    "name": "Mr Bean",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2892242,
+    "lon": 103.8171998
+  },
+  {
+    "osm_id": 8246669105,
+    "osm_type": "node",
+    "name": "Thousand Taste",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2894163,
+    "lon": 103.8169135
+  },
+  {
+    "osm_id": 8459997647,
+    "osm_type": "node",
+    "name": "Anas Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2872171,
+    "lon": 103.8187235
+  },
+  {
+    "osm_id": 8459997648,
+    "osm_type": "node",
+    "name": "80 Eating House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2877473,
+    "lon": 103.8187432
+  },
+  {
+    "osm_id": 8460359361,
+    "osm_type": "node",
+    "name": "Leung Sang Hong Kong Pastries",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2854693,
+    "lon": 103.8269609
+  },
+  {
+    "osm_id": 8460359363,
+    "osm_type": "node",
+    "name": "S-Pearl Tea",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2854189,
+    "lon": 103.8269847
+  },
+  {
+    "osm_id": 9491383875,
+    "osm_type": "node",
+    "name": "Cendex Cafeteria",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2803309,
+    "lon": 103.822311
+  },
+  {
+    "osm_id": 9760783011,
+    "osm_type": "node",
+    "name": "Round Boy Roasters",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2777496,
+    "lon": 103.8303621
+  },
+  {
+    "osm_id": 12041233370,
+    "osm_type": "node",
+    "name": "190 Degrees Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2830017,
+    "lon": 103.8170815
+  },
+  {
+    "osm_id": 12041260772,
+    "osm_type": "node",
+    "name": "Bake with Yen",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2837583,
+    "lon": 103.8176435
+  },
+  {
+    "osm_id": 12041260869,
+    "osm_type": "node",
+    "name": "Ah Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Bukit Merah",
+    "lat": 1.2836578,
+    "lon": 103.8166418
+  },
+  {
+    "osm_id": 13075454002,
+    "osm_type": "node",
+    "name": "Fu Hua Soya Bean",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2889679,
+    "lon": 103.8273681
+  },
+  {
+    "osm_id": 13096405501,
+    "osm_type": "node",
+    "name": "Pralet",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2835936,
+    "lon": 103.8344133
+  },
+  {
+    "osm_id": 172095141,
+    "osm_type": "way",
+    "name": "Blk 11 Telok Blangah Crescent Market & Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2773843,
+    "lon": 103.8186816
+  },
+  {
+    "osm_id": 172242423,
+    "osm_type": "way",
+    "name": "Por Kee Eating House 1996",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2841622,
+    "lon": 103.8327821
+  },
+  {
+    "osm_id": 172363351,
+    "osm_type": "way",
+    "name": "Beo Crescent Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2888373,
+    "lon": 103.8273518
+  },
+  {
+    "osm_id": 481534992,
+    "osm_type": "way",
+    "name": "Havelock Road Cooked Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2879711,
+    "lon": 103.8294136
+  },
+  {
+    "osm_id": 569802289,
+    "osm_type": "way",
+    "name": "Pantry",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2863602,
+    "lon": 103.8146261
+  },
+  {
+    "osm_id": 1114929402,
+    "osm_type": "way",
+    "name": "老曾记",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Bukit Merah",
+    "lat": 1.2898811,
+    "lon": 103.8172093
+  },
+  {
+    "osm_id": 1318605429,
+    "osm_type": "node",
+    "name": "McDonald's",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2748834,
+    "lon": 103.846034
+  },
+  {
+    "osm_id": 1829443947,
+    "osm_type": "node",
+    "name": "Amoy Street Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2793519,
+    "lon": 103.8466661
+  },
+  {
+    "osm_id": 1829738413,
+    "osm_type": "node",
+    "name": "Jalan Kukoh Food Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2882238,
+    "lon": 103.8399499
+  },
+  {
+    "osm_id": 1950182530,
+    "osm_type": "node",
+    "name": "Nanyang Old Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2818086,
+    "lon": 103.8448952
+  },
+  {
+    "osm_id": 2099138257,
+    "osm_type": "node",
+    "name": "Toby's Estate",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2899337,
+    "lon": 103.8374006
+  },
+  {
+    "osm_id": 2099138262,
+    "osm_type": "node",
+    "name": "Kith Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2897265,
+    "lon": 103.8380311
+  },
+  {
+    "osm_id": 2099138263,
+    "osm_type": "node",
+    "name": "Swirls bake shop",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2901144,
+    "lon": 103.837542
+  },
+  {
+    "osm_id": 2402480207,
+    "osm_type": "node",
+    "name": "Kfc",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2854247,
+    "lon": 103.845301
+  },
+  {
+    "osm_id": 2402530869,
+    "osm_type": "node",
+    "name": "Subway",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2745747,
+    "lon": 103.8437017
+  },
+  {
+    "osm_id": 2578014374,
+    "osm_type": "node",
+    "name": "MOS Burger",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2749353,
+    "lon": 103.8435698
+  },
+  {
+    "osm_id": 2700916762,
+    "osm_type": "node",
+    "name": "Starbucks",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2775874,
+    "lon": 103.8472839
+  },
+  {
+    "osm_id": 2881830809,
+    "osm_type": "node",
+    "name": "Enjoy Tea",
+    "amenity": null,
+    "shop": "tea",
+    "planning_area": "Outram",
+    "lat": 1.2819496,
+    "lon": 103.8439535
+  },
+  {
+    "osm_id": 2881830840,
+    "osm_type": "node",
+    "name": "Tea Chapter",
+    "amenity": null,
+    "shop": "tea",
+    "planning_area": "Outram",
+    "lat": 1.280181,
+    "lon": 103.8436066
+  },
+  {
+    "osm_id": 3100404287,
+    "osm_type": "node",
+    "name": "Tiong Bahru Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2844537,
+    "lon": 103.8336496
+  },
+  {
+    "osm_id": 3336359310,
+    "osm_type": "node",
+    "name": "The Audacious Cakery",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2774171,
+    "lon": 103.839582
+  },
+  {
+    "osm_id": 3369782863,
+    "osm_type": "node",
+    "name": "The Reading Room",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2790186,
+    "lon": 103.8405488
+  },
+  {
+    "osm_id": 3756813815,
+    "osm_type": "node",
+    "name": "Coffee-Hugg",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2795459,
+    "lon": 103.8472103
+  },
+  {
+    "osm_id": 3756813982,
+    "osm_type": "node",
+    "name": "Hong Hock Eating House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2830895,
+    "lon": 103.8459013
+  },
+  {
+    "osm_id": 3756813986,
+    "osm_type": "node",
+    "name": "Sarnie's Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2816102,
+    "lon": 103.8480052
+  },
+  {
+    "osm_id": 3756817953,
+    "osm_type": "node",
+    "name": "Good Morning Nanyang Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2836704,
+    "lon": 103.8437169
+  },
+  {
+    "osm_id": 3756817955,
+    "osm_type": "node",
+    "name": "Tai Thong Cake Shop",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2836681,
+    "lon": 103.8451531
+  },
+  {
+    "osm_id": 3756830557,
+    "osm_type": "node",
+    "name": "Cafe3",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802624,
+    "lon": 103.840749
+  },
+  {
+    "osm_id": 3756859725,
+    "osm_type": "node",
+    "name": "Eight Cafe & Bar",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.27877,
+    "lon": 103.8409466
+  },
+  {
+    "osm_id": 3756864117,
+    "osm_type": "node",
+    "name": "Bread & Hearth Artisinal Bakery Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.279998,
+    "lon": 103.8416049
+  },
+  {
+    "osm_id": 3756878282,
+    "osm_type": "node",
+    "name": "The New Harbor Cafe And Bar",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2778481,
+    "lon": 103.8435064
+  },
+  {
+    "osm_id": 3756885764,
+    "osm_type": "node",
+    "name": "PS Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806518,
+    "lon": 103.8463297
+  },
+  {
+    "osm_id": 3756924879,
+    "osm_type": "node",
+    "name": "Vanilla Bar and Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2817131,
+    "lon": 103.8477241
+  },
+  {
+    "osm_id": 3759024653,
+    "osm_type": "node",
+    "name": "Telok Ayer Coffee Shop",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2812576,
+    "lon": 103.848009
+  },
+  {
+    "osm_id": 3759079385,
+    "osm_type": "node",
+    "name": "Café Insadong",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2817757,
+    "lon": 103.8451344
+  },
+  {
+    "osm_id": 3759094223,
+    "osm_type": "node",
+    "name": "La Grigne Patisserie",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2810935,
+    "lon": 103.8451554
+  },
+  {
+    "osm_id": 3759784388,
+    "osm_type": "node",
+    "name": "Blue Mist Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2769673,
+    "lon": 103.8432327
+  },
+  {
+    "osm_id": 3759784407,
+    "osm_type": "node",
+    "name": "Tuxedo",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2760366,
+    "lon": 103.8435529
+  },
+  {
+    "osm_id": 3759784409,
+    "osm_type": "node",
+    "name": "5 The Moments Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.278066,
+    "lon": 103.8438142
+  },
+  {
+    "osm_id": 3759786768,
+    "osm_type": "node",
+    "name": "Drury Lane",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2782815,
+    "lon": 103.8435791
+  },
+  {
+    "osm_id": 3759819048,
+    "osm_type": "node",
+    "name": "Yuen Yeung",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2797635,
+    "lon": 103.8427965
+  },
+  {
+    "osm_id": 3759824406,
+    "osm_type": "node",
+    "name": "Qafe by Night",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2795007,
+    "lon": 103.8440883
+  },
+  {
+    "osm_id": 3759828393,
+    "osm_type": "node",
+    "name": "Ardent's Cafe Bar",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2796764,
+    "lon": 103.8423536
+  },
+  {
+    "osm_id": 3759828395,
+    "osm_type": "node",
+    "name": "fieldnotes",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2797824,
+    "lon": 103.8428436
+  },
+  {
+    "osm_id": 3759828400,
+    "osm_type": "node",
+    "name": "May Wong's Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2797301,
+    "lon": 103.8423784
+  },
+  {
+    "osm_id": 3759832489,
+    "osm_type": "node",
+    "name": "ReStore",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2776397,
+    "lon": 103.8433965
+  },
+  {
+    "osm_id": 3759833732,
+    "osm_type": "node",
+    "name": "Yixing Xuan Teahouse",
+    "amenity": null,
+    "shop": "tea",
+    "planning_area": "Outram",
+    "lat": 1.278559,
+    "lon": 103.8437797
+  },
+  {
+    "osm_id": 3759836215,
+    "osm_type": "node",
+    "name": "Victory Seafood",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2790122,
+    "lon": 103.8417197
+  },
+  {
+    "osm_id": 3759836751,
+    "osm_type": "node",
+    "name": "Foong Kee Coffee Shop",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2794739,
+    "lon": 103.8416436
+  },
+  {
+    "osm_id": 3759845200,
+    "osm_type": "node",
+    "name": "Tiong Shian Seafood House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2824783,
+    "lon": 103.8425115
+  },
+  {
+    "osm_id": 3759845201,
+    "osm_type": "node",
+    "name": "Tong Ah Eating House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801078,
+    "lon": 103.8414763
+  },
+  {
+    "osm_id": 3771293487,
+    "osm_type": "node",
+    "name": "Pizza Hut Delivery",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806365,
+    "lon": 103.8423084
+  },
+  {
+    "osm_id": 3810777678,
+    "osm_type": "node",
+    "name": "Strangers' Reunion Waffles",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2769715,
+    "lon": 103.8363345
+  },
+  {
+    "osm_id": 3812412509,
+    "osm_type": "node",
+    "name": "Artisan Boulangerie Co",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2783661,
+    "lon": 103.8508048
+  },
+  {
+    "osm_id": 3812816407,
+    "osm_type": "node",
+    "name": "Dimbulah (Market Street)",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2822928,
+    "lon": 103.8504676
+  },
+  {
+    "osm_id": 3840260292,
+    "osm_type": "node",
+    "name": "Toast Box",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2793273,
+    "lon": 103.8509999
+  },
+  {
+    "osm_id": 3840262791,
+    "osm_type": "node",
+    "name": "Imperial Treasure Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2791288,
+    "lon": 103.8510401
+  },
+  {
+    "osm_id": 3895041271,
+    "osm_type": "node",
+    "name": "Chef Icon",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2772275,
+    "lon": 103.8368655
+  },
+  {
+    "osm_id": 3980085400,
+    "osm_type": "node",
+    "name": "Hot Shotz",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2863502,
+    "lon": 103.8494199
+  },
+  {
+    "osm_id": 4297822594,
+    "osm_type": "node",
+    "name": "太平洋咖啡",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2780525,
+    "lon": 103.8458152
+  },
+  {
+    "osm_id": 4365993293,
+    "osm_type": "node",
+    "name": "Zhen Zhen Porridge",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804136,
+    "lon": 103.8447169
+  },
+  {
+    "osm_id": 4398307389,
+    "osm_type": "node",
+    "name": "Nylon Coffee Roasters",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.276814,
+    "lon": 103.839832
+  },
+  {
+    "osm_id": 4546730141,
+    "osm_type": "node",
+    "name": "Maison Kayser Raffles Place",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2849337,
+    "lon": 103.849759
+  },
+  {
+    "osm_id": 4571723694,
+    "osm_type": "node",
+    "name": "BreadTalk",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2854017,
+    "lon": 103.8451581
+  },
+  {
+    "osm_id": 4579396441,
+    "osm_type": "node",
+    "name": "S11",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2857856,
+    "lon": 103.842623
+  },
+  {
+    "osm_id": 4593886689,
+    "osm_type": "node",
+    "name": "The Mad Men Attic Bar",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2862122,
+    "lon": 103.8488398
+  },
+  {
+    "osm_id": 4613655889,
+    "osm_type": "node",
+    "name": "My Awesome Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801306,
+    "lon": 103.847118
+  },
+  {
+    "osm_id": 4613657797,
+    "osm_type": "node",
+    "name": "The Populus Coffee and Food Co",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.278196,
+    "lon": 103.8406988
+  },
+  {
+    "osm_id": 4620337789,
+    "osm_type": "node",
+    "name": "Bingki Korean bingsu dessert",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2772559,
+    "lon": 103.8428716
+  },
+  {
+    "osm_id": 4629107271,
+    "osm_type": "node",
+    "name": "Ye Lai Xiang Tasty Barbecue",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802721,
+    "lon": 103.8446671
+  },
+  {
+    "osm_id": 4629107272,
+    "osm_type": "node",
+    "name": "洪家福州蠔饼 Maxwell Fuzhou Oyster Cake",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805876,
+    "lon": 103.8447192
+  },
+  {
+    "osm_id": 4629107273,
+    "osm_type": "node",
+    "name": "中国街咸煎饼 Hum Jin Pang",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803161,
+    "lon": 103.8449076
+  },
+  {
+    "osm_id": 4629107274,
+    "osm_type": "node",
+    "name": "阿仔海南雞飯 Ah Tai Chicken Rice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805497,
+    "lon": 103.8447516
+  },
+  {
+    "osm_id": 4629107275,
+    "osm_type": "node",
+    "name": "天天海南雞飯 Tian Tian Hainanese Chicken Rice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280495,
+    "lon": 103.8447984
+  },
+  {
+    "osm_id": 4723219341,
+    "osm_type": "node",
+    "name": "Pulse Patisserie",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Outram",
+    "lat": 1.2870985,
+    "lon": 103.8468556
+  },
+  {
+    "osm_id": 4723314855,
+    "osm_type": "node",
+    "name": "Butter Town Breakfast Club",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2821421,
+    "lon": 103.8453468
+  },
+  {
+    "osm_id": 4724336427,
+    "osm_type": "node",
+    "name": "The Muffinry",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2820568,
+    "lon": 103.8482868
+  },
+  {
+    "osm_id": 4724402984,
+    "osm_type": "node",
+    "name": "Burger King",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2857242,
+    "lon": 103.8496553
+  },
+  {
+    "osm_id": 4724989242,
+    "osm_type": "node",
+    "name": "Dimbulah",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2737664,
+    "lon": 103.8445951
+  },
+  {
+    "osm_id": 4725018634,
+    "osm_type": "node",
+    "name": "The Coffee Bean & Tea Leaf",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2758765,
+    "lon": 103.8462919
+  },
+  {
+    "osm_id": 4726775776,
+    "osm_type": "node",
+    "name": "Cosat Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2798619,
+    "lon": 103.8495645
+  },
+  {
+    "osm_id": 4729016994,
+    "osm_type": "node",
+    "name": "Dapper Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802779,
+    "lon": 103.8466941
+  },
+  {
+    "osm_id": 4729017990,
+    "osm_type": "node",
+    "name": "Delicius Pasticceria",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807589,
+    "lon": 103.8503427
+  },
+  {
+    "osm_id": 4729038490,
+    "osm_type": "node",
+    "name": "Pantler",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802342,
+    "lon": 103.8471382
+  },
+  {
+    "osm_id": 4729378191,
+    "osm_type": "node",
+    "name": "Chapter 55",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2842017,
+    "lon": 103.8344071
+  },
+  {
+    "osm_id": 4736908326,
+    "osm_type": "node",
+    "name": "Sam Yat Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2846281,
+    "lon": 103.8349888
+  },
+  {
+    "osm_id": 4737053627,
+    "osm_type": "node",
+    "name": "Highlander Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2767642,
+    "lon": 103.8361215
+  },
+  {
+    "osm_id": 4738136626,
+    "osm_type": "node",
+    "name": "Ya Kun Family Café",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2886339,
+    "lon": 103.8466808
+  },
+  {
+    "osm_id": 4745227680,
+    "osm_type": "node",
+    "name": "Bero Coffee Singapore",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.278965,
+    "lon": 103.8401423
+  },
+  {
+    "osm_id": 4770641426,
+    "osm_type": "node",
+    "name": "Whisk",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2848484,
+    "lon": 103.8330993
+  },
+  {
+    "osm_id": 4982867038,
+    "osm_type": "node",
+    "name": "Japan Rail Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2766437,
+    "lon": 103.8456129
+  },
+  {
+    "osm_id": 5040225372,
+    "osm_type": "node",
+    "name": "Guangdong Porridge",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2790696,
+    "lon": 103.841617
+  },
+  {
+    "osm_id": 5040225374,
+    "osm_type": "node",
+    "name": "Yed & deen",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2791077,
+    "lon": 103.8415996
+  },
+  {
+    "osm_id": 5181430821,
+    "osm_type": "node",
+    "name": "Kou Wei Eating House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2867177,
+    "lon": 103.8420737
+  },
+  {
+    "osm_id": 5265243683,
+    "osm_type": "node",
+    "name": "Galicier Pastry",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Outram",
+    "lat": 1.2842908,
+    "lon": 103.8343433
+  },
+  {
+    "osm_id": 5267205321,
+    "osm_type": "node",
+    "name": "Chinatown Complex Foodcourt",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2854002,
+    "lon": 103.8429495
+  },
+  {
+    "osm_id": 5426347721,
+    "osm_type": "node",
+    "name": "Ya Kun Kaya Toast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2747979,
+    "lon": 103.8436326
+  },
+  {
+    "osm_id": 5458627121,
+    "osm_type": "node",
+    "name": "LiHO here somewhere",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2830784,
+    "lon": 103.8483408
+  },
+  {
+    "osm_id": 5540572021,
+    "osm_type": "node",
+    "name": "Duck Master",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2843651,
+    "lon": 103.8429834
+  },
+  {
+    "osm_id": 5580594422,
+    "osm_type": "node",
+    "name": "Coffee Break",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2796097,
+    "lon": 103.8466809
+  },
+  {
+    "osm_id": 5643031322,
+    "osm_type": "node",
+    "name": "Fangko Coffee & Beer",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2878409,
+    "lon": 103.8470936
+  },
+  {
+    "osm_id": 5645108322,
+    "osm_type": "node",
+    "name": "Punch",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2868977,
+    "lon": 103.8472948
+  },
+  {
+    "osm_id": 5661727630,
+    "osm_type": "node",
+    "name": "Henri",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2831573,
+    "lon": 103.8488688
+  },
+  {
+    "osm_id": 5661727633,
+    "osm_type": "node",
+    "name": "Salad & Kebab Corner",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2834006,
+    "lon": 103.8488154
+  },
+  {
+    "osm_id": 5679780626,
+    "osm_type": "node",
+    "name": "food china town near",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2812649,
+    "lon": 103.848395
+  },
+  {
+    "osm_id": 5721635580,
+    "osm_type": "node",
+    "name": "Tiong Shian Food Court",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2826229,
+    "lon": 103.8423622
+  },
+  {
+    "osm_id": 5721635584,
+    "osm_type": "node",
+    "name": "K88 Coffee House",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2814723,
+    "lon": 103.8435944
+  },
+  {
+    "osm_id": 5803888953,
+    "osm_type": "node",
+    "name": "Plus Coffee Joint",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2823697,
+    "lon": 103.8449185
+  },
+  {
+    "osm_id": 5855474286,
+    "osm_type": "node",
+    "name": "Afterglow by Anglow",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801562,
+    "lon": 103.841641
+  },
+  {
+    "osm_id": 5855474287,
+    "osm_type": "node",
+    "name": "Soulalife",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2848786,
+    "lon": 103.8477095
+  },
+  {
+    "osm_id": 5855474385,
+    "osm_type": "node",
+    "name": "Avorush",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2782745,
+    "lon": 103.8506304
+  },
+  {
+    "osm_id": 5855483186,
+    "osm_type": "node",
+    "name": "Food Rebel",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2808923,
+    "lon": 103.8483199
+  },
+  {
+    "osm_id": 5855543785,
+    "osm_type": "node",
+    "name": "Grain Traders",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2817841,
+    "lon": 103.8500914
+  },
+  {
+    "osm_id": 5855543787,
+    "osm_type": "node",
+    "name": "Pickleville",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2781906,
+    "lon": 103.8482175
+  },
+  {
+    "osm_id": 5909205685,
+    "osm_type": "node",
+    "name": "Big Bowls Project",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2795201,
+    "lon": 103.8468049
+  },
+  {
+    "osm_id": 6082899986,
+    "osm_type": "node",
+    "name": "Frienzlink Cafeteria",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2874426,
+    "lon": 103.848173
+  },
+  {
+    "osm_id": 6261115385,
+    "osm_type": "node",
+    "name": "Merci Marcel",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2844007,
+    "lon": 103.8336915
+  },
+  {
+    "osm_id": 6267447085,
+    "osm_type": "node",
+    "name": "Mr. Coconut",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2889117,
+    "lon": 103.8468154
+  },
+  {
+    "osm_id": 6349196383,
+    "osm_type": "node",
+    "name": "Baristart Coffee Singapore",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2776963,
+    "lon": 103.8444702
+  },
+  {
+    "osm_id": 6349196384,
+    "osm_type": "node",
+    "name": "Bearded Bella",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2776334,
+    "lon": 103.842895
+  },
+  {
+    "osm_id": 6349199456,
+    "osm_type": "node",
+    "name": "Butcher Boy",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280007,
+    "lon": 103.8413881
+  },
+  {
+    "osm_id": 6357966793,
+    "osm_type": "node",
+    "name": "Mugiho Bakers",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2806959,
+    "lon": 103.8506618
+  },
+  {
+    "osm_id": 6357966794,
+    "osm_type": "node",
+    "name": "Thunder Tea Rice",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805639,
+    "lon": 103.8507094
+  },
+  {
+    "osm_id": 6360441451,
+    "osm_type": "node",
+    "name": "Kongfu Zai (Chicken Rice)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803502,
+    "lon": 103.8504999
+  },
+  {
+    "osm_id": 6360441452,
+    "osm_type": "node",
+    "name": "Teochew City (Mixed Rice)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803911,
+    "lon": 103.8504999
+  },
+  {
+    "osm_id": 6360441453,
+    "osm_type": "node",
+    "name": "Claypot Bak Kuh Teh",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804668,
+    "lon": 103.8505019
+  },
+  {
+    "osm_id": 6360441454,
+    "osm_type": "node",
+    "name": "Seng Keng (Local Delights)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805044,
+    "lon": 103.8504966
+  },
+  {
+    "osm_id": 6360441455,
+    "osm_type": "node",
+    "name": "Mr Popiah (Local Delights)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804112,
+    "lon": 103.8506428
+  },
+  {
+    "osm_id": 6360441456,
+    "osm_type": "node",
+    "name": "Shree Ganga",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280442,
+    "lon": 103.8506253
+  },
+  {
+    "osm_id": 6360441457,
+    "osm_type": "node",
+    "name": "Loy Kee (Yong Tau Foo)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280489,
+    "lon": 103.8505851
+  },
+  {
+    "osm_id": 6360441458,
+    "osm_type": "node",
+    "name": "Kway Chap (Pig's Organ Soup)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805185,
+    "lon": 103.8505683
+  },
+  {
+    "osm_id": 6360441459,
+    "osm_type": "node",
+    "name": "Fishing (Fish Soup)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804689,
+    "lon": 103.8504718
+  },
+  {
+    "osm_id": 6360441460,
+    "osm_type": "node",
+    "name": "Yong Kee (BBQ Seafood)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805969,
+    "lon": 103.8507454
+  },
+  {
+    "osm_id": 6360441461,
+    "osm_type": "node",
+    "name": "Hao Jia (Ban Mian)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806123,
+    "lon": 103.8506542
+  },
+  {
+    "osm_id": 6360469515,
+    "osm_type": "node",
+    "name": "Sunny Viet",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807293,
+    "lon": 103.8505274
+  },
+  {
+    "osm_id": 6360469516,
+    "osm_type": "node",
+    "name": "Song Kee (Noodle House)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807172,
+    "lon": 103.8504282
+  },
+  {
+    "osm_id": 6360469517,
+    "osm_type": "node",
+    "name": "Biryani Point",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807407,
+    "lon": 103.850386
+  },
+  {
+    "osm_id": 6360469518,
+    "osm_type": "node",
+    "name": "Lai Heng (Char Kway Teow)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807548,
+    "lon": 103.8504081
+  },
+  {
+    "osm_id": 6360469519,
+    "osm_type": "node",
+    "name": "Mama Thai",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805268,
+    "lon": 103.8502525
+  },
+  {
+    "osm_id": 6360469520,
+    "osm_type": "node",
+    "name": "Bao Luo Wan Xiang",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805436,
+    "lon": 103.8504114
+  },
+  {
+    "osm_id": 6360469521,
+    "osm_type": "node",
+    "name": "Central Food (Mixed Veg Rice)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280618,
+    "lon": 103.8502411
+  },
+  {
+    "osm_id": 6361799515,
+    "osm_type": "node",
+    "name": "Paris Baguette",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2796636,
+    "lon": 103.8507016
+  },
+  {
+    "osm_id": 6373283585,
+    "osm_type": "node",
+    "name": "The Social",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807127,
+    "lon": 103.8422385
+  },
+  {
+    "osm_id": 6377378485,
+    "osm_type": "node",
+    "name": "Jewel Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2781191,
+    "lon": 103.8475971
+  },
+  {
+    "osm_id": 6377378486,
+    "osm_type": "node",
+    "name": "Huggs",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2786222,
+    "lon": 103.8479707
+  },
+  {
+    "osm_id": 6377378585,
+    "osm_type": "node",
+    "name": "Killiney",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2787545,
+    "lon": 103.8486005
+  },
+  {
+    "osm_id": 6380091785,
+    "osm_type": "node",
+    "name": "Turkish Cuisine",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807597,
+    "lon": 103.8503227
+  },
+  {
+    "osm_id": 6380091786,
+    "osm_type": "node",
+    "name": "Healthy Carbs",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806608,
+    "lon": 103.8503407
+  },
+  {
+    "osm_id": 6382570485,
+    "osm_type": "node",
+    "name": "Gustoso Grill (Pasta Western Food)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805439,
+    "lon": 103.8503761
+  },
+  {
+    "osm_id": 6382570486,
+    "osm_type": "node",
+    "name": "Jason (Yong Tau Foo)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806014,
+    "lon": 103.8502473
+  },
+  {
+    "osm_id": 6382570487,
+    "osm_type": "node",
+    "name": "AS (Indian Classic Cuisine)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805854,
+    "lon": 103.8502559
+  },
+  {
+    "osm_id": 6382570488,
+    "osm_type": "node",
+    "name": "Qiu Lian (Ban Miam)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806383,
+    "lon": 103.8503747
+  },
+  {
+    "osm_id": 6382570585,
+    "osm_type": "node",
+    "name": "The Beef House (Homemade Beefball Noodles)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806234,
+    "lon": 103.8503515
+  },
+  {
+    "osm_id": 6382570685,
+    "osm_type": "node",
+    "name": "Hao Heng (Dim Sum)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280557,
+    "lon": 103.8503942
+  },
+  {
+    "osm_id": 6382586985,
+    "osm_type": "node",
+    "name": "Delhi Express (Indian Cuisine)",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807661,
+    "lon": 103.8505222
+  },
+  {
+    "osm_id": 6456690686,
+    "osm_type": "node",
+    "name": "HeDeLe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768633,
+    "lon": 103.8432538
+  },
+  {
+    "osm_id": 6457789885,
+    "osm_type": "node",
+    "name": "Kafe UTU",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2798229,
+    "lon": 103.8419945
+  },
+  {
+    "osm_id": 6477817987,
+    "osm_type": "node",
+    "name": "glasshouse",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2783165,
+    "lon": 103.8409443
+  },
+  {
+    "osm_id": 6477913285,
+    "osm_type": "node",
+    "name": "Five Oars",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2789229,
+    "lon": 103.844076
+  },
+  {
+    "osm_id": 6495051587,
+    "osm_type": "node",
+    "name": "Clan Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2793295,
+    "lon": 103.8404683
+  },
+  {
+    "osm_id": 6510909486,
+    "osm_type": "node",
+    "name": "Monument Lifestyle",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2783437,
+    "lon": 103.8431564
+  },
+  {
+    "osm_id": 6513062486,
+    "osm_type": "node",
+    "name": "Carrotsticks & Cravings",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2898196,
+    "lon": 103.8376754
+  },
+  {
+    "osm_id": 6513118586,
+    "osm_type": "node",
+    "name": "Common Man Stan",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802937,
+    "lon": 103.8479121
+  },
+  {
+    "osm_id": 6513118686,
+    "osm_type": "node",
+    "name": "Old Tiong Bahru Bak Kut Teh",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2845604,
+    "lon": 103.832752
+  },
+  {
+    "osm_id": 6515034599,
+    "osm_type": "node",
+    "name": "Mdm Yap's Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2849003,
+    "lon": 103.8448291
+  },
+  {
+    "osm_id": 6515034608,
+    "osm_type": "node",
+    "name": "Hill Street Coffee Shop",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2851332,
+    "lon": 103.8447675
+  },
+  {
+    "osm_id": 6515034613,
+    "osm_type": "node",
+    "name": "Paulinni",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.284302,
+    "lon": 103.8443298
+  },
+  {
+    "osm_id": 6549183806,
+    "osm_type": "node",
+    "name": "Satay Street",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803286,
+    "lon": 103.8501588
+  },
+  {
+    "osm_id": 6649270103,
+    "osm_type": "node",
+    "name": "World Peace Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2783993,
+    "lon": 103.8410419
+  },
+  {
+    "osm_id": 6776061089,
+    "osm_type": "node",
+    "name": "Gochi",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2834079,
+    "lon": 103.8490628
+  },
+  {
+    "osm_id": 6780606079,
+    "osm_type": "node",
+    "name": "Barcook",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2889552,
+    "lon": 103.8465163
+  },
+  {
+    "osm_id": 6780606081,
+    "osm_type": "node",
+    "name": "Craftsmen Specialty Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2886145,
+    "lon": 103.846498
+  },
+  {
+    "osm_id": 6780648079,
+    "osm_type": "node",
+    "name": "Tsujiri",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2890667,
+    "lon": 103.8460004
+  },
+  {
+    "osm_id": 6780648686,
+    "osm_type": "node",
+    "name": "Chagee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2889301,
+    "lon": 103.8466067
+  },
+  {
+    "osm_id": 6815404094,
+    "osm_type": "node",
+    "name": "Peoples Park Centre",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.285942,
+    "lon": 103.8442264
+  },
+  {
+    "osm_id": 6816990631,
+    "osm_type": "node",
+    "name": "The Nourish Co.",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.279811,
+    "lon": 103.8450614
+  },
+  {
+    "osm_id": 7013126185,
+    "osm_type": "node",
+    "name": "Market Street Hawker Centre",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2847738,
+    "lon": 103.8502341
+  },
+  {
+    "osm_id": 7099721485,
+    "osm_type": "node",
+    "name": "Cafe B",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2816001,
+    "lon": 103.8460503
+  },
+  {
+    "osm_id": 7111373286,
+    "osm_type": "node",
+    "name": "Shake Shack",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2785923,
+    "lon": 103.8416918
+  },
+  {
+    "osm_id": 7130380987,
+    "osm_type": "node",
+    "name": "Hawker chang",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2832448,
+    "lon": 103.8430922
+  },
+  {
+    "osm_id": 7184649881,
+    "osm_type": "node",
+    "name": "September Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2776582,
+    "lon": 103.8428471
+  },
+  {
+    "osm_id": 7184649882,
+    "osm_type": "node",
+    "name": "Golden Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2775601,
+    "lon": 103.8431014
+  },
+  {
+    "osm_id": 7502374285,
+    "osm_type": "node",
+    "name": "Genius Central",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2830895,
+    "lon": 103.8484992
+  },
+  {
+    "osm_id": 7877075603,
+    "osm_type": "node",
+    "name": "Mellower Expresso",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.277564,
+    "lon": 103.849426
+  },
+  {
+    "osm_id": 8198993117,
+    "osm_type": "node",
+    "name": "Outram Park Fried Kway Teow",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2854371,
+    "lon": 103.845882
+  },
+  {
+    "osm_id": 8223862815,
+    "osm_type": "node",
+    "name": "J.2 美食阁",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2871381,
+    "lon": 103.8346101
+  },
+  {
+    "osm_id": 8642382000,
+    "osm_type": "node",
+    "name": "Randy Indulgence",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768096,
+    "lon": 103.8454008
+  },
+  {
+    "osm_id": 8642382002,
+    "osm_type": "node",
+    "name": "LiHO",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768723,
+    "lon": 103.845252
+  },
+  {
+    "osm_id": 8642382003,
+    "osm_type": "node",
+    "name": "Jewel",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768839,
+    "lon": 103.8455183
+  },
+  {
+    "osm_id": 8642382004,
+    "osm_type": "node",
+    "name": "Cedele",
+    "amenity": "cafe",
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2768776,
+    "lon": 103.8457348
+  },
+  {
+    "osm_id": 8642382008,
+    "osm_type": "node",
+    "name": "Qin Ji Rougamo",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768656,
+    "lon": 103.8456829
+  },
+  {
+    "osm_id": 8642382010,
+    "osm_type": "node",
+    "name": "Milksha",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2769164,
+    "lon": 103.8450029
+  },
+  {
+    "osm_id": 8642382011,
+    "osm_type": "node",
+    "name": "Boost",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768706,
+    "lon": 103.8452856
+  },
+  {
+    "osm_id": 8642389119,
+    "osm_type": "node",
+    "name": "Workspace",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768125,
+    "lon": 103.8456648
+  },
+  {
+    "osm_id": 8642389121,
+    "osm_type": "node",
+    "name": "Swee Heng 1989 Classic",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2768062,
+    "lon": 103.8452717
+  },
+  {
+    "osm_id": 8642389132,
+    "osm_type": "node",
+    "name": "Fun Toast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2769507,
+    "lon": 103.8452746
+  },
+  {
+    "osm_id": 8642389134,
+    "osm_type": "node",
+    "name": "Old Tea House",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768062,
+    "lon": 103.8453791
+  },
+  {
+    "osm_id": 8642389137,
+    "osm_type": "node",
+    "name": "Makai Poké",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2768184,
+    "lon": 103.8454916
+  },
+  {
+    "osm_id": 8642464777,
+    "osm_type": "node",
+    "name": "Local Coffee People",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2758801,
+    "lon": 103.845677
+  },
+  {
+    "osm_id": 8642464779,
+    "osm_type": "node",
+    "name": "Coffee to Go",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2759586,
+    "lon": 103.8458128
+  },
+  {
+    "osm_id": 8642464786,
+    "osm_type": "node",
+    "name": "Hey Long Cha",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2761441,
+    "lon": 103.8459903
+  },
+  {
+    "osm_id": 8642464792,
+    "osm_type": "node",
+    "name": "Alchemist",
+    "amenity": "cafe",
+    "shop": "coffee",
+    "planning_area": "Outram",
+    "lat": 1.2759582,
+    "lon": 103.8461636
+  },
+  {
+    "osm_id": 8642464796,
+    "osm_type": "node",
+    "name": "The New and Old Café",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2761334,
+    "lon": 103.8459518
+  },
+  {
+    "osm_id": 8642464799,
+    "osm_type": "node",
+    "name": "Cafe Belle Vie",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2756901,
+    "lon": 103.8457378
+  },
+  {
+    "osm_id": 8642464802,
+    "osm_type": "node",
+    "name": "Trung Nguyen Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2757808,
+    "lon": 103.8461242
+  },
+  {
+    "osm_id": 8642464803,
+    "osm_type": "node",
+    "name": "Jewel 7",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2761376,
+    "lon": 103.8462181
+  },
+  {
+    "osm_id": 8642464808,
+    "osm_type": "node",
+    "name": "Miss Tea",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2757282,
+    "lon": 103.84589
+  },
+  {
+    "osm_id": 8642592335,
+    "osm_type": "node",
+    "name": "Kebabs Factory",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2792282,
+    "lon": 103.850418
+  },
+  {
+    "osm_id": 8642592337,
+    "osm_type": "node",
+    "name": "Hello",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2788881,
+    "lon": 103.8501343
+  },
+  {
+    "osm_id": 8642592342,
+    "osm_type": "node",
+    "name": "Shenton Food Hall",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2784306,
+    "lon": 103.8499033
+  },
+  {
+    "osm_id": 8642592345,
+    "osm_type": "node",
+    "name": "乐福阁",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2789333,
+    "lon": 103.8501634
+  },
+  {
+    "osm_id": 8879344817,
+    "osm_type": "node",
+    "name": "Pang's Satay",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2822092,
+    "lon": 103.8426083
+  },
+  {
+    "osm_id": 8941731746,
+    "osm_type": "node",
+    "name": "Mad Roaster",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2794177,
+    "lon": 103.8466011
+  },
+  {
+    "osm_id": 9061507017,
+    "osm_type": "node",
+    "name": "Yellow Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2756022,
+    "lon": 103.841242
+  },
+  {
+    "osm_id": 9061515417,
+    "osm_type": "node",
+    "name": "Cafe 2000",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2738962,
+    "lon": 103.8452218
+  },
+  {
+    "osm_id": 9118933517,
+    "osm_type": "node",
+    "name": "Ramu",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2798689,
+    "lon": 103.8451719
+  },
+  {
+    "osm_id": 9118943117,
+    "osm_type": "node",
+    "name": "和记粥",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280597,
+    "lon": 103.8445652
+  },
+  {
+    "osm_id": 9118961718,
+    "osm_type": "node",
+    "name": "Parallel Coffee Roasters",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2798177,
+    "lon": 103.8429427
+  },
+  {
+    "osm_id": 9118961822,
+    "osm_type": "node",
+    "name": "Caracara",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2791644,
+    "lon": 103.8421939
+  },
+  {
+    "osm_id": 9122506517,
+    "osm_type": "node",
+    "name": "Mellower Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2779695,
+    "lon": 103.8484405
+  },
+  {
+    "osm_id": 9402010571,
+    "osm_type": "node",
+    "name": "Dome Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2827947,
+    "lon": 103.8457186
+  },
+  {
+    "osm_id": 9402035837,
+    "osm_type": "node",
+    "name": "Taj Authentic Indian Cuisine",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2832042,
+    "lon": 103.8457466
+  },
+  {
+    "osm_id": 9430617117,
+    "osm_type": "node",
+    "name": "Coffee Hive",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2807197,
+    "lon": 103.8487845
+  },
+  {
+    "osm_id": 9491384773,
+    "osm_type": "node",
+    "name": "Everton Food Place",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.276993,
+    "lon": 103.8390688
+  },
+  {
+    "osm_id": 9594317145,
+    "osm_type": "node",
+    "name": "Food court",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2746892,
+    "lon": 103.8413729
+  },
+  {
+    "osm_id": 9671017227,
+    "osm_type": "node",
+    "name": "Park Bench Deli",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2865001,
+    "lon": 103.8487051
+  },
+  {
+    "osm_id": 9671017339,
+    "osm_type": "node",
+    "name": "Burger bar New York",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2823142,
+    "lon": 103.8475242
+  },
+  {
+    "osm_id": 9671017623,
+    "osm_type": "node",
+    "name": "Gong He Guan",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2840256,
+    "lon": 103.8451625
+  },
+  {
+    "osm_id": 9671017631,
+    "osm_type": "node",
+    "name": "Dolç Patisserie",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2764754,
+    "lon": 103.8358641
+  },
+  {
+    "osm_id": 9671017717,
+    "osm_type": "node",
+    "name": "Baker’s Bench",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.278739,
+    "lon": 103.8409873
+  },
+  {
+    "osm_id": 9674875818,
+    "osm_type": "node",
+    "name": "Dolc Patisserie",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.276477,
+    "lon": 103.8358479
+  },
+  {
+    "osm_id": 9760783011,
+    "osm_type": "node",
+    "name": "Round Boy Roasters",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2777496,
+    "lon": 103.8303621
+  },
+  {
+    "osm_id": 9772458717,
+    "osm_type": "node",
+    "name": "Kaffe & Toast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2788501,
+    "lon": 103.8359854
+  },
+  {
+    "osm_id": 9774769917,
+    "osm_type": "node",
+    "name": "O Coffee Club Xpress",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2813077,
+    "lon": 103.835466
+  },
+  {
+    "osm_id": 9787662766,
+    "osm_type": "node",
+    "name": "Polar",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Outram",
+    "lat": 1.2801011,
+    "lon": 103.8347536
+  },
+  {
+    "osm_id": 9787669580,
+    "osm_type": "node",
+    "name": "Mr Bean",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Outram",
+    "lat": 1.2794267,
+    "lon": 103.8352472
+  },
+  {
+    "osm_id": 9787669581,
+    "osm_type": "node",
+    "name": "Triplets",
+    "amenity": "cafe",
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2795501,
+    "lon": 103.8352364
+  },
+  {
+    "osm_id": 9827708288,
+    "osm_type": "node",
+    "name": "Island Vintage Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.286913,
+    "lon": 103.845118
+  },
+  {
+    "osm_id": 9837614947,
+    "osm_type": "node",
+    "name": "Saladstop",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2842821,
+    "lon": 103.8502843
+  },
+  {
+    "osm_id": 9837614948,
+    "osm_type": "node",
+    "name": "% Arabica",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2836323,
+    "lon": 103.8501996
+  },
+  {
+    "osm_id": 9837614951,
+    "osm_type": "node",
+    "name": "Bee's Knees Urban",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2842139,
+    "lon": 103.850273
+  },
+  {
+    "osm_id": 9858438344,
+    "osm_type": "node",
+    "name": "Maxi Coffee Bar",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2814584,
+    "lon": 103.8453728
+  },
+  {
+    "osm_id": 9881906300,
+    "osm_type": "node",
+    "name": "Community Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2838443,
+    "lon": 103.8455104
+  },
+  {
+    "osm_id": 9907357618,
+    "osm_type": "node",
+    "name": "Shen’s Tea & Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2843054,
+    "lon": 103.8472281
+  },
+  {
+    "osm_id": 9918939099,
+    "osm_type": "node",
+    "name": "Huggs Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2888851,
+    "lon": 103.8465192
+  },
+  {
+    "osm_id": 10001370341,
+    "osm_type": "node",
+    "name": "Ji Xiang Confectionery (Everton Ang Ku Kueh)",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2774248,
+    "lon": 103.8401631
+  },
+  {
+    "osm_id": 10005439091,
+    "osm_type": "node",
+    "name": "Group therapy",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2837294,
+    "lon": 103.8471823
+  },
+  {
+    "osm_id": 10068959440,
+    "osm_type": "node",
+    "name": "OnlyCreamery Gelato",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2831405,
+    "lon": 103.8438376
+  },
+  {
+    "osm_id": 10135277419,
+    "osm_type": "node",
+    "name": "Bamboo Bowls",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2833352,
+    "lon": 103.8482938
+  },
+  {
+    "osm_id": 10135477917,
+    "osm_type": "node",
+    "name": "5thelement",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2782602,
+    "lon": 103.843067
+  },
+  {
+    "osm_id": 10277272713,
+    "osm_type": "node",
+    "name": "Cafe & Bar Gaurocre",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2776266,
+    "lon": 103.8443706
+  },
+  {
+    "osm_id": 10742863258,
+    "osm_type": "node",
+    "name": "The Food Platelets",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805174,
+    "lon": 103.8385406
+  },
+  {
+    "osm_id": 10771041160,
+    "osm_type": "node",
+    "name": "Fresh Fruits",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806005,
+    "lon": 103.8504402
+  },
+  {
+    "osm_id": 10796548381,
+    "osm_type": "node",
+    "name": "Prata Wala",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2851009,
+    "lon": 103.844946
+  },
+  {
+    "osm_id": 10877220284,
+    "osm_type": "node",
+    "name": "Flash Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2788714,
+    "lon": 103.8485481
+  },
+  {
+    "osm_id": 10877239899,
+    "osm_type": "node",
+    "name": "Best Satay 7 & 8 (Lau Pa Sat)",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803494,
+    "lon": 103.8500936
+  },
+  {
+    "osm_id": 11030285966,
+    "osm_type": "node",
+    "name": "So Good Bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2746416,
+    "lon": 103.8435602
+  },
+  {
+    "osm_id": 11052023854,
+    "osm_type": "node",
+    "name": "Double Shot Coffee Shenton",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2738515,
+    "lon": 103.8463266
+  },
+  {
+    "osm_id": 11052051046,
+    "osm_type": "node",
+    "name": "Double Shot Coffee Kampong Bahru",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2771773,
+    "lon": 103.8365584
+  },
+  {
+    "osm_id": 11135468363,
+    "osm_type": "node",
+    "name": "Gentlebros Café",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2837849,
+    "lon": 103.8464249
+  },
+  {
+    "osm_id": 11135554534,
+    "osm_type": "node",
+    "name": "The fat kid bakery",
+    "amenity": null,
+    "shop": "bakery",
+    "planning_area": "Outram",
+    "lat": 1.2806831,
+    "lon": 103.847092
+  },
+  {
+    "osm_id": 11167054405,
+    "osm_type": "node",
+    "name": "J2 Famous Crispy Curry Puff",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2793238,
+    "lon": 103.846577
+  },
+  {
+    "osm_id": 11293429386,
+    "osm_type": "node",
+    "name": "Sultan Kebab",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804496,
+    "lon": 103.8445095
+  },
+  {
+    "osm_id": 11293429413,
+    "osm_type": "node",
+    "name": "Coffee Queen",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804064,
+    "lon": 103.8445478
+  },
+  {
+    "osm_id": 11293429421,
+    "osm_type": "node",
+    "name": "Sisaket Thai Food",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804718,
+    "lon": 103.8444898
+  },
+  {
+    "osm_id": 11293429423,
+    "osm_type": "node",
+    "name": "四川菜馆 Sichuan Cuisine",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804265,
+    "lon": 103.84453
+  },
+  {
+    "osm_id": 11352862203,
+    "osm_type": "node",
+    "name": "Routine Cafe & Bar",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2779682,
+    "lon": 103.8431713
+  },
+  {
+    "osm_id": 11374776669,
+    "osm_type": "node",
+    "name": "Café Monochrome",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2823862,
+    "lon": 103.8441553
+  },
+  {
+    "osm_id": 11380902369,
+    "osm_type": "node",
+    "name": "Kreams Café",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2775669,
+    "lon": 103.8462615
+  },
+  {
+    "osm_id": 11391932582,
+    "osm_type": "node",
+    "name": "Mr. Appam",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801587,
+    "lon": 103.8447678
+  },
+  {
+    "osm_id": 11472804045,
+    "osm_type": "node",
+    "name": "Dawn",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2868367,
+    "lon": 103.8478323
+  },
+  {
+    "osm_id": 11477297669,
+    "osm_type": "node",
+    "name": "老伴豆花 Lao Ban Soya Beancurd",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803472,
+    "lon": 103.8446004
+  },
+  {
+    "osm_id": 11477308669,
+    "osm_type": "node",
+    "name": "金華魚頭米粉 Jin Hua Fish Head Bee Hoon",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803856,
+    "lon": 103.8446823
+  },
+  {
+    "osm_id": 11584408983,
+    "osm_type": "node",
+    "name": "Moomoo",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2856574,
+    "lon": 103.8475275
+  },
+  {
+    "osm_id": 11627229959,
+    "osm_type": "node",
+    "name": "Luckin Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2848005,
+    "lon": 103.8499509
+  },
+  {
+    "osm_id": 11668402658,
+    "osm_type": "node",
+    "name": "Tanamera Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2786267,
+    "lon": 103.8494874
+  },
+  {
+    "osm_id": 11754949207,
+    "osm_type": "node",
+    "name": "Kura Patisserie & Bakery",
+    "amenity": null,
+    "shop": "pastry",
+    "planning_area": "Outram",
+    "lat": 1.2867062,
+    "lon": 103.8480288
+  },
+  {
+    "osm_id": 11813192570,
+    "osm_type": "node",
+    "name": "TWG Tea",
+    "amenity": null,
+    "shop": "tea",
+    "planning_area": "Outram",
+    "lat": 1.2835015,
+    "lon": 103.8507775
+  },
+  {
+    "osm_id": 11813192969,
+    "osm_type": "node",
+    "name": "Bacaha",
+    "amenity": null,
+    "shop": "coffee",
+    "planning_area": "Outram",
+    "lat": 1.2835396,
+    "lon": 103.8508669
+  },
+  {
+    "osm_id": 11828532012,
+    "osm_type": "node",
+    "name": "PY Roast",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.285059,
+    "lon": 103.8482332
+  },
+  {
+    "osm_id": 11935120736,
+    "osm_type": "node",
+    "name": "Matchaya",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2839234,
+    "lon": 103.8498631
+  },
+  {
+    "osm_id": 11975373455,
+    "osm_type": "node",
+    "name": "Guo Yogurt & Dessert",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2827615,
+    "lon": 103.8456994
+  },
+  {
+    "osm_id": 11975373461,
+    "osm_type": "node",
+    "name": "Rough Guys Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2832075,
+    "lon": 103.8457047
+  },
+  {
+    "osm_id": 12100242201,
+    "osm_type": "node",
+    "name": "Madame Ooze",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2821891,
+    "lon": 103.845362
+  },
+  {
+    "osm_id": 12210041981,
+    "osm_type": "node",
+    "name": "Hattendo Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2771367,
+    "lon": 103.8454784
+  },
+  {
+    "osm_id": 12243964825,
+    "osm_type": "node",
+    "name": "brwd / KINN",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2873871,
+    "lon": 103.8478419
+  },
+  {
+    "osm_id": 12470619069,
+    "osm_type": "node",
+    "name": "ECHO House",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805108,
+    "lon": 103.8452748
+  },
+  {
+    "osm_id": 12470619073,
+    "osm_type": "node",
+    "name": "Pacto by Parchmen",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804574,
+    "lon": 103.8451784
+  },
+  {
+    "osm_id": 12470619076,
+    "osm_type": "node",
+    "name": "Kyuukei Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803988,
+    "lon": 103.8452894
+  },
+  {
+    "osm_id": 12509455060,
+    "osm_type": "node",
+    "name": "amps tea",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2854449,
+    "lon": 103.8450778
+  },
+  {
+    "osm_id": 12509455061,
+    "osm_type": "node",
+    "name": "Panda Chan Snack",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2886824,
+    "lon": 103.8466995
+  },
+  {
+    "osm_id": 12509455063,
+    "osm_type": "node",
+    "name": "Chia Puddies",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2890234,
+    "lon": 103.8466355
+  },
+  {
+    "osm_id": 12556244357,
+    "osm_type": "node",
+    "name": "Borderless Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2782794,
+    "lon": 103.8439245
+  },
+  {
+    "osm_id": 13033095929,
+    "osm_type": "node",
+    "name": "NTWU canteen",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2760085,
+    "lon": 103.833031
+  },
+  {
+    "osm_id": 13038483552,
+    "osm_type": "node",
+    "name": "Juice farm",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804934,
+    "lon": 103.8446509
+  },
+  {
+    "osm_id": 13038524191,
+    "osm_type": "node",
+    "name": "Alipapa Briyani",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804383,
+    "lon": 103.8446384
+  },
+  {
+    "osm_id": 13038528646,
+    "osm_type": "node",
+    "name": "North & South Authentic Indian cuisine",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804827,
+    "lon": 103.8446014
+  },
+  {
+    "osm_id": 13039484094,
+    "osm_type": "node",
+    "name": "Holland village nasi Lemak",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2861039,
+    "lon": 103.8443707
+  },
+  {
+    "osm_id": 13039501940,
+    "osm_type": "node",
+    "name": "Nasi Lemak",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2854883,
+    "lon": 103.8430071
+  },
+  {
+    "osm_id": 13039516185,
+    "osm_type": "node",
+    "name": "Muslim food@people's Park",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2854411,
+    "lon": 103.8430598
+  },
+  {
+    "osm_id": 13039517002,
+    "osm_type": "node",
+    "name": "Dudu café",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2795142,
+    "lon": 103.8478418
+  },
+  {
+    "osm_id": 13061492840,
+    "osm_type": "node",
+    "name": "福順錦記燒臘麵家",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802384,
+    "lon": 103.8448051
+  },
+  {
+    "osm_id": 13061492841,
+    "osm_type": "node",
+    "name": "蛋佬 Danla Scrambled Egg Rice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802857,
+    "lon": 103.8447656
+  },
+  {
+    "osm_id": 13061492842,
+    "osm_type": "node",
+    "name": "新鮮果汁 Fresh Fruit Juice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801349,
+    "lon": 103.8449474
+  },
+  {
+    "osm_id": 13061492843,
+    "osm_type": "node",
+    "name": "Traditional Family Cuisine",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801367,
+    "lon": 103.8448899
+  },
+  {
+    "osm_id": 13061492844,
+    "osm_type": "node",
+    "name": "Pakistani Dum Biryani SG",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801845,
+    "lon": 103.84485
+  },
+  {
+    "osm_id": 13061492847,
+    "osm_type": "node",
+    "name": "一家潮州魚粥·魚湯",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801087,
+    "lon": 103.8449133
+  },
+  {
+    "osm_id": 13061492848,
+    "osm_type": "node",
+    "name": "老火湯 Maxwell Herb Soup",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280193,
+    "lon": 103.8448994
+  },
+  {
+    "osm_id": 13061492850,
+    "osm_type": "node",
+    "name": "裕廊东18年传统味鱼圆面",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802902,
+    "lon": 103.8448189
+  },
+  {
+    "osm_id": 13061492851,
+    "osm_type": "node",
+    "name": "原味鮮湯 Original Soup",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802129,
+    "lon": 103.8448263
+  },
+  {
+    "osm_id": 13061492853,
+    "osm_type": "node",
+    "name": "江南味道",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802209,
+    "lon": 103.8448763
+  },
+  {
+    "osm_id": 13061492855,
+    "osm_type": "node",
+    "name": "Our Kitchen Thai Food",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801629,
+    "lon": 103.8449243
+  },
+  {
+    "osm_id": 13061496137,
+    "osm_type": "node",
+    "name": "Avoca Broo",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805041,
+    "lon": 103.8445836
+  },
+  {
+    "osm_id": 13061496138,
+    "osm_type": "node",
+    "name": "顺美咖啡室 Soon Li Coffee Shop",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805537,
+    "lon": 103.844601
+  },
+  {
+    "osm_id": 13061496139,
+    "osm_type": "node",
+    "name": "Maxwell Satay",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804015,
+    "lon": 103.8446691
+  },
+  {
+    "osm_id": 13061496140,
+    "osm_type": "node",
+    "name": "潮州鱼圆面 Teo Chew Fishball Noodle",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803055,
+    "lon": 103.8447491
+  },
+  {
+    "osm_id": 13061496141,
+    "osm_type": "node",
+    "name": "喜迎客",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802646,
+    "lon": 103.8447832
+  },
+  {
+    "osm_id": 13061496143,
+    "osm_type": "node",
+    "name": "順興飲品 Soon Heng",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803118,
+    "lon": 103.8448011
+  },
+  {
+    "osm_id": 13061496144,
+    "osm_type": "node",
+    "name": "Sunto Gyoza 三多餃子",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280462,
+    "lon": 103.8446186
+  },
+  {
+    "osm_id": 13061496145,
+    "osm_type": "node",
+    "name": "真味",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805123,
+    "lon": 103.8446353
+  },
+  {
+    "osm_id": 13061496148,
+    "osm_type": "node",
+    "name": "品源",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805725,
+    "lon": 103.8445854
+  },
+  {
+    "osm_id": 13061496150,
+    "osm_type": "node",
+    "name": "炒粿条 炒虾面 蚝煎 菜头粿",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804317,
+    "lon": 103.8447019
+  },
+  {
+    "osm_id": 13061496151,
+    "osm_type": "node",
+    "name": "湖汝飲品 Hu Ru Beverages",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803242,
+    "lon": 103.8447335
+  },
+  {
+    "osm_id": 13061496152,
+    "osm_type": "node",
+    "name": "興興海南雞飯 Heng Heng Hainanese Chicken",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805241,
+    "lon": 103.8445668
+  },
+  {
+    "osm_id": 13061496154,
+    "osm_type": "node",
+    "name": "Somerset Delicacies",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802688,
+    "lon": 103.8448367
+  },
+  {
+    "osm_id": 13061496155,
+    "osm_type": "node",
+    "name": "中國街花生湯 Peanuts Soup",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803327,
+    "lon": 103.8447838
+  },
+  {
+    "osm_id": 13061496158,
+    "osm_type": "node",
+    "name": "瑞珍 Swee Ting",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804697,
+    "lon": 103.8446705
+  },
+  {
+    "osm_id": 13061496161,
+    "osm_type": "node",
+    "name": "海兰板面鱼汤 Pan Mee Fish Soup",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803459,
+    "lon": 103.8447154
+  },
+  {
+    "osm_id": 13061496162,
+    "osm_type": "node",
+    "name": "聚福坊",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804501,
+    "lon": 103.8446867
+  },
+  {
+    "osm_id": 13061496164,
+    "osm_type": "node",
+    "name": "日新糕粿美食 Ri Xin Snack Delights",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803737,
+    "lon": 103.8447499
+  },
+  {
+    "osm_id": 13061496165,
+    "osm_type": "node",
+    "name": "囉㘃·薄餅·鮮蛤 Rojak · Kopiah & Cockle",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803551,
+    "lon": 103.8447653
+  },
+  {
+    "osm_id": 13061552719,
+    "osm_type": "node",
+    "name": "Hajmeer Kwaja Muslim Food",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280065,
+    "lon": 103.844851
+  },
+  {
+    "osm_id": 13061552721,
+    "osm_type": "node",
+    "name": "Hello Banhmi",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801855,
+    "lon": 103.844744
+  },
+  {
+    "osm_id": 13061552722,
+    "osm_type": "node",
+    "name": "合記五香貫腸",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802079,
+    "lon": 103.8447241
+  },
+  {
+    "osm_id": 13061552723,
+    "osm_type": "node",
+    "name": "同心居 Special Shanghai Tim-Sum",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803277,
+    "lon": 103.8446177
+  },
+  {
+    "osm_id": 13061552724,
+    "osm_type": "node",
+    "name": "The Green Leaf",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801375,
+    "lon": 103.8447867
+  },
+  {
+    "osm_id": 13061552725,
+    "osm_type": "node",
+    "name": "富城薄餅·薄餅皮 Fortune Kopiah",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801164,
+    "lon": 103.8448054
+  },
+  {
+    "osm_id": 13061552726,
+    "osm_type": "node",
+    "name": "五十年代 The 1950's Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280367,
+    "lon": 103.8445829
+  },
+  {
+    "osm_id": 13061552727,
+    "osm_type": "node",
+    "name": "南京街肉骨茶",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803839,
+    "lon": 103.8445679
+  },
+  {
+    "osm_id": 13061552728,
+    "osm_type": "node",
+    "name": "Smh",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2800918,
+    "lon": 103.8448272
+  },
+  {
+    "osm_id": 13061552730,
+    "osm_type": "node",
+    "name": "开心美食 Happy Food",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.28025,
+    "lon": 103.8446868
+  },
+  {
+    "osm_id": 13061552731,
+    "osm_type": "node",
+    "name": "喜多多 Xi Duo Duo",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802291,
+    "lon": 103.8447053
+  },
+  {
+    "osm_id": 13061552732,
+    "osm_type": "node",
+    "name": "亚忠燒臘麵",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802937,
+    "lon": 103.8446479
+  },
+  {
+    "osm_id": 13061600004,
+    "osm_type": "node",
+    "name": "東風發 Tong Fong Fatt Hainanese Boneless Chicken Rice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803394,
+    "lon": 103.8449316
+  },
+  {
+    "osm_id": 13061600005,
+    "osm_type": "node",
+    "name": "湖景金香蕉炸 Lakeview Kim Goreng Pisang",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803623,
+    "lon": 103.8448684
+  },
+  {
+    "osm_id": 13061600006,
+    "osm_type": "node",
+    "name": "No. 1 Maxwell 麦士威美食",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806731,
+    "lon": 103.8446461
+  },
+  {
+    "osm_id": 13061600007,
+    "osm_type": "node",
+    "name": "鼎鼎红麻辣香锅",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805874,
+    "lon": 103.8446777
+  },
+  {
+    "osm_id": 13061600008,
+    "osm_type": "node",
+    "name": "一豆 One Soy",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804508,
+    "lon": 103.8448363
+  },
+  {
+    "osm_id": 13061600009,
+    "osm_type": "node",
+    "name": "卤庄卤肉饭 Bold Braised",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806264,
+    "lon": 103.8446446
+  },
+  {
+    "osm_id": 13061600010,
+    "osm_type": "node",
+    "name": "海南雞飯 Uncle Louis Famous Chicken Rice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804942,
+    "lon": 103.8447566
+  },
+  {
+    "osm_id": 13061600012,
+    "osm_type": "node",
+    "name": "ICE Dessert 甜品冰屋",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805167,
+    "lon": 103.8447798
+  },
+  {
+    "osm_id": 13061600014,
+    "osm_type": "node",
+    "name": "永香茶室 En Hiang Beverages",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280243,
+    "lon": 103.8450141
+  },
+  {
+    "osm_id": 13061600015,
+    "osm_type": "node",
+    "name": "冰沙浆果 Chendol Coconut Dessert",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806505,
+    "lon": 103.8446654
+  },
+  {
+    "osm_id": 13061600017,
+    "osm_type": "node",
+    "name": "古早美味 Traditional Delight",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803361,
+    "lon": 103.8448906
+  },
+  {
+    "osm_id": 13061600018,
+    "osm_type": "node",
+    "name": "麥士威 Maxwell",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804646,
+    "lon": 103.8447817
+  },
+  {
+    "osm_id": 13061600019,
+    "osm_type": "node",
+    "name": "和平茶室 Ho Peng Coffee Stall",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802932,
+    "lon": 103.844927
+  },
+  {
+    "osm_id": 13061600020,
+    "osm_type": "node",
+    "name": "K3 Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805492,
+    "lon": 103.84471
+  },
+  {
+    "osm_id": 13061600021,
+    "osm_type": "node",
+    "name": "興興 木薯糕 蕃薯旦",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803875,
+    "lon": 103.844847
+  },
+  {
+    "osm_id": 13061600022,
+    "osm_type": "node",
+    "name": "红炆羊肉汤 Hong Wen Mutton Soup",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802443,
+    "lon": 103.8449684
+  },
+  {
+    "osm_id": 13061600023,
+    "osm_type": "node",
+    "name": "濱海南美食 Marina South Delicious Food",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804802,
+    "lon": 103.8447685
+  },
+  {
+    "osm_id": 13061600024,
+    "osm_type": "node",
+    "name": "南洋真宝 Straits Authentic",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803845,
+    "lon": 103.844893
+  },
+  {
+    "osm_id": 13061600025,
+    "osm_type": "node",
+    "name": "麦士威海南雞飯 Maxwell Hainanese Chicken Rice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805682,
+    "lon": 103.8446939
+  },
+  {
+    "osm_id": 13061600026,
+    "osm_type": "node",
+    "name": "Aoy's Thai",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2801932,
+    "lon": 103.8450117
+  },
+  {
+    "osm_id": 13061600027,
+    "osm_type": "node",
+    "name": "好滋味海南鸡扒",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802173,
+    "lon": 103.8449913
+  },
+  {
+    "osm_id": 13061600028,
+    "osm_type": "node",
+    "name": "老娘惹 Old Nyonya",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806057,
+    "lon": 103.8447037
+  },
+  {
+    "osm_id": 13061600029,
+    "osm_type": "node",
+    "name": "旺得福 Wonderful",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805143,
+    "lon": 103.8447396
+  },
+  {
+    "osm_id": 13061600030,
+    "osm_type": "node",
+    "name": "Baguette Huong Viet",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806074,
+    "lon": 103.8446607
+  },
+  {
+    "osm_id": 13061600031,
+    "osm_type": "node",
+    "name": "泉源林记生菓汁 Quan Yuan Fruit Juice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804088,
+    "lon": 103.8448722
+  },
+  {
+    "osm_id": 13061600032,
+    "osm_type": "node",
+    "name": "莆田美食 Putian Cuisine",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802117,
+    "lon": 103.8450409
+  },
+  {
+    "osm_id": 13061600033,
+    "osm_type": "node",
+    "name": "福来潮州鱼圆肉脞面 Teochew Fishball Bak Chor Mee",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802707,
+    "lon": 103.844946
+  },
+  {
+    "osm_id": 13061600034,
+    "osm_type": "node",
+    "name": "福記福州魚丸雲吞麵",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805686,
+    "lon": 103.8447355
+  },
+  {
+    "osm_id": 13061600035,
+    "osm_type": "node",
+    "name": "天記粥品",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2804286,
+    "lon": 103.8448553
+  },
+  {
+    "osm_id": 13061600036,
+    "osm_type": "node",
+    "name": "佳乐家 Jia Le Jia",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802684,
+    "lon": 103.8449924
+  },
+  {
+    "osm_id": 13061600037,
+    "osm_type": "node",
+    "name": "東方 Oriental Stall",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2802931,
+    "lon": 103.8449712
+  },
+  {
+    "osm_id": 13061600038,
+    "osm_type": "node",
+    "name": "小漁村 Fish Village",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280407,
+    "lon": 103.8448305
+  },
+  {
+    "osm_id": 13061600039,
+    "osm_type": "node",
+    "name": "小妹茶室 Xiao Mei Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806267,
+    "lon": 103.8446857
+  },
+  {
+    "osm_id": 13061600040,
+    "osm_type": "node",
+    "name": "War Ree Boat Noodle",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806494,
+    "lon": 103.8446251
+  },
+  {
+    "osm_id": 13061600041,
+    "osm_type": "node",
+    "name": "18经济美食 Economical Delights",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2803177,
+    "lon": 103.8449502
+  },
+  {
+    "osm_id": 13061600042,
+    "osm_type": "node",
+    "name": "興 传统咖啡面包 Traditional Coffee & Bread",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2805344,
+    "lon": 103.8447648
+  },
+  {
+    "osm_id": 13061634065,
+    "osm_type": "node",
+    "name": "Neo Juice",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806677,
+    "lon": 103.8445292
+  },
+  {
+    "osm_id": 13093985401,
+    "osm_type": "node",
+    "name": "Home Best Dessert",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2836524,
+    "lon": 103.8437596
+  },
+  {
+    "osm_id": 13096405501,
+    "osm_type": "node",
+    "name": "Pralet",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2835936,
+    "lon": 103.8344133
+  },
+  {
+    "osm_id": 13106035701,
+    "osm_type": "node",
+    "name": "Sojourner Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.27784,
+    "lon": 103.8474682
+  },
+  {
+    "osm_id": 13197097502,
+    "osm_type": "node",
+    "name": "Baristart Coffee Singapore (Keong Saik)",
+    "amenity": null,
+    "shop": "coffee",
+    "planning_area": "Outram",
+    "lat": 1.2788195,
+    "lon": 103.8415262
+  },
+  {
+    "osm_id": 13254117995,
+    "osm_type": "node",
+    "name": "SIP at SAM",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2716931,
+    "lon": 103.8367899
+  },
+  {
+    "osm_id": 13254117997,
+    "osm_type": "node",
+    "name": "alittle 1",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2752627,
+    "lon": 103.8443591
+  },
+  {
+    "osm_id": 13341880301,
+    "osm_type": "node",
+    "name": "queic by Olivia",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2808613,
+    "lon": 103.8420876
+  },
+  {
+    "osm_id": 13341899401,
+    "osm_type": "node",
+    "name": "Great Nanyang Heritage Cafe 大南洋",
+    "amenity": null,
+    "shop": "coffee",
+    "planning_area": "Outram",
+    "lat": 1.2775414,
+    "lon": 103.8430933
+  },
+  {
+    "osm_id": 13342928501,
+    "osm_type": "node",
+    "name": "Teochew Street Curry Bee Hoon / Mee",
+    "amenity": null,
+    "shop": "coffee",
+    "planning_area": "Outram",
+    "lat": 1.2853018,
+    "lon": 103.8460175
+  },
+  {
+    "osm_id": 13608799622,
+    "osm_type": "node",
+    "name": "Pek Sin Choon",
+    "amenity": null,
+    "shop": "tea",
+    "planning_area": "Outram",
+    "lat": 1.2837322,
+    "lon": 103.8451211
+  },
+  {
+    "osm_id": 13608799627,
+    "osm_type": "node",
+    "name": "Lavi Tacos",
+    "amenity": "fast_food",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2846802,
+    "lon": 103.8415515
+  },
+  {
+    "osm_id": 13624614869,
+    "osm_type": "node",
+    "name": "Tina's Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2766698,
+    "lon": 103.8394347
+  },
+  {
+    "osm_id": 13685988601,
+    "osm_type": "node",
+    "name": "Cafe Mary Grace",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2780202,
+    "lon": 103.8442713
+  },
+  {
+    "osm_id": 13775175001,
+    "osm_type": "node",
+    "name": "Butter tgt",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2783648,
+    "lon": 103.8431461
+  },
+  {
+    "osm_id": 13775316102,
+    "osm_type": "node",
+    "name": "POUT Rooftop Cafe",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2877586,
+    "lon": 103.8482394
+  },
+  {
+    "osm_id": 13987257801,
+    "osm_type": "node",
+    "name": "Brewth",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2744354,
+    "lon": 103.8447182
+  },
+  {
+    "osm_id": 14099262852,
+    "osm_type": "node",
+    "name": "Let’s Go Bago",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2794285,
+    "lon": 103.8431506
+  },
+  {
+    "osm_id": 14184494351,
+    "osm_type": "node",
+    "name": "Old Tea Hut",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2746698,
+    "lon": 103.8468119
+  },
+  {
+    "osm_id": 14317575508,
+    "osm_type": "node",
+    "name": "Caligraph Coffee",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2759451,
+    "lon": 103.845596
+  },
+  {
+    "osm_id": 45098520,
+    "osm_type": "way",
+    "name": "Lau Pa Sat",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2806123,
+    "lon": 103.8504767
+  },
+  {
+    "osm_id": 47298639,
+    "osm_type": "way",
+    "name": "Maxwell Food Center",
+    "amenity": "food_court",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.280352,
+    "lon": 103.8447393
+  },
+  {
+    "osm_id": 172242423,
+    "osm_type": "way",
+    "name": "Por Kee Eating House 1996",
+    "amenity": "cafe",
+    "shop": null,
+    "planning_area": "Outram",
+    "lat": 1.2841622,
+    "lon": 103.8327821
+  }
+]

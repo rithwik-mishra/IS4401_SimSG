@@ -1,0 +1,13 @@
+# Core
+pandas>=2.0
+pydantic>=2.0
+
+# HTTP (OSM Overpass scraper)
+requests>=2.31
+
+# Vector database (Layer 2 RAG)
+chromadb>=0.5.0
+
+# FastAPI runtime
+fastapi>=0.111
+uvicorn[standard]>=0.29

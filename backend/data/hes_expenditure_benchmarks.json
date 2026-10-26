@@ -1,0 +1,67 @@
+{
+  "_source": "SingStat Household Expenditure Survey 2023 (HES 2022/23)",
+  "_note": "All figures in SGD per month per household. F&B = food & non-alcoholic beverages category. Amounts are median monthly expenditure estimates segmented by income decile and dwelling type, mapped to SimSG archetypes.",
+  "archetypes": {
+    "retiree": {
+      "description": "HDB 1-3 room, household income < S$3,000/month (pension / CPF draw-down), age 65+",
+      "monthly_food_budget_sgd": 350,
+      "hawker_tolerance_per_meal_sgd": 5.0,
+      "cafe_willingness_to_pay_sgd": 5.5,
+      "specialty_coffee_ceiling_sgd": 6.0,
+      "bubble_tea_frequency": "rare",
+      "cdc_voucher_reliance": true,
+      "price_sensitivity": "very_high"
+    },
+    "student": {
+      "description": "Tertiary student, household income < S$5,000, age 18-25",
+      "monthly_food_budget_sgd": 280,
+      "hawker_tolerance_per_meal_sgd": 5.5,
+      "cafe_willingness_to_pay_sgd": 7.0,
+      "specialty_coffee_ceiling_sgd": 7.5,
+      "bubble_tea_frequency": "2-3x per week",
+      "cdc_voucher_reliance": false,
+      "price_sensitivity": "high"
+    },
+    "working_class": {
+      "description": "HDB 3-4 room, household income S$3,000-S$6,000, clerical / service sector",
+      "monthly_food_budget_sgd": 520,
+      "hawker_tolerance_per_meal_sgd": 6.0,
+      "cafe_willingness_to_pay_sgd": 7.5,
+      "specialty_coffee_ceiling_sgd": 8.0,
+      "bubble_tea_frequency": "1-2x per week",
+      "cdc_voucher_reliance": true,
+      "price_sensitivity": "high"
+    },
+    "heartland_family": {
+      "description": "HDB 4-5 room, dual income S$6,000-S$10,000, children in household",
+      "monthly_food_budget_sgd": 820,
+      "hawker_tolerance_per_meal_sgd": 7.0,
+      "cafe_willingness_to_pay_sgd": 9.0,
+      "specialty_coffee_ceiling_sgd": 10.0,
+      "bubble_tea_frequency": "1x per week",
+      "cdc_voucher_reliance": false,
+      "price_sensitivity": "medium"
+    },
+    "affluent_pro": {
+      "description": "Condo / landed, household income > S$10,000, PME / expat",
+      "monthly_food_budget_sgd": 1400,
+      "hawker_tolerance_per_meal_sgd": 9.0,
+      "cafe_willingness_to_pay_sgd": 12.0,
+      "specialty_coffee_ceiling_sgd": 15.0,
+      "bubble_tea_frequency": "occasional",
+      "cdc_voucher_reliance": false,
+      "price_sensitivity": "low"
+    }
+  },
+  "national_benchmarks": {
+    "median_monthly_household_expenditure_sgd": 4906,
+    "food_share_of_total_expenditure_pct": 0.22,
+    "eating_out_share_of_food_pct": 0.73,
+    "hawker_avg_meal_price_sgd": 4.80,
+    "coffeeshop_kopi_sgd": 1.30,
+    "coffeeshop_kaya_toast_set_sgd": 3.50,
+    "bubble_tea_avg_sgd": 3.80,
+    "third_wave_cafe_black_coffee_sgd": 6.50,
+    "third_wave_cafe_specialty_latte_sgd": 8.00
+  }
+}
