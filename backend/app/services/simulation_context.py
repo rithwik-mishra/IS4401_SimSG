@@ -31,7 +31,28 @@ from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
 
 logger = logging.getLogger(__name__)
 
-from app.schemas import *
+# ---------------------------------------------------------------------------
+# Import data schemas
+# ---------------------------------------------------------------------------
+
+try:
+    from app.schemas import (
+        ArchetypeSpendingProfile,
+        ArchetypeWeights,
+        DemographicProfile,
+        RAGChunk,
+        SimulationContextPayload,
+        SpendingThresholds,
+    )
+except ImportError:
+    from backend.app.schemas import (
+        ArchetypeSpendingProfile,
+        ArchetypeWeights,
+        DemographicProfile,
+        RAGChunk,
+        SimulationContextPayload,
+        SpendingThresholds,
+    )
 
 _HERE = Path(__file__).resolve()
 # Walk up until we find the data/ directory (works from any depth)
