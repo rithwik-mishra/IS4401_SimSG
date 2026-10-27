@@ -10,9 +10,13 @@ All commands below are run from the `backend/` folder.
 
 ```
 cd backend
+python -m venv venv
+venv\Scripts\activate       # PowerShell/cmd; on macOS/Linux: source venv/bin/activate
 pip install -r requirements.txt
 copy .env.example .env      # then fill in your API key
 ```
+
+Remember to activate the virtual environment again in each new terminal before running the commands below.
 
 `.env` settings:
 
