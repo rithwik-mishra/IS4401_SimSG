@@ -1,0 +1,109 @@
+dwelling,category,spend_per_member
+1-2 room,Food and Non-Alcoholic Beverages,101.5
+1-2 room,Alcoholic Beverages and Tobacco,27.2
+1-2 room,Clothing and Footwear,13.7
+1-2 room,Housing and Utilities,124.6
+1-2 room,"Furnishing, Household Equipment and Routine Household Maintenance",37.4
+1-2 room,Health,132.9
+1-2 room,Transport,90.4
+1-2 room,Information and Communication,57.6
+1-2 room,"Recreation, Sport and Culture",37.9
+1-2 room,Education,11.3
+1-2 room,Food and Beverage Serving Services,233.1
+1-2 room,Accommodation Services,4.2
+1-2 room,Insurance and Financial Services,107.5
+1-2 room,Miscellaneous Goods and Services,33.4
+1-2 room,Non-Assignable Expenditure,2.8
+1-2 room,Total,1015.6
+1-2 room,Imputed rentals for owner-occupied accommodation,159.5
+1-2 room,"Total, including imputed rental of owner-occupied accommodation",1175.1
+3 room,Food and Non-Alcoholic Beverages,134.9
+3 room,Alcoholic Beverages and Tobacco,18.4
+3 room,Clothing and Footwear,26.2
+3 room,Housing and Utilities,146.5
+3 room,"Furnishing, Household Equipment and Routine Household Maintenance",81.8
+3 room,Health,176.3
+3 room,Transport,157.1
+3 room,Information and Communication,86.4
+3 room,"Recreation, Sport and Culture",66.6
+3 room,Education,34.9
+3 room,Food and Beverage Serving Services,293.1
+3 room,Accommodation Services,11.7
+3 room,Insurance and Financial Services,165.4
+3 room,Miscellaneous Goods and Services,70.6
+3 room,Non-Assignable Expenditure,3.8
+3 room,Total,1473.7
+3 room,Imputed rentals for owner-occupied accommodation,387.6
+3 room,"Total, including imputed rental of owner-occupied accommodation",1861.3
+4 room,Food and Non-Alcoholic Beverages,143.7
+4 room,Alcoholic Beverages and Tobacco,13.5
+4 room,Clothing and Footwear,31.7
+4 room,Housing and Utilities,125.8
+4 room,"Furnishing, Household Equipment and Routine Household Maintenance",94.3
+4 room,Health,149.8
+4 room,Transport,226.0
+4 room,Information and Communication,91.0
+4 room,"Recreation, Sport and Culture",98.0
+4 room,Education,76.0
+4 room,Food and Beverage Serving Services,313.0
+4 room,Accommodation Services,16.7
+4 room,Insurance and Financial Services,179.7
+4 room,Miscellaneous Goods and Services,94.6
+4 room,Non-Assignable Expenditure,5.5
+4 room,Total,1659.5
+4 room,Imputed rentals for owner-occupied accommodation,363.5
+4 room,"Total, including imputed rental of owner-occupied accommodation",2023.0
+5 room/exec,Food and Non-Alcoholic Beverages,153.4
+5 room/exec,Alcoholic Beverages and Tobacco,9.6
+5 room/exec,Clothing and Footwear,36.8
+5 room/exec,Housing and Utilities,137.5
+5 room/exec,"Furnishing, Household Equipment and Routine Household Maintenance",108.6
+5 room/exec,Health,153.9
+5 room/exec,Transport,295.0
+5 room/exec,Information and Communication,94.4
+5 room/exec,"Recreation, Sport and Culture",107.8
+5 room/exec,Education,100.5
+5 room/exec,Food and Beverage Serving Services,330.9
+5 room/exec,Accommodation Services,24.6
+5 room/exec,Insurance and Financial Services,210.9
+5 room/exec,Miscellaneous Goods and Services,94.4
+5 room/exec,Non-Assignable Expenditure,6.9
+5 room/exec,Total,1865.1
+5 room/exec,Imputed rentals for owner-occupied accommodation,346.6
+5 room/exec,"Total, including imputed rental of owner-occupied accommodation",2211.7
+condo,Food and Non-Alcoholic Beverages,186.1
+condo,Alcoholic Beverages and Tobacco,15.1
+condo,Clothing and Footwear,69.4
+condo,Housing and Utilities,563.6
+condo,"Furnishing, Household Equipment and Routine Household Maintenance",179.3
+condo,Health,217.7
+condo,Transport,555.7
+condo,Information and Communication,118.6
+condo,"Recreation, Sport and Culture",209.6
+condo,Education,235.4
+condo,Food and Beverage Serving Services,453.0
+condo,Accommodation Services,67.0
+condo,Insurance and Financial Services,276.0
+condo,Miscellaneous Goods and Services,144.5
+condo,Non-Assignable Expenditure,7.6
+condo,Total,3298.6
+condo,Imputed rentals for owner-occupied accommodation,781.7
+condo,"Total, including imputed rental of owner-occupied accommodation",4080.3
+landed,Food and Non-Alcoholic Beverages,196.4
+landed,Alcoholic Beverages and Tobacco,8.9
+landed,Clothing and Footwear,55.8
+landed,Housing and Utilities,332.9
+landed,"Furnishing, Household Equipment and Routine Household Maintenance",375.9
+landed,Health,234.2
+landed,Transport,700.3
+landed,Information and Communication,102.2
+landed,"Recreation, Sport and Culture",168.1
+landed,Education,171.2
+landed,Food and Beverage Serving Services,354.9
+landed,Accommodation Services,53.0
+landed,Insurance and Financial Services,270.1
+landed,Miscellaneous Goods and Services,142.3
+landed,Non-Assignable Expenditure,4.6
+landed,Total,3170.9
+landed,Imputed rentals for owner-occupied accommodation,919.4
+landed,"Total, including imputed rental of owner-occupied accommodation",4090.2

@@ -1,3 +1,11 @@
+# secrets
 .env
-__pycache__
-__init__.py
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# generated outputs
+backend/data/runs/

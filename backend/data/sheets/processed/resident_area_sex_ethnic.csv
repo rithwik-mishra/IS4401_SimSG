@@ -1,0 +1,233 @@
+area,sex,ethnic_group,residents
+Ang Mo Kio,Male,Chinese,61510
+Bedok,Male,Chinese,95240
+Bishan,Male,Chinese,36540
+Bukit Batok,Male,Chinese,56810
+Bukit Merah,Male,Chinese,54970
+Bukit Panjang,Male,Chinese,48790
+Bukit Timah,Male,Chinese,34340
+Choa Chu Kang,Male,Chinese,62860
+Clementi,Male,Chinese,40260
+Geylang,Male,Chinese,45170
+Hougang,Male,Chinese,89030
+Jurong East,Male,Chinese,24810
+Jurong West,Male,Chinese,86750
+Kallang,Male,Chinese,37300
+Marine Parade,Male,Chinese,16640
+Novena,Male,Chinese,21110
+Outram,Male,Chinese,6680
+Pasir Ris,Male,Chinese,45790
+Punggol,Male,Chinese,75330
+Queenstown,Male,Chinese,38590
+Sembawang,Male,Chinese,39960
+Sengkang,Male,Chinese,100730
+Serangoon,Male,Chinese,47350
+Tampines,Male,Chinese,92930
+Tanglin,Male,Chinese,8460
+Tengah,Male,Chinese,8500
+Toa Payoh,Male,Chinese,56360
+Woodlands,Male,Chinese,76490
+Yishun,Male,Chinese,75590
+Ang Mo Kio,Female,Chinese,68490
+Bedok,Female,Chinese,104180
+Bishan,Female,Chinese,39250
+Bukit Batok,Female,Chinese,60400
+Bukit Merah,Female,Chinese,62120
+Bukit Panjang,Female,Chinese,51000
+Bukit Timah,Female,Chinese,40420
+Choa Chu Kang,Female,Chinese,64160
+Clementi,Female,Chinese,45040
+Geylang,Female,Chinese,47830
+Hougang,Female,Chinese,94820
+Jurong East,Female,Chinese,25990
+Jurong West,Female,Chinese,87160
+Kallang,Female,Chinese,39850
+Marine Parade,Female,Chinese,19600
+Novena,Female,Chinese,22580
+Outram,Female,Chinese,7030
+Pasir Ris,Female,Chinese,47720
+Punggol,Female,Chinese,77680
+Queenstown,Female,Chinese,44920
+Sembawang,Female,Chinese,41090
+Sengkang,Female,Chinese,104960
+Serangoon,Female,Chinese,51590
+Tampines,Female,Chinese,98670
+Tanglin,Female,Chinese,10330
+Tengah,Female,Chinese,8620
+Toa Payoh,Female,Chinese,62390
+Woodlands,Female,Chinese,76470
+Yishun,Female,Chinese,78690
+Ang Mo Kio,Male,Malay,5800
+Bedok,Male,Malay,18280
+Bishan,Male,Malay,1400
+Bukit Batok,Male,Malay,13390
+Bukit Merah,Male,Malay,5160
+Bukit Panjang,Male,Malay,11120
+Bukit Timah,Male,Malay,310
+Choa Chu Kang,Male,Malay,17940
+Clementi,Male,Malay,3930
+Geylang,Male,Malay,5950
+Hougang,Male,Malay,9130
+Jurong East,Male,Malay,6040
+Jurong West,Male,Malay,23300
+Kallang,Male,Malay,3540
+Marine Parade,Male,Malay,1380
+Novena,Male,Malay,890
+Outram,Male,Malay,790
+Pasir Ris,Male,Malay,14860
+Punggol,Male,Malay,14920
+Queenstown,Male,Malay,3210
+Sembawang,Male,Malay,8990
+Sengkang,Male,Malay,15040
+Serangoon,Male,Malay,2250
+Tampines,Male,Malay,31730
+Tanglin,Male,Malay,100
+Tengah,Male,Malay,2240
+Toa Payoh,Male,Malay,4800
+Woodlands,Male,Malay,33340
+Yishun,Male,Malay,21780
+Ang Mo Kio,Female,Malay,5940
+Bedok,Female,Malay,19170
+Bishan,Female,Malay,1480
+Bukit Batok,Female,Malay,13600
+Bukit Merah,Female,Malay,4830
+Bukit Panjang,Female,Malay,11010
+Bukit Timah,Female,Malay,430
+Choa Chu Kang,Female,Malay,18070
+Clementi,Female,Malay,4060
+Geylang,Female,Malay,6020
+Hougang,Female,Malay,9190
+Jurong East,Female,Malay,6110
+Jurong West,Female,Malay,23350
+Kallang,Female,Malay,3310
+Marine Parade,Female,Malay,1450
+Novena,Female,Malay,940
+Outram,Female,Malay,660
+Pasir Ris,Female,Malay,15250
+Punggol,Female,Malay,15130
+Queenstown,Female,Malay,3300
+Sembawang,Female,Malay,9320
+Sengkang,Female,Malay,15350
+Serangoon,Female,Malay,2310
+Tampines,Female,Malay,32750
+Tanglin,Female,Malay,130
+Tengah,Female,Malay,2220
+Toa Payoh,Female,Malay,4860
+Woodlands,Female,Malay,33220
+Yishun,Female,Malay,22230
+Ang Mo Kio,Male,Indian,6150
+Bedok,Male,Indian,12880
+Bishan,Male,Indian,2960
+Bukit Batok,Male,Indian,8320
+Bukit Merah,Male,Indian,6750
+Bukit Panjang,Male,Indian,5300
+Bukit Timah,Male,Indian,2020
+Choa Chu Kang,Male,Indian,9670
+Clementi,Male,Indian,3640
+Geylang,Male,Indian,4440
+Hougang,Male,Indian,9660
+Jurong East,Male,Indian,4180
+Jurong West,Male,Indian,13890
+Kallang,Male,Indian,7500
+Marine Parade,Male,Indian,2780
+Novena,Male,Indian,2190
+Outram,Male,Indian,650
+Pasir Ris,Male,Indian,7470
+Punggol,Male,Indian,7910
+Queenstown,Male,Indian,3490
+Sembawang,Male,Indian,5120
+Sengkang,Male,Indian,12200
+Serangoon,Male,Indian,4820
+Tampines,Male,Indian,12530
+Tanglin,Male,Indian,1250
+Tengah,Male,Indian,530
+Toa Payoh,Male,Indian,4800
+Woodlands,Male,Indian,14500
+Yishun,Male,Indian,11800
+Ang Mo Kio,Female,Indian,6350
+Bedok,Female,Indian,12400
+Bishan,Female,Indian,3000
+Bukit Batok,Female,Indian,8110
+Bukit Merah,Female,Indian,6560
+Bukit Panjang,Female,Indian,5230
+Bukit Timah,Female,Indian,2110
+Choa Chu Kang,Female,Indian,9470
+Clementi,Female,Indian,3750
+Geylang,Female,Indian,4020
+Hougang,Female,Indian,9360
+Jurong East,Female,Indian,3910
+Jurong West,Female,Indian,12880
+Kallang,Female,Indian,7020
+Marine Parade,Female,Indian,2740
+Novena,Female,Indian,2080
+Outram,Female,Indian,530
+Pasir Ris,Female,Indian,6960
+Punggol,Female,Indian,7520
+Queenstown,Female,Indian,3480
+Sembawang,Female,Indian,4870
+Sengkang,Female,Indian,11850
+Serangoon,Female,Indian,4960
+Tampines,Female,Indian,12050
+Tanglin,Female,Indian,1300
+Tengah,Female,Indian,480
+Toa Payoh,Female,Indian,4630
+Woodlands,Female,Indian,13890
+Yishun,Female,Indian,11630
+Ang Mo Kio,Male,Others,1810
+Bedok,Male,Others,5720
+Bishan,Male,Others,1380
+Bukit Batok,Male,Others,2250
+Bukit Merah,Male,Others,2600
+Bukit Panjang,Male,Others,1690
+Bukit Timah,Male,Others,3080
+Choa Chu Kang,Male,Others,2340
+Clementi,Male,Others,1630
+Geylang,Male,Others,1800
+Hougang,Male,Others,2480
+Jurong East,Male,Others,800
+Jurong West,Male,Others,2740
+Kallang,Male,Others,1420
+Marine Parade,Male,Others,1430
+Novena,Male,Others,1610
+Outram,Male,Others,290
+Pasir Ris,Male,Others,2960
+Punggol,Male,Others,2110
+Queenstown,Male,Others,2150
+Sembawang,Male,Others,1750
+Sengkang,Male,Others,3060
+Serangoon,Male,Others,1480
+Tampines,Male,Others,4120
+Tanglin,Male,Others,1540
+Tengah,Male,Others,110
+Toa Payoh,Male,Others,1830
+Woodlands,Male,Others,2850
+Yishun,Male,Others,2770
+Ang Mo Kio,Female,Others,2680
+Bedok,Female,Others,6490
+Bishan,Female,Others,1510
+Bukit Batok,Female,Others,2960
+Bukit Merah,Female,Others,3200
+Bukit Panjang,Female,Others,2230
+Bukit Timah,Female,Others,3190
+Choa Chu Kang,Female,Others,3040
+Clementi,Female,Others,1930
+Geylang,Female,Others,2410
+Hougang,Female,Others,3560
+Jurong East,Female,Others,1100
+Jurong West,Female,Others,3780
+Kallang,Female,Others,1790
+Marine Parade,Female,Others,1470
+Novena,Female,Others,1780
+Outram,Female,Others,320
+Pasir Ris,Female,Others,3240
+Punggol,Female,Others,3550
+Queenstown,Female,Others,2350
+Sembawang,Female,Others,2250
+Sengkang,Female,Others,4410
+Serangoon,Female,Others,1870
+Tampines,Female,Others,5320
+Tanglin,Female,Others,1510
+Tengah,Female,Others,260
+Toa Payoh,Female,Others,2560
+Woodlands,Female,Others,3690
+Yishun,Female,Others,4250

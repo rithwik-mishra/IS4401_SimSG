@@ -1,0 +1,1103 @@
+area,age_group,age_lo,sex,residents
+Ang Mo Kio,0-4,0,Male,2190
+Bedok,0-4,0,Male,4390
+Bishan,0-4,0,Male,1590
+Bukit Batok,0-4,0,Male,3630
+Bukit Merah,0-4,0,Male,2250
+Bukit Panjang,0-4,0,Male,2660
+Bukit Timah,0-4,0,Male,1640
+Choa Chu Kang,0-4,0,Male,3610
+Clementi,0-4,0,Male,2100
+Geylang,0-4,0,Male,2380
+Hougang,0-4,0,Male,3770
+Jurong East,0-4,0,Male,920
+Jurong West,0-4,0,Male,4150
+Kallang,0-4,0,Male,1710
+Marine Parade,0-4,0,Male,820
+Novena,0-4,0,Male,1070
+Outram,0-4,0,Male,190
+Pasir Ris,0-4,0,Male,2390
+Punggol,0-4,0,Male,6010
+Queenstown,0-4,0,Male,1880
+Sembawang,0-4,0,Male,3010
+Sengkang,0-4,0,Male,6480
+Serangoon,0-4,0,Male,1790
+Tampines,0-4,0,Male,7780
+Tanglin,0-4,0,Male,550
+Tengah,0-4,0,Male,1280
+Toa Payoh,0-4,0,Male,3450
+Woodlands,0-4,0,Male,5280
+Yishun,0-4,0,Male,4940
+Ang Mo Kio,5-9,5,Male,2740
+Bedok,5-9,5,Male,5730
+Bishan,5-9,5,Male,2140
+Bukit Batok,5-9,5,Male,4210
+Bukit Merah,5-9,5,Male,2740
+Bukit Panjang,5-9,5,Male,3080
+Bukit Timah,5-9,5,Male,2540
+Choa Chu Kang,5-9,5,Male,4430
+Clementi,5-9,5,Male,2650
+Geylang,5-9,5,Male,2380
+Hougang,5-9,5,Male,4860
+Jurong East,5-9,5,Male,1260
+Jurong West,5-9,5,Male,5720
+Kallang,5-9,5,Male,1950
+Marine Parade,5-9,5,Male,1230
+Novena,5-9,5,Male,1790
+Outram,5-9,5,Male,230
+Pasir Ris,5-9,5,Male,3230
+Punggol,5-9,5,Male,7760
+Queenstown,5-9,5,Male,1970
+Sembawang,5-9,5,Male,3270
+Sengkang,5-9,5,Male,8200
+Serangoon,5-9,5,Male,2310
+Tampines,5-9,5,Male,7580
+Tanglin,5-9,5,Male,740
+Tengah,5-9,5,Male,530
+Toa Payoh,5-9,5,Male,3410
+Woodlands,5-9,5,Male,6020
+Yishun,5-9,5,Male,6050
+Ang Mo Kio,10-14,10,Male,3230
+Bedok,10-14,10,Male,6170
+Bishan,10-14,10,Male,2110
+Bukit Batok,10-14,10,Male,3850
+Bukit Merah,10-14,10,Male,3130
+Bukit Panjang,10-14,10,Male,3530
+Bukit Timah,10-14,10,Male,2530
+Choa Chu Kang,10-14,10,Male,4720
+Clementi,10-14,10,Male,2610
+Geylang,10-14,10,Male,2270
+Hougang,10-14,10,Male,5000
+Jurong East,10-14,10,Male,1460
+Jurong West,10-14,10,Male,6620
+Kallang,10-14,10,Male,2160
+Marine Parade,10-14,10,Male,1310
+Novena,10-14,10,Male,1620
+Outram,10-14,10,Male,320
+Pasir Ris,10-14,10,Male,3600
+Punggol,10-14,10,Male,7700
+Queenstown,10-14,10,Male,2290
+Sembawang,10-14,10,Male,3230
+Sengkang,10-14,10,Male,8650
+Serangoon,10-14,10,Male,2640
+Tampines,10-14,10,Male,6780
+Tanglin,10-14,10,Male,730
+Tengah,10-14,10,Male,420
+Toa Payoh,10-14,10,Male,3100
+Woodlands,10-14,10,Male,6470
+Yishun,10-14,10,Male,5900
+Ang Mo Kio,15-19,15,Male,3610
+Bedok,15-19,15,Male,6580
+Bishan,15-19,15,Male,2260
+Bukit Batok,15-19,15,Male,4110
+Bukit Merah,15-19,15,Male,3120
+Bukit Panjang,15-19,15,Male,3600
+Bukit Timah,15-19,15,Male,2330
+Choa Chu Kang,15-19,15,Male,5230
+Clementi,15-19,15,Male,2710
+Geylang,15-19,15,Male,2480
+Hougang,15-19,15,Male,5310
+Jurong East,15-19,15,Male,1780
+Jurong West,15-19,15,Male,7570
+Kallang,15-19,15,Male,2060
+Marine Parade,15-19,15,Male,1140
+Novena,15-19,15,Male,1350
+Outram,15-19,15,Male,320
+Pasir Ris,15-19,15,Male,3990
+Punggol,15-19,15,Male,6070
+Queenstown,15-19,15,Male,2300
+Sembawang,15-19,15,Male,3420
+Sengkang,15-19,15,Male,8020
+Serangoon,15-19,15,Male,2870
+Tampines,15-19,15,Male,6750
+Tanglin,15-19,15,Male,600
+Tengah,15-19,15,Male,360
+Toa Payoh,15-19,15,Male,3060
+Woodlands,15-19,15,Male,7470
+Yishun,15-19,15,Male,5780
+Ang Mo Kio,20-24,20,Male,3900
+Bedok,20-24,20,Male,7060
+Bishan,20-24,20,Male,2320
+Bukit Batok,20-24,20,Male,4520
+Bukit Merah,20-24,20,Male,3050
+Bukit Panjang,20-24,20,Male,4060
+Bukit Timah,20-24,20,Male,2190
+Choa Chu Kang,20-24,20,Male,6060
+Clementi,20-24,20,Male,2410
+Geylang,20-24,20,Male,2500
+Hougang,20-24,20,Male,5840
+Jurong East,20-24,20,Male,2130
+Jurong West,20-24,20,Male,8110
+Kallang,20-24,20,Male,2130
+Marine Parade,20-24,20,Male,1110
+Novena,20-24,20,Male,1220
+Outram,20-24,20,Male,270
+Pasir Ris,20-24,20,Male,4780
+Punggol,20-24,20,Male,4740
+Queenstown,20-24,20,Male,2280
+Sembawang,20-24,20,Male,3420
+Sengkang,20-24,20,Male,7090
+Serangoon,20-24,20,Male,3160
+Tampines,20-24,20,Male,6950
+Tanglin,20-24,20,Male,510
+Tengah,20-24,20,Male,310
+Toa Payoh,20-24,20,Male,2990
+Woodlands,20-24,20,Male,8920
+Yishun,20-24,20,Male,6060
+Ang Mo Kio,25-29,25,Male,4630
+Bedok,25-29,25,Male,8170
+Bishan,25-29,25,Male,2770
+Bukit Batok,25-29,25,Male,5110
+Bukit Merah,25-29,25,Male,3690
+Bukit Panjang,25-29,25,Male,4680
+Bukit Timah,25-29,25,Male,2040
+Choa Chu Kang,25-29,25,Male,7880
+Clementi,25-29,25,Male,2580
+Geylang,25-29,25,Male,3300
+Hougang,25-29,25,Male,7460
+Jurong East,25-29,25,Male,2440
+Jurong West,25-29,25,Male,8880
+Kallang,25-29,25,Male,2630
+Marine Parade,25-29,25,Male,1160
+Novena,25-29,25,Male,1370
+Outram,25-29,25,Male,420
+Pasir Ris,25-29,25,Male,6150
+Punggol,25-29,25,Male,4660
+Queenstown,25-29,25,Male,2750
+Sembawang,25-29,25,Male,3570
+Sengkang,25-29,25,Male,7680
+Serangoon,25-29,25,Male,3940
+Tampines,25-29,25,Male,9470
+Tanglin,25-29,25,Male,480
+Tengah,25-29,25,Male,980
+Toa Payoh,25-29,25,Male,3740
+Woodlands,25-29,25,Male,11310
+Yishun,25-29,25,Male,7290
+Ang Mo Kio,30-34,30,Male,5030
+Bedok,30-34,30,Male,8670
+Bishan,30-34,30,Male,3240
+Bukit Batok,30-34,30,Male,5900
+Bukit Merah,30-34,30,Male,4630
+Bukit Panjang,30-34,30,Male,5130
+Bukit Timah,30-34,30,Male,2160
+Choa Chu Kang,30-34,30,Male,7750
+Clementi,30-34,30,Male,3280
+Geylang,30-34,30,Male,5040
+Hougang,30-34,30,Male,8570
+Jurong East,30-34,30,Male,2430
+Jurong West,30-34,30,Male,8990
+Kallang,30-34,30,Male,3690
+Marine Parade,30-34,30,Male,1190
+Novena,30-34,30,Male,1590
+Outram,30-34,30,Male,490
+Pasir Ris,30-34,30,Male,5790
+Punggol,30-34,30,Male,7170
+Queenstown,30-34,30,Male,3660
+Sembawang,30-34,30,Male,4540
+Sengkang,30-34,30,Male,9520
+Serangoon,30-34,30,Male,4180
+Tampines,30-34,30,Male,13410
+Tanglin,30-34,30,Male,620
+Tengah,30-34,30,Male,2320
+Toa Payoh,30-34,30,Male,5680
+Woodlands,30-34,30,Male,10350
+Yishun,30-34,30,Male,8640
+Ang Mo Kio,35-39,35,Male,4490
+Bedok,35-39,35,Male,8580
+Bishan,35-39,35,Male,2870
+Bukit Batok,35-39,35,Male,6620
+Bukit Merah,35-39,35,Male,4730
+Bukit Panjang,35-39,35,Male,4820
+Bukit Timah,35-39,35,Male,2610
+Choa Chu Kang,35-39,35,Male,6340
+Clementi,35-39,35,Male,3720
+Geylang,35-39,35,Male,4920
+Hougang,35-39,35,Male,8120
+Jurong East,35-39,35,Male,2180
+Jurong West,35-39,35,Male,8070
+Kallang,35-39,35,Male,3640
+Marine Parade,35-39,35,Male,1400
+Novena,35-39,35,Male,1810
+Outram,35-39,35,Male,570
+Pasir Ris,35-39,35,Male,4170
+Punggol,35-39,35,Male,9320
+Queenstown,35-39,35,Male,3510
+Sembawang,35-39,35,Male,4800
+Sengkang,35-39,35,Male,10670
+Serangoon,35-39,35,Male,3840
+Tampines,35-39,35,Male,12240
+Tanglin,35-39,35,Male,800
+Tengah,35-39,35,Male,1320
+Toa Payoh,35-39,35,Male,5900
+Woodlands,35-39,35,Male,8590
+Yishun,35-39,35,Male,9020
+Ang Mo Kio,40-44,40,Male,4680
+Bedok,40-44,40,Male,8610
+Bishan,40-44,40,Male,2620
+Bukit Batok,40-44,40,Male,5430
+Bukit Merah,40-44,40,Male,4940
+Bukit Panjang,40-44,40,Male,4560
+Bukit Timah,40-44,40,Male,3080
+Choa Chu Kang,40-44,40,Male,5830
+Clementi,40-44,40,Male,3860
+Geylang,40-44,40,Male,4060
+Hougang,40-44,40,Male,7620
+Jurong East,40-44,40,Male,2210
+Jurong West,40-44,40,Male,8690
+Kallang,40-44,40,Male,3450
+Marine Parade,40-44,40,Male,1630
+Novena,40-44,40,Male,2000
+Outram,40-44,40,Male,560
+Pasir Ris,40-44,40,Male,4220
+Punggol,40-44,40,Male,10430
+Queenstown,40-44,40,Male,3380
+Sembawang,40-44,40,Male,4260
+Sengkang,40-44,40,Male,11570
+Serangoon,40-44,40,Male,3430
+Tampines,40-44,40,Male,9850
+Tanglin,40-44,40,Male,970
+Tengah,40-44,40,Male,1000
+Toa Payoh,40-44,40,Male,4650
+Woodlands,40-44,40,Male,8050
+Yishun,40-44,40,Male,8650
+Ang Mo Kio,45-49,45,Male,5160
+Bedok,45-49,45,Male,9030
+Bishan,45-49,45,Male,2710
+Bukit Batok,45-49,45,Male,5230
+Bukit Merah,45-49,45,Male,5280
+Bukit Panjang,45-49,45,Male,4220
+Bukit Timah,45-49,45,Male,3140
+Choa Chu Kang,45-49,45,Male,5710
+Clementi,45-49,45,Male,3870
+Geylang,45-49,45,Male,3870
+Hougang,45-49,45,Male,7010
+Jurong East,45-49,45,Male,2220
+Jurong West,45-49,45,Male,9430
+Kallang,45-49,45,Male,3730
+Marine Parade,45-49,45,Male,1790
+Novena,45-49,45,Male,2040
+Outram,45-49,45,Male,650
+Pasir Ris,45-49,45,Male,4440
+Punggol,45-49,45,Male,9170
+Queenstown,45-49,45,Male,3500
+Sembawang,45-49,45,Male,4200
+Sengkang,45-49,45,Male,10640
+Serangoon,45-49,45,Male,3610
+Tampines,45-49,45,Male,8630
+Tanglin,45-49,45,Male,950
+Tengah,45-49,45,Male,630
+Toa Payoh,45-49,45,Male,4460
+Woodlands,45-49,45,Male,8230
+Yishun,45-49,45,Male,7610
+Ang Mo Kio,50-54,50,Male,5660
+Bedok,50-54,50,Male,9970
+Bishan,50-54,50,Male,2980
+Bukit Batok,50-54,50,Male,5790
+Bukit Merah,50-54,50,Male,5520
+Bukit Panjang,50-54,50,Male,4760
+Bukit Timah,50-54,50,Male,3170
+Choa Chu Kang,50-54,50,Male,6320
+Clementi,50-54,50,Male,3820
+Geylang,50-54,50,Male,4080
+Hougang,50-54,50,Male,7720
+Jurong East,50-54,50,Male,2610
+Jurong West,50-54,50,Male,10050
+Kallang,50-54,50,Male,3820
+Marine Parade,50-54,50,Male,1900
+Novena,50-54,50,Male,2180
+Outram,50-54,50,Male,690
+Pasir Ris,50-54,50,Male,4980
+Punggol,50-54,50,Male,7860
+Queenstown,50-54,50,Male,3790
+Sembawang,50-54,50,Male,4410
+Sengkang,50-54,50,Male,10220
+Serangoon,50-54,50,Male,3720
+Tampines,50-54,50,Male,8100
+Tanglin,50-54,50,Male,1020
+Tengah,50-54,50,Male,540
+Toa Payoh,50-54,50,Male,4730
+Woodlands,50-54,50,Male,9060
+Yishun,50-54,50,Male,7640
+Ang Mo Kio,55-59,55,Male,5550
+Bedok,55-59,55,Male,9420
+Bishan,55-59,55,Male,2720
+Bukit Batok,55-59,55,Male,5830
+Bukit Merah,55-59,55,Male,5080
+Bukit Panjang,55-59,55,Male,4730
+Bukit Timah,55-59,55,Male,2750
+Choa Chu Kang,55-59,55,Male,7310
+Clementi,55-59,55,Male,3190
+Geylang,55-59,55,Male,3820
+Hougang,55-59,55,Male,7650
+Jurong East,55-59,55,Male,2600
+Jurong West,55-59,55,Male,9620
+Kallang,55-59,55,Male,3600
+Marine Parade,55-59,55,Male,1580
+Novena,55-59,55,Male,1760
+Outram,55-59,55,Male,600
+Pasir Ris,55-59,55,Male,5460
+Punggol,55-59,55,Male,5430
+Queenstown,55-59,55,Male,3360
+Sembawang,55-59,55,Male,3770
+Sengkang,55-59,55,Male,8260
+Serangoon,55-59,55,Male,3680
+Tampines,55-59,55,Male,8510
+Tanglin,55-59,55,Male,830
+Tengah,55-59,55,Male,470
+Toa Payoh,55-59,55,Male,4320
+Woodlands,55-59,55,Male,10110
+Yishun,55-59,55,Male,7410
+Ang Mo Kio,60-64,60,Male,6000
+Bedok,60-64,60,Male,10060
+Bishan,60-64,60,Male,2920
+Bukit Batok,60-64,60,Male,6110
+Bukit Merah,60-64,60,Male,5110
+Bukit Panjang,60-64,60,Male,5180
+Bukit Timah,60-64,60,Male,2330
+Choa Chu Kang,60-64,60,Male,7750
+Clementi,60-64,60,Male,3120
+Geylang,60-64,60,Male,4280
+Hougang,60-64,60,Male,8850
+Jurong East,60-64,60,Male,2850
+Jurong West,60-64,60,Male,9370
+Kallang,60-64,60,Male,3780
+Marine Parade,60-64,60,Male,1510
+Novena,60-64,60,Male,1580
+Outram,60-64,60,Male,740
+Pasir Ris,60-64,60,Male,6660
+Punggol,60-64,60,Male,4660
+Queenstown,60-64,60,Male,3290
+Sembawang,60-64,60,Male,3510
+Sengkang,60-64,60,Male,7590
+Serangoon,60-64,60,Male,4070
+Tampines,60-64,60,Male,10050
+Tanglin,60-64,60,Male,690
+Tengah,60-64,60,Male,410
+Toa Payoh,60-64,60,Male,4440
+Woodlands,60-64,60,Male,9900
+Yishun,60-64,60,Male,8460
+Ang Mo Kio,65-69,65,Male,5670
+Bedok,65-69,65,Male,9940
+Bishan,65-69,65,Male,3110
+Bukit Batok,65-69,65,Male,5650
+Bukit Merah,65-69,65,Male,5070
+Bukit Panjang,65-69,65,Male,4900
+Bukit Timah,65-69,65,Male,2190
+Choa Chu Kang,65-69,65,Male,6190
+Clementi,65-69,65,Male,2660
+Geylang,65-69,65,Male,4200
+Hougang,65-69,65,Male,8600
+Jurong East,65-69,65,Male,2940
+Jurong West,65-69,65,Male,8250
+Kallang,65-69,65,Male,3800
+Marine Parade,65-69,65,Male,1370
+Novena,65-69,65,Male,1410
+Outram,65-69,65,Male,750
+Pasir Ris,65-69,65,Male,4860
+Punggol,65-69,65,Male,3500
+Queenstown,65-69,65,Male,2780
+Sembawang,65-69,65,Male,2790
+Sengkang,65-69,65,Male,6700
+Serangoon,65-69,65,Male,4380
+Tampines,65-69,65,Male,9930
+Tanglin,65-69,65,Male,570
+Tengah,65-69,65,Male,350
+Toa Payoh,65-69,65,Male,4520
+Woodlands,65-69,65,Male,7610
+Yishun,65-69,65,Male,7380
+Ang Mo Kio,70-74,70,Male,5050
+Bedok,70-74,70,Male,8300
+Bishan,70-74,70,Male,2520
+Bukit Batok,70-74,70,Male,4330
+Bukit Merah,70-74,70,Male,4270
+Bukit Panjang,70-74,70,Male,3400
+Bukit Timah,70-74,70,Male,1820
+Choa Chu Kang,70-74,70,Male,3930
+Clementi,70-74,70,Male,2560
+Geylang,70-74,70,Male,3300
+Hougang,70-74,70,Male,6530
+Jurong East,70-74,70,Male,2660
+Jurong West,70-74,70,Male,6410
+Kallang,70-74,70,Male,3080
+Marine Parade,70-74,70,Male,1060
+Novena,70-74,70,Male,1150
+Outram,70-74,70,Male,610
+Pasir Ris,70-74,70,Male,3170
+Punggol,70-74,70,Male,2700
+Queenstown,70-74,70,Male,2390
+Sembawang,70-74,70,Male,1810
+Sengkang,70-74,70,Male,4780
+Serangoon,70-74,70,Male,3700
+Tampines,70-74,70,Male,7670
+Tanglin,70-74,70,Male,500
+Tengah,70-74,70,Male,250
+Toa Payoh,70-74,70,Male,3640
+Woodlands,70-74,70,Male,4950
+Yishun,70-74,70,Male,5500
+Ang Mo Kio,75-79,75,Male,3960
+Bedok,75-79,75,Male,6260
+Bishan,75-79,75,Male,1800
+Bukit Batok,75-79,75,Male,2570
+Bukit Merah,75-79,75,Male,3430
+Bukit Panjang,75-79,75,Male,2080
+Bukit Timah,75-79,75,Male,1560
+Choa Chu Kang,75-79,75,Male,2250
+Clementi,75-79,75,Male,2330
+Geylang,75-79,75,Male,2340
+Hougang,75-79,75,Male,4160
+Jurong East,75-79,75,Male,1830
+Jurong West,75-79,75,Male,4100
+Kallang,75-79,75,Male,2300
+Marine Parade,75-79,75,Male,930
+Novena,75-79,75,Male,890
+Outram,75-79,75,Male,490
+Pasir Ris,75-79,75,Male,1810
+Punggol,75-79,75,Male,1840
+Queenstown,75-79,75,Male,1990
+Sembawang,75-79,75,Male,1050
+Sengkang,75-79,75,Male,2930
+Serangoon,75-79,75,Male,2510
+Tampines,75-79,75,Male,4560
+Tanglin,75-79,75,Male,410
+Tengah,75-79,75,Male,130
+Toa Payoh,75-79,75,Male,2740
+Woodlands,75-79,75,Male,2820
+Yishun,75-79,75,Male,3260
+Ang Mo Kio,80-84,80,Male,2010
+Bedok,80-84,80,Male,2860
+Bishan,80-84,80,Male,860
+Bukit Batok,80-84,80,Male,1050
+Bukit Merah,80-84,80,Male,1760
+Bukit Panjang,80-84,80,Male,870
+Bukit Timah,80-84,80,Male,860
+Choa Chu Kang,80-84,80,Male,890
+Clementi,80-84,80,Male,1100
+Geylang,80-84,80,Male,1110
+Hougang,80-84,80,Male,1820
+Jurong East,80-84,80,Male,780
+Jurong West,80-84,80,Male,1560
+Kallang,80-84,80,Male,1140
+Marine Parade,80-84,80,Male,530
+Novena,80-84,80,Male,490
+Outram,80-84,80,Male,230
+Pasir Ris,80-84,80,Male,770
+Punggol,80-84,80,Male,740
+Queenstown,80-84,80,Male,1130
+Sembawang,80-84,80,Male,420
+Sengkang,80-84,80,Male,1200
+Serangoon,80-84,80,Male,1100
+Tampines,80-84,80,Male,1700
+Tanglin,80-84,80,Male,200
+Tengah,80-84,80,Male,40
+Toa Payoh,80-84,80,Male,1480
+Woodlands,80-84,80,Male,1170
+Yishun,80-84,80,Male,1360
+Ang Mo Kio,85-89,85,Male,1180
+Bedok,85-89,85,Male,1570
+Bishan,85-89,85,Male,500
+Bukit Batok,85-89,85,Male,570
+Bukit Merah,85-89,85,Male,1140
+Bukit Panjang,85-89,85,Male,460
+Bukit Timah,85-89,85,Male,520
+Choa Chu Kang,85-89,85,Male,460
+Clementi,85-89,85,Male,630
+Geylang,85-89,85,Male,690
+Hougang,85-89,85,Male,990
+Jurong East,85-89,85,Male,360
+Jurong West,85-89,85,Male,790
+Kallang,85-89,85,Male,770
+Marine Parade,85-89,85,Male,370
+Novena,85-89,85,Male,310
+Outram,85-89,85,Male,170
+Pasir Ris,85-89,85,Male,420
+Punggol,85-89,85,Male,390
+Queenstown,85-89,85,Male,790
+Sembawang,85-89,85,Male,260
+Sengkang,85-89,85,Male,610
+Serangoon,85-89,85,Male,680
+Tampines,85-89,85,Male,950
+Tanglin,85-89,85,Male,130
+Tengah,85-89,85,Male,20
+Toa Payoh,85-89,85,Male,1010
+Woodlands,85-89,85,Male,610
+Yishun,85-89,85,Male,680
+Ang Mo Kio,90+,90,Male,550
+Bedok,90+,90,Male,750
+Bishan,90+,90,Male,240
+Bukit Batok,90+,90,Male,280
+Bukit Merah,90+,90,Male,560
+Bukit Panjang,90+,90,Male,200
+Bukit Timah,90+,90,Male,300
+Choa Chu Kang,90+,90,Male,170
+Clementi,90+,90,Male,250
+Geylang,90+,90,Male,360
+Hougang,90+,90,Male,430
+Jurong East,90+,90,Male,170
+Jurong West,90+,90,Male,280
+Kallang,90+,90,Male,340
+Marine Parade,90+,90,Male,210
+Novena,90+,90,Male,160
+Outram,90+,90,Male,120
+Pasir Ris,90+,90,Male,210
+Punggol,90+,90,Male,140
+Queenstown,90+,90,Male,400
+Sembawang,90+,90,Male,100
+Sengkang,90+,90,Male,210
+Serangoon,90+,90,Male,310
+Tampines,90+,90,Male,390
+Tanglin,90+,90,Male,70
+Tengah,90+,90,Male,10
+Toa Payoh,90+,90,Male,470
+Woodlands,90+,90,Male,280
+Yishun,90+,90,Male,320
+Ang Mo Kio,0-4,0,Female,2070
+Bedok,0-4,0,Female,4230
+Bishan,0-4,0,Female,1350
+Bukit Batok,0-4,0,Female,3430
+Bukit Merah,0-4,0,Female,2310
+Bukit Panjang,0-4,0,Female,2400
+Bukit Timah,0-4,0,Female,1800
+Choa Chu Kang,0-4,0,Female,3460
+Clementi,0-4,0,Female,1940
+Geylang,0-4,0,Female,2350
+Hougang,0-4,0,Female,3780
+Jurong East,0-4,0,Female,880
+Jurong West,0-4,0,Female,3870
+Kallang,0-4,0,Female,1580
+Marine Parade,0-4,0,Female,810
+Novena,0-4,0,Female,880
+Outram,0-4,0,Female,190
+Pasir Ris,0-4,0,Female,2320
+Punggol,0-4,0,Female,5820
+Queenstown,0-4,0,Female,1790
+Sembawang,0-4,0,Female,2860
+Sengkang,0-4,0,Female,6190
+Serangoon,0-4,0,Female,1670
+Tampines,0-4,0,Female,7050
+Tanglin,0-4,0,Female,600
+Tengah,0-4,0,Female,1210
+Toa Payoh,0-4,0,Female,3260
+Woodlands,0-4,0,Female,4830
+Yishun,0-4,0,Female,4540
+Ang Mo Kio,5-9,5,Female,2910
+Bedok,5-9,5,Female,5380
+Bishan,5-9,5,Female,1710
+Bukit Batok,5-9,5,Female,3950
+Bukit Merah,5-9,5,Female,2710
+Bukit Panjang,5-9,5,Female,3000
+Bukit Timah,5-9,5,Female,3240
+Choa Chu Kang,5-9,5,Female,4340
+Clementi,5-9,5,Female,2550
+Geylang,5-9,5,Female,2330
+Hougang,5-9,5,Female,4900
+Jurong East,5-9,5,Female,1120
+Jurong West,5-9,5,Female,5350
+Kallang,5-9,5,Female,1820
+Marine Parade,5-9,5,Female,1230
+Novena,5-9,5,Female,1200
+Outram,5-9,5,Female,220
+Pasir Ris,5-9,5,Female,2990
+Punggol,5-9,5,Female,7450
+Queenstown,5-9,5,Female,1920
+Sembawang,5-9,5,Female,3160
+Sengkang,5-9,5,Female,7660
+Serangoon,5-9,5,Female,2130
+Tampines,5-9,5,Female,7290
+Tanglin,5-9,5,Female,850
+Tengah,5-9,5,Female,530
+Toa Payoh,5-9,5,Female,3080
+Woodlands,5-9,5,Female,5730
+Yishun,5-9,5,Female,5550
+Ang Mo Kio,10-14,10,Female,3220
+Bedok,10-14,10,Female,5930
+Bishan,10-14,10,Female,1900
+Bukit Batok,10-14,10,Female,3720
+Bukit Merah,10-14,10,Female,2960
+Bukit Panjang,10-14,10,Female,3390
+Bukit Timah,10-14,10,Female,3000
+Choa Chu Kang,10-14,10,Female,4500
+Clementi,10-14,10,Female,2650
+Geylang,10-14,10,Female,2250
+Hougang,10-14,10,Female,4980
+Jurong East,10-14,10,Female,1410
+Jurong West,10-14,10,Female,6370
+Kallang,10-14,10,Female,1990
+Marine Parade,10-14,10,Female,1230
+Novena,10-14,10,Female,1390
+Outram,10-14,10,Female,360
+Pasir Ris,10-14,10,Female,3400
+Punggol,10-14,10,Female,7060
+Queenstown,10-14,10,Female,2160
+Sembawang,10-14,10,Female,3010
+Sengkang,10-14,10,Female,8150
+Serangoon,10-14,10,Female,2430
+Tampines,10-14,10,Female,6320
+Tanglin,10-14,10,Female,830
+Tengah,10-14,10,Female,420
+Toa Payoh,10-14,10,Female,2850
+Woodlands,10-14,10,Female,5980
+Yishun,10-14,10,Female,5720
+Ang Mo Kio,15-19,15,Female,3520
+Bedok,15-19,15,Female,6460
+Bishan,15-19,15,Female,2100
+Bukit Batok,15-19,15,Female,4080
+Bukit Merah,15-19,15,Female,3190
+Bukit Panjang,15-19,15,Female,3530
+Bukit Timah,15-19,15,Female,2830
+Choa Chu Kang,15-19,15,Female,4910
+Clementi,15-19,15,Female,2610
+Geylang,15-19,15,Female,2230
+Hougang,15-19,15,Female,5230
+Jurong East,15-19,15,Female,1690
+Jurong West,15-19,15,Female,7320
+Kallang,15-19,15,Female,1990
+Marine Parade,15-19,15,Female,1160
+Novena,15-19,15,Female,1280
+Outram,15-19,15,Female,360
+Pasir Ris,15-19,15,Female,3740
+Punggol,15-19,15,Female,5720
+Queenstown,15-19,15,Female,2170
+Sembawang,15-19,15,Female,3230
+Sengkang,15-19,15,Female,7630
+Serangoon,15-19,15,Female,2740
+Tampines,15-19,15,Female,6230
+Tanglin,15-19,15,Female,680
+Tengah,15-19,15,Female,370
+Toa Payoh,15-19,15,Female,2850
+Woodlands,15-19,15,Female,7090
+Yishun,15-19,15,Female,5540
+Ang Mo Kio,20-24,20,Female,3710
+Bedok,20-24,20,Female,6930
+Bishan,20-24,20,Female,2170
+Bukit Batok,20-24,20,Female,4410
+Bukit Merah,20-24,20,Female,2930
+Bukit Panjang,20-24,20,Female,3960
+Bukit Timah,20-24,20,Female,2430
+Choa Chu Kang,20-24,20,Female,5920
+Clementi,20-24,20,Female,2450
+Geylang,20-24,20,Female,2410
+Hougang,20-24,20,Female,5530
+Jurong East,20-24,20,Female,1990
+Jurong West,20-24,20,Female,7650
+Kallang,20-24,20,Female,2180
+Marine Parade,20-24,20,Female,1140
+Novena,20-24,20,Female,1110
+Outram,20-24,20,Female,260
+Pasir Ris,20-24,20,Female,4390
+Punggol,20-24,20,Female,4540
+Queenstown,20-24,20,Female,2400
+Sembawang,20-24,20,Female,3370
+Sengkang,20-24,20,Female,6830
+Serangoon,20-24,20,Female,2940
+Tampines,20-24,20,Female,6800
+Tanglin,20-24,20,Female,590
+Tengah,20-24,20,Female,330
+Toa Payoh,20-24,20,Female,2960
+Woodlands,20-24,20,Female,8280
+Yishun,20-24,20,Female,5590
+Ang Mo Kio,25-29,25,Female,4450
+Bedok,25-29,25,Female,7720
+Bishan,25-29,25,Female,2660
+Bukit Batok,25-29,25,Female,5120
+Bukit Merah,25-29,25,Female,4010
+Bukit Panjang,25-29,25,Female,4540
+Bukit Timah,25-29,25,Female,2230
+Choa Chu Kang,25-29,25,Female,7440
+Clementi,25-29,25,Female,2620
+Geylang,25-29,25,Female,3390
+Hougang,25-29,25,Female,7240
+Jurong East,25-29,25,Female,2210
+Jurong West,25-29,25,Female,8390
+Kallang,25-29,25,Female,2830
+Marine Parade,25-29,25,Female,1200
+Novena,25-29,25,Female,1440
+Outram,25-29,25,Female,440
+Pasir Ris,25-29,25,Female,5550
+Punggol,25-29,25,Female,4910
+Queenstown,25-29,25,Female,2950
+Sembawang,25-29,25,Female,3670
+Sengkang,25-29,25,Female,7790
+Serangoon,25-29,25,Female,3660
+Tampines,25-29,25,Female,9530
+Tanglin,25-29,25,Female,600
+Tengah,25-29,25,Female,1440
+Toa Payoh,25-29,25,Female,4010
+Woodlands,25-29,25,Female,10550
+Yishun,25-29,25,Female,7210
+Ang Mo Kio,30-34,30,Female,5180
+Bedok,30-34,30,Female,8940
+Bishan,30-34,30,Female,3170
+Bukit Batok,30-34,30,Female,6670
+Bukit Merah,30-34,30,Female,5110
+Bukit Panjang,30-34,30,Female,5140
+Bukit Timah,30-34,30,Female,2640
+Choa Chu Kang,30-34,30,Female,7580
+Clementi,30-34,30,Female,3670
+Geylang,30-34,30,Female,5520
+Hougang,30-34,30,Female,8630
+Jurong East,30-34,30,Female,2290
+Jurong West,30-34,30,Female,8770
+Kallang,30-34,30,Female,3890
+Marine Parade,30-34,30,Female,1410
+Novena,30-34,30,Female,1870
+Outram,30-34,30,Female,540
+Pasir Ris,30-34,30,Female,5520
+Punggol,30-34,30,Female,8800
+Queenstown,30-34,30,Female,3910
+Sembawang,30-34,30,Female,5020
+Sengkang,30-34,30,Female,10630
+Serangoon,30-34,30,Female,4400
+Tampines,30-34,30,Female,14030
+Tanglin,30-34,30,Female,820
+Tengah,30-34,30,Female,2300
+Toa Payoh,30-34,30,Female,6620
+Woodlands,30-34,30,Female,9960
+Yishun,30-34,30,Female,9270
+Ang Mo Kio,35-39,35,Female,5210
+Bedok,35-39,35,Female,9720
+Bishan,35-39,35,Female,3290
+Bukit Batok,35-39,35,Female,7090
+Bukit Merah,35-39,35,Female,5550
+Bukit Panjang,35-39,35,Female,5250
+Bukit Timah,35-39,35,Female,3460
+Choa Chu Kang,35-39,35,Female,6760
+Clementi,35-39,35,Female,4270
+Geylang,35-39,35,Female,5120
+Hougang,35-39,35,Female,9060
+Jurong East,35-39,35,Female,2390
+Jurong West,35-39,35,Female,8850
+Kallang,35-39,35,Female,3940
+Marine Parade,35-39,35,Female,1800
+Novena,35-39,35,Female,2290
+Outram,35-39,35,Female,520
+Pasir Ris,35-39,35,Female,4750
+Punggol,35-39,35,Female,10890
+Queenstown,35-39,35,Female,3930
+Sembawang,35-39,35,Female,5010
+Sengkang,35-39,35,Female,12520
+Serangoon,35-39,35,Female,4230
+Tampines,35-39,35,Female,12500
+Tanglin,35-39,35,Female,1120
+Tengah,35-39,35,Female,1080
+Toa Payoh,35-39,35,Female,6110
+Woodlands,35-39,35,Female,9020
+Yishun,35-39,35,Female,9850
+Ang Mo Kio,40-44,40,Female,5580
+Bedok,40-44,40,Female,10030
+Bishan,40-44,40,Female,2960
+Bukit Batok,40-44,40,Female,6140
+Bukit Merah,40-44,40,Female,5570
+Bukit Panjang,40-44,40,Female,4970
+Bukit Timah,40-44,40,Female,3720
+Choa Chu Kang,40-44,40,Female,6570
+Clementi,40-44,40,Female,4470
+Geylang,40-44,40,Female,4490
+Hougang,40-44,40,Female,8470
+Jurong East,40-44,40,Female,2450
+Jurong West,40-44,40,Female,9920
+Kallang,40-44,40,Female,3870
+Marine Parade,40-44,40,Female,2020
+Novena,40-44,40,Female,2380
+Outram,40-44,40,Female,600
+Pasir Ris,40-44,40,Female,4780
+Punggol,40-44,40,Female,11660
+Queenstown,40-44,40,Female,3990
+Sembawang,40-44,40,Female,4660
+Sengkang,40-44,40,Female,12860
+Serangoon,40-44,40,Female,4010
+Tampines,40-44,40,Female,10610
+Tanglin,40-44,40,Female,1220
+Tengah,40-44,40,Female,1040
+Toa Payoh,40-44,40,Female,5210
+Woodlands,40-44,40,Female,8740
+Yishun,40-44,40,Female,9280
+Ang Mo Kio,45-49,45,Female,5930
+Bedok,45-49,45,Female,10500
+Bishan,45-49,45,Female,3080
+Bukit Batok,45-49,45,Female,5900
+Bukit Merah,45-49,45,Female,5950
+Bukit Panjang,45-49,45,Female,4760
+Bukit Timah,45-49,45,Female,3420
+Choa Chu Kang,45-49,45,Female,6310
+Clementi,45-49,45,Female,4310
+Geylang,45-49,45,Female,4110
+Hougang,45-49,45,Female,7960
+Jurong East,45-49,45,Female,2590
+Jurong West,45-49,45,Female,10030
+Kallang,45-49,45,Female,3900
+Marine Parade,45-49,45,Female,2070
+Novena,45-49,45,Female,2350
+Outram,45-49,45,Female,750
+Pasir Ris,45-49,45,Female,5050
+Punggol,45-49,45,Female,9090
+Queenstown,45-49,45,Female,4210
+Sembawang,45-49,45,Female,4720
+Sengkang,45-49,45,Female,11590
+Serangoon,45-49,45,Female,4020
+Tampines,45-49,45,Female,9120
+Tanglin,45-49,45,Female,1160
+Tengah,45-49,45,Female,630
+Toa Payoh,45-49,45,Female,4990
+Woodlands,45-49,45,Female,8980
+Yishun,45-49,45,Female,8270
+Ang Mo Kio,50-54,50,Female,6270
+Bedok,50-54,50,Female,10660
+Bishan,50-54,50,Female,3340
+Bukit Batok,50-54,50,Female,6260
+Bukit Merah,50-54,50,Female,5810
+Bukit Panjang,50-54,50,Female,5250
+Bukit Timah,50-54,50,Female,3510
+Choa Chu Kang,50-54,50,Female,7160
+Clementi,50-54,50,Female,4040
+Geylang,50-54,50,Female,4070
+Hougang,50-54,50,Female,8260
+Jurong East,50-54,50,Female,2830
+Jurong West,50-54,50,Female,9870
+Kallang,50-54,50,Female,3930
+Marine Parade,50-54,50,Female,2080
+Novena,50-54,50,Female,2240
+Outram,50-54,50,Female,630
+Pasir Ris,50-54,50,Female,5500
+Punggol,50-54,50,Female,7370
+Queenstown,50-54,50,Female,4080
+Sembawang,50-54,50,Female,4780
+Sengkang,50-54,50,Female,10210
+Serangoon,50-54,50,Female,4400
+Tampines,50-54,50,Female,9150
+Tanglin,50-54,50,Female,1110
+Tengah,50-54,50,Female,520
+Toa Payoh,50-54,50,Female,5160
+Woodlands,50-54,50,Female,10230
+Yishun,50-54,50,Female,8030
+Ang Mo Kio,55-59,55,Female,5940
+Bedok,55-59,55,Female,9850
+Bishan,55-59,55,Female,3100
+Bukit Batok,55-59,55,Female,6090
+Bukit Merah,55-59,55,Female,5110
+Bukit Panjang,55-59,55,Female,5060
+Bukit Timah,55-59,55,Female,2850
+Choa Chu Kang,55-59,55,Female,7950
+Clementi,55-59,55,Female,3410
+Geylang,55-59,55,Female,3790
+Hougang,55-59,55,Female,8380
+Jurong East,55-59,55,Female,2690
+Jurong West,55-59,55,Female,9220
+Kallang,55-59,55,Female,3430
+Marine Parade,55-59,55,Female,1700
+Novena,55-59,55,Female,1760
+Outram,55-59,55,Female,570
+Pasir Ris,55-59,55,Female,6820
+Punggol,55-59,55,Female,5100
+Queenstown,55-59,55,Female,3670
+Sembawang,55-59,55,Female,3680
+Sengkang,55-59,55,Female,7910
+Serangoon,55-59,55,Female,4190
+Tampines,55-59,55,Female,10030
+Tanglin,55-59,55,Female,860
+Tengah,55-59,55,Female,380
+Toa Payoh,55-59,55,Female,4640
+Woodlands,55-59,55,Female,10460
+Yishun,55-59,55,Female,7810
+Ang Mo Kio,60-64,60,Female,6220
+Bedok,60-64,60,Female,10680
+Bishan,60-64,60,Female,3540
+Bukit Batok,60-64,60,Female,6210
+Bukit Merah,60-64,60,Female,4970
+Bukit Panjang,60-64,60,Female,5560
+Bukit Timah,60-64,60,Female,2660
+Choa Chu Kang,60-64,60,Female,7460
+Clementi,60-64,60,Female,3230
+Geylang,60-64,60,Female,4090
+Hougang,60-64,60,Female,9160
+Jurong East,60-64,60,Female,2950
+Jurong West,60-64,60,Female,8720
+Kallang,60-64,60,Female,3530
+Marine Parade,60-64,60,Female,1620
+Novena,60-64,60,Female,1630
+Outram,60-64,60,Female,560
+Pasir Ris,60-64,60,Female,6380
+Punggol,60-64,60,Female,4370
+Queenstown,60-64,60,Female,3390
+Sembawang,60-64,60,Female,3280
+Sengkang,60-64,60,Female,7710
+Serangoon,60-64,60,Female,4740
+Tampines,60-64,60,Female,11340
+Tanglin,60-64,60,Female,690
+Tengah,60-64,60,Female,440
+Toa Payoh,60-64,60,Female,4880
+Woodlands,60-64,60,Female,9130
+Yishun,60-64,60,Female,8920
+Ang Mo Kio,65-69,65,Female,6410
+Bedok,65-69,65,Female,10680
+Bishan,65-69,65,Female,3460
+Bukit Batok,65-69,65,Female,5810
+Bukit Merah,65-69,65,Female,5140
+Bukit Panjang,65-69,65,Female,4770
+Bukit Timah,65-69,65,Female,2410
+Choa Chu Kang,65-69,65,Female,5620
+Clementi,65-69,65,Female,3310
+Geylang,65-69,65,Female,4200
+Hougang,65-69,65,Female,8850
+Jurong East,65-69,65,Female,3160
+Jurong West,65-69,65,Female,8140
+Kallang,65-69,65,Female,3550
+Marine Parade,65-69,65,Female,1470
+Novena,65-69,65,Female,1510
+Outram,65-69,65,Female,610
+Pasir Ris,65-69,65,Female,4660
+Punggol,65-69,65,Female,3860
+Queenstown,65-69,65,Female,3290
+Sembawang,65-69,65,Female,2730
+Sengkang,65-69,65,Female,7060
+Serangoon,65-69,65,Female,4960
+Tampines,65-69,65,Female,10900
+Tanglin,65-69,65,Female,630
+Tengah,65-69,65,Female,420
+Toa Payoh,65-69,65,Female,4930
+Woodlands,65-69,65,Female,7110
+Yishun,65-69,65,Female,7900
+Ang Mo Kio,70-74,70,Female,6210
+Bedok,70-74,70,Female,9390
+Bishan,70-74,70,Female,2790
+Bukit Batok,70-74,70,Female,4530
+Bukit Merah,70-74,70,Female,5050
+Bukit Panjang,70-74,70,Female,3400
+Bukit Timah,70-74,70,Female,2040
+Choa Chu Kang,70-74,70,Female,3860
+Clementi,70-74,70,Female,3460
+Geylang,70-74,70,Female,3580
+Hougang,70-74,70,Female,6670
+Jurong East,70-74,70,Female,2700
+Jurong West,70-74,70,Female,6680
+Kallang,70-74,70,Female,3290
+Marine Parade,70-74,70,Female,1330
+Novena,70-74,70,Female,1340
+Outram,70-74,70,Female,590
+Pasir Ris,70-74,70,Female,2900
+Punggol,70-74,70,Female,3110
+Queenstown,70-74,70,Female,3050
+Sembawang,70-74,70,Female,1810
+Sengkang,70-74,70,Female,5180
+Serangoon,70-74,70,Female,3930
+Tampines,70-74,70,Female,7920
+Tanglin,70-74,70,Female,560
+Tengah,70-74,70,Female,250
+Toa Payoh,70-74,70,Female,4150
+Woodlands,70-74,70,Female,4820
+Yishun,70-74,70,Female,5780
+Ang Mo Kio,75-79,75,Female,4930
+Bedok,75-79,75,Female,7290
+Bishan,75-79,75,Female,2110
+Bukit Batok,75-79,75,Female,2830
+Bukit Merah,75-79,75,Female,4600
+Bukit Panjang,75-79,75,Female,2210
+Bukit Timah,75-79,75,Female,1700
+Choa Chu Kang,75-79,75,Female,2420
+Clementi,75-79,75,Female,2870
+Geylang,75-79,75,Female,2870
+Hougang,75-79,75,Female,4750
+Jurong East,75-79,75,Female,1990
+Jurong West,75-79,75,Female,4220
+Kallang,75-79,75,Female,2770
+Marine Parade,75-79,75,Female,1280
+Novena,75-79,75,Female,1140
+Outram,75-79,75,Female,550
+Pasir Ris,75-79,75,Female,2050
+Punggol,75-79,75,Female,2270
+Queenstown,75-79,75,Female,3010
+Sembawang,75-79,75,Female,1200
+Sengkang,75-79,75,Female,3410
+Serangoon,75-79,75,Female,2900
+Tampines,75-79,75,Female,4960
+Tanglin,75-79,75,Female,460
+Tengah,75-79,75,Female,130
+Toa Payoh,75-79,75,Female,3650
+Woodlands,75-79,75,Female,3230
+Yishun,75-79,75,Female,3840
+Ang Mo Kio,80-84,80,Female,2780
+Bedok,80-84,80,Female,3720
+Bishan,80-84,80,Female,1170
+Bukit Batok,80-84,80,Female,1390
+Bukit Merah,80-84,80,Female,2650
+Bukit Panjang,80-84,80,Female,1150
+Bukit Timah,80-84,80,Female,990
+Choa Chu Kang,80-84,80,Female,1200
+Clementi,80-84,80,Female,1420
+Geylang,80-84,80,Female,1540
+Hougang,80-84,80,Female,2420
+Jurong East,80-84,80,Female,880
+Jurong West,80-84,80,Female,2010
+Kallang,80-84,80,Female,1580
+Marine Parade,80-84,80,Female,740
+Novena,80-84,80,Female,680
+Outram,80-84,80,Female,320
+Pasir Ris,80-84,80,Female,1080
+Punggol,80-84,80,Female,960
+Queenstown,80-84,80,Female,1800
+Sembawang,80-84,80,Female,690
+Sengkang,80-84,80,Female,1620
+Serangoon,80-84,80,Female,1540
+Tampines,80-84,80,Female,2370
+Tanglin,80-84,80,Female,230
+Tengah,80-84,80,Female,60
+Toa Payoh,80-84,80,Female,2310
+Woodlands,80-84,80,Female,1550
+Yishun,80-84,80,Female,1840
+Ang Mo Kio,85-89,85,Female,1790
+Bedok,85-89,85,Female,2500
+Bishan,85-89,85,Female,800
+Bukit Batok,85-89,85,Female,860
+Bukit Merah,85-89,85,Female,1890
+Bukit Panjang,85-89,85,Female,700
+Bukit Timah,85-89,85,Female,720
+Choa Chu Kang,85-89,85,Female,780
+Clementi,85-89,85,Female,950
+Geylang,85-89,85,Female,1120
+Hougang,85-89,85,Female,1630
+Jurong East,85-89,85,Female,580
+Jurong West,85-89,85,Female,1120
+Kallang,85-89,85,Female,1160
+Marine Parade,85-89,85,Female,590
+Novena,85-89,85,Female,540
+Outram,85-89,85,Female,250
+Pasir Ris,85-89,85,Female,740
+Punggol,85-89,85,Female,570
+Queenstown,85-89,85,Female,1430
+Sembawang,85-89,85,Female,410
+Sengkang,85-89,85,Female,1000
+Serangoon,85-89,85,Female,1130
+Tampines,85-89,85,Female,1610
+Tanglin,85-89,85,Female,150
+Tengah,85-89,85,Female,30
+Toa Payoh,85-89,85,Female,1710
+Woodlands,85-89,85,Female,1000
+Yishun,85-89,85,Female,1150
+Ang Mo Kio,90+,90,Female,1120
+Bedok,90+,90,Female,1660
+Bishan,90+,90,Female,540
+Bukit Batok,90+,90,Female,590
+Bukit Merah,90+,90,Female,1210
+Bukit Panjang,90+,90,Female,430
+Bukit Timah,90+,90,Female,480
+Choa Chu Kang,90+,90,Female,530
+Clementi,90+,90,Female,550
+Geylang,90+,90,Female,830
+Hougang,90+,90,Female,1030
+Jurong East,90+,90,Female,330
+Jurong West,90+,90,Female,670
+Kallang,90+,90,Female,750
+Marine Parade,90+,90,Female,400
+Novena,90+,90,Female,360
+Outram,90+,90,Female,220
+Pasir Ris,90+,90,Female,530
+Punggol,90+,90,Female,330
+Queenstown,90+,90,Female,900
+Sembawang,90+,90,Female,260
+Sengkang,90+,90,Female,620
+Serangoon,90+,90,Female,710
+Tampines,90+,90,Female,1040
+Tanglin,90+,90,Female,110
+Tengah,90+,90,Female,20
+Toa Payoh,90+,90,Female,1080
+Woodlands,90+,90,Female,570
+Yishun,90+,90,Female,720

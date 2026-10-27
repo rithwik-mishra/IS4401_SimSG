@@ -1,0 +1,175 @@
+area,dwelling,households
+Ang Mo Kio,1-2 room,5700
+Bedok,1-2 room,5600
+Bishan,1-2 room,700
+Bukit Batok,1-2 room,5500
+Bukit Merah,1-2 room,8200
+Bukit Panjang,1-2 room,2300
+Bukit Timah,1-2 room,100
+Choa Chu Kang,1-2 room,2800
+Clementi,1-2 room,1200
+Geylang,1-2 room,5200
+Hougang,1-2 room,3600
+Jurong East,1-2 room,1300
+Jurong West,1-2 room,4300
+Kallang,1-2 room,5400
+Marine Parade,1-2 room,1900
+Novena,1-2 room,900
+Outram,1-2 room,1900
+Pasir Ris,1-2 room,700
+Punggol,1-2 room,9000
+Queenstown,1-2 room,4100
+Sembawang,1-2 room,4200
+Sengkang,1-2 room,8200
+Serangoon,1-2 room,600
+Tampines,1-2 room,3800
+Tanglin,1-2 room,0
+Tengah,1-2 room,2600
+Toa Payoh,1-2 room,5600
+Woodlands,1-2 room,6200
+Yishun,1-2 room,6600
+Ang Mo Kio,3 room,25100
+Bedok,3 room,21900
+Bishan,3 room,2300
+Bukit Batok,3 room,12300
+Bukit Merah,3 room,14300
+Bukit Panjang,3 room,4500
+Bukit Timah,3 room,400
+Choa Chu Kang,3 room,2500
+Clementi,3 room,11700
+Geylang,3 room,13200
+Hougang,3 room,10200
+Jurong East,3 room,7000
+Jurong West,3 room,13100
+Kallang,3 room,11000
+Marine Parade,3 room,3400
+Novena,3 room,3000
+Outram,3 room,1500
+Pasir Ris,3 room,300
+Punggol,3 room,6400
+Queenstown,3 room,12800
+Sembawang,3 room,1900
+Sengkang,3 room,5300
+Serangoon,3 room,4800
+Tampines,3 room,16000
+Tanglin,3 room,0
+Tengah,3 room,400
+Toa Payoh,3 room,16700
+Woodlands,3 room,7100
+Yishun,3 room,16300
+Ang Mo Kio,4 room,14800
+Bedok,4 room,22400
+Bishan,4 room,9400
+Bukit Batok,4 room,20700
+Bukit Merah,4 room,15500
+Bukit Panjang,4 room,19200
+Bukit Timah,4 room,900
+Choa Chu Kang,4 room,25900
+Clementi,4 room,9700
+Geylang,4 room,13300
+Hougang,4 room,27900
+Jurong East,4 room,8200
+Jurong West,4 room,32400
+Kallang,4 room,9700
+Marine Parade,4 room,1800
+Novena,4 room,2800
+Outram,4 room,1100
+Pasir Ris,4 room,11600
+Punggol,4 room,25300
+Queenstown,4 room,10200
+Sembawang,4 room,12700
+Sengkang,4 room,34700
+Serangoon,4 room,10300
+Tampines,4 room,38300
+Tanglin,4 room,0
+Tengah,4 room,2500
+Toa Payoh,4 room,14400
+Woodlands,4 room,34200
+Yishun,4 room,32700
+Ang Mo Kio,5 room/exec,6700
+Bedok,5 room/exec,13100
+Bishan,5 room/exec,7600
+Bukit Batok,5 room/exec,11600
+Bukit Merah,5 room/exec,8500
+Bukit Panjang,5 room/exec,13900
+Bukit Timah,5 room/exec,900
+Choa Chu Kang,5 room/exec,22600
+Clementi,5 room/exec,5000
+Geylang,5 room/exec,4500
+Hougang,5 room/exec,16200
+Jurong East,5 room/exec,7400
+Jurong West,5 room/exec,31000
+Kallang,5 room/exec,4100
+Marine Parade,5 room/exec,1700
+Novena,5 room/exec,1200
+Outram,5 room/exec,400
+Pasir Ris,5 room/exec,17100
+Punggol,5 room/exec,19600
+Queenstown,5 room/exec,4500
+Sembawang,5 room/exec,12800
+Sengkang,5 room/exec,32000
+Serangoon,5 room/exec,6300
+Tampines,5 room/exec,29400
+Tanglin,5 room/exec,0
+Tengah,5 room/exec,1700
+Toa Payoh,5 room/exec,7100
+Woodlands,5 room/exec,28000
+Yishun,5 room/exec,13300
+Ang Mo Kio,condo,5500
+Bedok,condo,22500
+Bishan,condo,7300
+Bukit Batok,condo,11700
+Bukit Merah,condo,6000
+Bukit Panjang,condo,6800
+Bukit Timah,condo,15400
+Choa Chu Kang,condo,8500
+Clementi,condo,9700
+Geylang,condo,10900
+Hougang,condo,14600
+Jurong East,condo,2500
+Jurong West,condo,6800
+Kallang,condo,8600
+Marine Parade,condo,7200
+Novena,condo,8900
+Outram,condo,200
+Pasir Ris,condo,15300
+Punggol,condo,8400
+Queenstown,condo,7500
+Sembawang,condo,4800
+Sengkang,condo,15400
+Serangoon,condo,8100
+Tampines,condo,14300
+Tanglin,condo,6700
+Tengah,condo,0
+Toa Payoh,condo,7600
+Woodlands,condo,6100
+Yishun,condo,7300
+Ang Mo Kio,landed,4100
+Bedok,landed,12100
+Bishan,landed,2900
+Bukit Batok,landed,1600
+Bukit Merah,landed,100
+Bukit Panjang,landed,1100
+Bukit Timah,landed,9100
+Choa Chu Kang,landed,600
+Clementi,landed,1800
+Geylang,landed,1500
+Hougang,landed,6200
+Jurong East,landed,0
+Jurong West,landed,1200
+Kallang,landed,400
+Marine Parade,landed,2300
+Novena,landed,2500
+Outram,landed,0
+Pasir Ris,landed,2200
+Punggol,landed,100
+Queenstown,landed,1000
+Sembawang,landed,1100
+Sengkang,landed,400
+Serangoon,landed,10100
+Tampines,landed,1200
+Tanglin,landed,1200
+Tengah,landed,0
+Toa Payoh,landed,1400
+Woodlands,landed,200
+Yishun,landed,1700

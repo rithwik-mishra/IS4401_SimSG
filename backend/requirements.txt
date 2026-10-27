@@ -11,3 +11,9 @@ chromadb>=0.5.0
 # FastAPI runtime
 fastapi>=0.111
 uvicorn[standard]>=0.29
+
+# SimSG data pipeline and respondent
+numpy>=1.26
+openpyxl>=3.1
+openai>=1.40
+python-dotenv>=1.0

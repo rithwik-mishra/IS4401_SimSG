@@ -1,0 +1,31 @@
+Wrote data/processed/resident_area_sex_ethnic.csv  (232 rows)
+Wrote data/processed/resident_area_age_sex.csv  (1102 rows)
+Wrote data/processed/household_area_income.csv  (609 rows)
+Wrote data/processed/household_income_dwelling.csv  (126 rows)
+Wrote data/processed/household_area_dwelling.csv  (174 rows)
+Wrote data/processed/spend_per_member_dwelling.csv  (108 rows)
+Wrote data/processed/household_dwelling_size.csv  (36 rows)
+Wrote data/checks/published_area_totals.csv  (reference only)
+
+[PASS] Same areas in all four area tables  (29 areas)
+[PASS] Dwelling labels match in income_dwelling  (['1-2 room', '3 room', '4 room', '5 room/exec', 'condo', 'landed'])
+[PASS] Dwelling labels match in area_dwelling  (['1-2 room', '3 room', '4 room', '5 room/exec', 'condo', 'landed'])
+[PASS] Dwelling labels match in spend  (['1-2 room', '3 room', '4 room', '5 room/exec', 'condo', 'landed'])
+[PASS] Dwelling labels match in size  (['1-2 room', '3 room', '4 room', '5 room/exec', 'condo', 'landed'])
+[PASS] Income bands match between area x income and income x dwelling  (21 bands)
+[PASS] No missing or negative values in ethnic  (missing=0, negative=0)
+[PASS] No missing or negative values in age  (missing=0, negative=0)
+[PASS] No missing or negative values in area_income  (missing=0, negative=0)
+[PASS] No missing or negative values in income_dwelling  (missing=0, negative=0)
+[PASS] No missing or negative values in area_dwelling  (missing=0, negative=0)
+[PASS] No missing or negative values in spend  (missing=0, negative=0)
+[PASS] No missing or negative values in size  (missing=0, negative=0)
+[PASS] Area x sex totals agree between ethnic and age tables (rounding <= 50)  (max gap 30)
+[PASS] Area income rows close to published area totals (rounding <= 500)  (max gap 200)
+[INFO] Households in unlisted dwelling types per area: up to 700 (largest: Hougang); total across 29 areas 3400
+[PASS] Dwelling rows never exceed the published area total beyond rounding (<= 200)  (min -100)
+[PASS] Published area totals identical in income and dwelling tables
+[INFO] Size table national households: 1,483,400; 29-area dwelling table: 1,467,100 (difference is the dropped 'Others' row + rounding)
+[PASS] Spending table has Food and Beverage Serving Services for all 6 dwellings
+
+ALL CHECKS PASSED
