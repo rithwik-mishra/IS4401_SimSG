@@ -131,7 +131,7 @@ class SimulationContextService:
             f"Available areas: {available}"
         )
 
-    def _query_rag(
+    def query_rag(
         self,
         planning_area: str,
         user_pitch: str,
@@ -173,6 +173,20 @@ class SimulationContextService:
             f"for planning_area='{planning_area}'"
         )
         return chunks, query_text
+
+    def get_indexed_planning_areas(self) -> list[str]:
+        """Return sorted list of planning areas indexed in ChromaDB."""
+        try:
+            data = self._collection.get(include=["metadatas"])
+            metas = data.get("metadatas", []) or []
+            areas = {m.get("planning_area") for m in metas if isinstance(m, dict) and m.get("planning_area")}
+            return sorted(areas)
+        except Exception as exc:
+            logger.error(f"Failed to fetch indexed planning areas: {exc}")
+            return []
+
+    # Backwards compatibility alias
+    _query_rag = query_rag
 
     # ------------------------------------------------------------------
     # Public API
