@@ -21,7 +21,9 @@ import json
 import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Tuple
+from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple
+
+
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -77,6 +79,65 @@ class SyntheticPersona(BaseModel):
     cafe_baseline_coffee_sgd: float = Field(
         default=6.50, description="Reference baseline price for specialty cafe coffee (S$6.50)"
     )
+
+
+class RepresentativePersona(BaseModel):
+    """
+    Flattened, table-ready record of a representative resident persona and their evaluation,
+    portraying one of the 5 key Singapore demographic archetypes for the React dashboard table.
+    """
+    demographic_cohort: str = Field(
+        ...,
+        description="Demographic cohort: Senior / Retiree, Working-Class, Suburban Family, Young Adult / Student, or Affluent Private Property",
+    )
+    persona_id: str = Field(
+        ...,
+        description="Unique persona identifier (e.g. 'AMK-001')",
+    )
+    age: int = Field(
+        ...,
+        description="Age of the resident in years",
+    )
+    gender: str = Field(
+        ...,
+        description="Gender (Male / Female)",
+    )
+    dwelling_type: str = Field(
+        ...,
+        description="Housing / dwelling type (e.g. '1-2 room', '3 room', '4 room', '5 room/exec', 'condo', 'landed')",
+    )
+    monthly_income_sgd: float = Field(
+        ...,
+        description="Estimated monthly household income in SGD",
+    )
+    daily_dining_budget_sgd: float = Field(
+        ...,
+        description="Daily dining-out spend budget ceiling in SGD (SingStat HES 2023)",
+    )
+    buy_probability_pct: int = Field(
+        ...,
+        description="Simulated probability (0-100%) that this persona would purchase the offering",
+    )
+    sentiment: str = Field(
+        ...,
+        description="Sentiment classification: Positive, Neutral, or Negative",
+    )
+    price_ceiling_sgd: float = Field(
+        ...,
+        description="Maximum acceptable price ceiling in SGD before it is considered too expensive",
+    )
+    primary_objection: str = Field(
+        ...,
+        description="Core objection or hesitation voiced by this persona (max 120 chars)",
+    )
+    quote: str = Field(
+        ...,
+        description="In-character qualitative quote in authentic Singapore voice",
+    )
+    too_cheap: Optional[float] = Field(default=None, description="Too Cheap threshold in SGD")
+    cheap: Optional[float] = Field(default=None, description="Cheap threshold in SGD")
+    expensive: Optional[float] = Field(default=None, description="Expensive threshold in SGD")
+    too_expensive: Optional[float] = Field(default=None, description="Too Expensive threshold in SGD")
 
 
 # ---------------------------------------------------------------------------
@@ -387,6 +448,249 @@ def sample_synthetic_cohort(
 
     return cohort
 
+
+
+
+def _synthesize_fallback_cohort_persona(
+    cohort_name: str,
+    concept: Optional[Any] = None,
+) -> RepresentativePersona:
+    """
+    Targeted demographic synthesis when a cohort has 0 draws in a planning area
+    (e.g. Working-Class in Bukit Timah, or Affluent in Outram).
+    Guarantees that all 5 key Singapore demographics are ALWAYS portrayed.
+    """
+    cand_p = getattr(concept, "candidate_price_sgd", 4.50) if concept else 4.50
+
+    if cohort_name == "Senior / Retiree":
+        return RepresentativePersona(
+            demographic_cohort="Senior / Retiree",
+            persona_id="SYN-SNR-01",
+            age=68,
+            gender="Female",
+            dwelling_type="3 room",
+            monthly_income_sgd=2200.0,
+            daily_dining_budget_sgd=14.50,
+            buy_probability_pct=15 if cand_p > 3.0 else 65,
+            sentiment="Negative" if cand_p > 3.0 else "Positive",
+            price_ceiling_sgd=3.50,
+            primary_objection="Fixed retirement allowance; significantly higher than coffeeshop kopi baseline.",
+            quote=f"Aiya, S${cand_p:.2f} is very steep lah. Coffeeshop kopi only S$1.40, why spend so much?",
+            too_cheap=0.80,
+            cheap=1.40,
+            expensive=2.80,
+            too_expensive=3.50,
+        )
+    elif cohort_name == "Working-Class":
+        return RepresentativePersona(
+            demographic_cohort="Working-Class",
+            persona_id="SYN-WRK-01",
+            age=38,
+            gender="Male",
+            dwelling_type="3 room",
+            monthly_income_sgd=3200.0,
+            daily_dining_budget_sgd=18.00,
+            buy_probability_pct=25 if cand_p > 4.5 else 60,
+            sentiment="Negative" if cand_p > 4.5 else "Neutral",
+            price_ceiling_sgd=4.50,
+            primary_objection="Daily expenditure constraint; prefers hawker routine for weekday meals.",
+            quote=f"Can buy once in a while as a treat, but S${cand_p:.2f} daily will burst my lunch budget.",
+            too_cheap=1.20,
+            cheap=2.20,
+            expensive=3.80,
+            too_expensive=4.50,
+        )
+    elif cohort_name == "Suburban Family":
+        return RepresentativePersona(
+            demographic_cohort="Suburban Family",
+            persona_id="SYN-FAM-01",
+            age=44,
+            gender="Female",
+            dwelling_type="4 room",
+            monthly_income_sgd=8200.0,
+            daily_dining_budget_sgd=28.00,
+            buy_probability_pct=55 if cand_p <= 6.0 else 30,
+            sentiment="Neutral" if cand_p <= 6.0 else "Negative",
+            price_ceiling_sgd=6.00,
+            primary_objection="Needs family bundle value and kid-friendly breakfast/tea sets.",
+            quote=f"Would visit on weekends with the family if there are sharing sets or toast bundles.",
+            too_cheap=1.80,
+            cheap=3.50,
+            expensive=5.20,
+            too_expensive=6.00,
+        )
+    elif cohort_name == "Young Adult / Student":
+        return RepresentativePersona(
+            demographic_cohort="Young Adult / Student",
+            persona_id="SYN-YNG-01",
+            age=22,
+            gender="Female",
+            dwelling_type="4 room",
+            monthly_income_sgd=1400.0,
+            daily_dining_budget_sgd=14.00,
+            buy_probability_pct=60 if cand_p <= 6.5 else 25,
+            sentiment="Positive" if cand_p <= 6.5 else "Negative",
+            price_ceiling_sgd=6.50,
+            primary_objection="Attractive specialty aesthetic, but high for non-income student routine.",
+            quote=f"Looks very aesthetic for study sessions, but S${cand_p:.2f} is slightly high for everyday.",
+            too_cheap=1.50,
+            cheap=3.20,
+            expensive=5.50,
+            too_expensive=6.50,
+        )
+    else:  # Affluent Private Property
+        return RepresentativePersona(
+            demographic_cohort="Affluent Private Property",
+            persona_id="REP-AFF-01",
+            age=36,
+            gender="Male",
+            dwelling_type="condo",
+            monthly_income_sgd=15500.0,
+            daily_dining_budget_sgd=55.00,
+            buy_probability_pct=80 if cand_p <= 9.0 else 45,
+            sentiment="Positive" if cand_p <= 9.0 else "Neutral",
+            price_ceiling_sgd=9.00,
+            primary_objection="Must maintain premium bean quality and extraction to justify pricing over chain cafes.",
+            quote=f"Happy to pay S${cand_p:.2f} if the roast profile and single-origin quality meet specialty standards.",
+            too_cheap=2.50,
+            cheap=4.80,
+            expensive=7.80,
+            too_expensive=9.00,
+        )
+
+
+def select_representative_demographic_personas(
+    personas: Sequence[SyntheticPersona],
+    evaluations: Sequence[Any],
+    concept: Optional[Any] = None,
+) -> List[RepresentativePersona]:
+    """
+    Selects a selective JSON list of N=5 resident personas where each persona is
+    from a different unique demographic such that all 5 key Singapore demographics are portrayed:
+      1. Senior / Retiree
+      2. Working-Class
+      3. Suburban Family
+      4. Young Adult / Student
+      5. Affluent Private Property
+
+    Formatted cleanly with flat, typed primitive fields ready for a React dashboard table.
+    """
+    TARGET_COHORTS = [
+        "Senior / Retiree",
+        "Working-Class",
+        "Suburban Family",
+        "Young Adult / Student",
+        "Affluent Private Property",
+    ]
+
+    eval_map: Dict[str, Dict[str, Any]] = {}
+    for ev in evaluations:
+        ev_dict = ev.model_dump() if hasattr(ev, "model_dump") else (ev if isinstance(ev, dict) else dict(ev))
+        pid = ev_dict.get("persona_id")
+        if pid:
+            eval_map[pid] = ev_dict
+
+    def score_fit(p: SyntheticPersona, cohort: str) -> float:
+        age = p.age
+        d = p.dwelling_type.lower()
+        inc = p.monthly_household_income_sgd
+        arch = getattr(p, "archetype", "").lower()
+
+        if cohort == "Senior / Retiree":
+            if age >= 65 or arch == "retiree":
+                return 100.0 + age
+            return -1.0
+        elif cohort == "Young Adult / Student":
+            if 20 <= age <= 24 or arch == "student":
+                return 100.0 - age
+            return -1.0
+        elif cohort == "Affluent Private Property":
+            if d in ["condo", "landed"]:
+                return 100.0 + min(50.0, inc / 500.0)
+            if arch == "affluent_pro" or inc >= 10000:
+                return 50.0 + min(50.0, inc / 500.0)
+            return -1.0
+        elif cohort == "Suburban Family":
+            if d in ["4 room", "5 room/exec"] and 25 <= age < 65:
+                return 100.0 + min(50.0, inc / 500.0)
+            if arch == "heartland_family":
+                return 70.0
+            return -1.0
+        elif cohort == "Working-Class":
+            if d in ["1-2 room", "3 room"] and 25 <= age < 65 and inc < 7000:
+                return 100.0 + max(0.0, (7000.0 - inc) / 100.0)
+            if arch == "working_class":
+                return 70.0
+            return -1.0
+        return -1.0
+
+    selected: List[RepresentativePersona] = []
+    used_ids: Set[str] = set()
+
+    for cohort_name in TARGET_COHORTS:
+        candidates = []
+        for p in personas:
+            if p.persona_id in used_ids:
+                continue
+            s = score_fit(p, cohort_name)
+            if s > 0:
+                candidates.append((s, p))
+
+        candidates.sort(key=lambda x: x[0], reverse=True)
+
+        if candidates:
+            best_s, best_p = candidates[0]
+            used_ids.add(best_p.persona_id)
+            ev_data = eval_map.get(best_p.persona_id, {})
+
+            price_ceiling = (
+                ev_data.get("expensive")
+                or ev_data.get("too_expensive")
+                or round(best_p.daily_dining_budget_sgd * 0.4, 2)
+            )
+
+            quote_val = str(
+                ev_data.get("in_character_quote")
+                or ev_data.get("quote")
+                or "Considering the offering."
+            )
+            objection_val = str(
+                ev_data.get("primary_objection")
+                or "Price disparity vs hawker alternatives."
+            )
+            sentiment_val = str(
+                ev_data.get("sentiment_label")
+                or ev_data.get("sentiment")
+                or "Neutral"
+            )
+
+            rep = RepresentativePersona(
+                demographic_cohort=cohort_name,
+                persona_id=best_p.persona_id,
+                age=best_p.age,
+                gender=best_p.gender,
+                dwelling_type=best_p.dwelling_type,
+                monthly_income_sgd=round(best_p.monthly_household_income_sgd, 2),
+                daily_dining_budget_sgd=round(best_p.daily_dining_budget_sgd, 2),
+                buy_probability_pct=int(ev_data.get("buy_probability_pct", 50)),
+                sentiment=sentiment_val,
+                price_ceiling_sgd=float(round(price_ceiling, 2)),
+                primary_objection=objection_val,
+                quote=quote_val,
+                too_cheap=ev_data.get("too_cheap"),
+                cheap=ev_data.get("cheap"),
+                expensive=ev_data.get("expensive"),
+                too_expensive=ev_data.get("too_expensive"),
+            )
+            selected.append(rep)
+        else:
+            rep = _synthesize_fallback_cohort_persona(cohort_name, concept)
+            selected.append(rep)
+
+    return selected
+
+
+select_representative_personas = select_representative_demographic_personas
 
 # ---------------------------------------------------------------------------
 # CLI Execution Block

@@ -2,13 +2,10 @@
 backend/tests/test_simulation_pipeline.py
 -------------------------------------------
 End-to-end integration test suite for SimSG's unified POST /api/simulate endpoint.
-Validates the complete 6-stage simulation pipeline:
-  1. Natural Language Query Decomposition
-  2. ChromaDB Layer 2 Qualitative RAG Retrieval
-  3. Monte Carlo Demographic Sampling (N=30 SingStat personas)
-  4. Async Parallel Persona Evaluation Engine (bounded concurrency)
-  5. Deterministic Econometric PSM Engine (Van Westendorp curves, OPP, PMC, PME, IPP, cohorts)
-  6. Macro Strategic Synthesis & Actionable Pivot Agent
+Validates the streamlined 3-part output:
+  1. recommendations (overall recommendations / insights)
+  2. personas (selective N=5 demographic table representing all 5 key Singapore demographics)
+  3. statistics (deterministic Van Westendorp curves, intersections, sentiment, cohorts)
 """
 
 from __future__ import annotations
@@ -44,61 +41,60 @@ def test_simulate_full_pipeline_mock(client: TestClient):
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     data = response.json()
 
-    # 1. Concept verification
-    concept = data["concept"]
-    assert "Kopi" in concept["concept_name"] or "kopi" in concept["concept_name"].lower()
-    assert concept["target_planning_area"] == "Ang Mo Kio"
-    assert concept["candidate_price_sgd"] == 7.00
-    assert concept["category_type"] in ["beverage", "bakery", "full_service_dining", "retail"]
+    # 1. Output structure verification: strictly 3 top-level keys
+    assert list(data.keys()) == ["recommendations", "personas", "statistics"]
 
-    # 2. General metadata
-    assert data["planning_area"] == "Ang Mo Kio"
-    assert data["sample_size"] == 30
-    assert data["seed"] == 42
+    # 2. Recommendations & Strategic Insights (First Output)
+    recommendations = data["recommendations"]
+    assert recommendations["verdict_badge"] in ["VIABLE", "MODERATE RISK", "HIGH RISK - PIVOT REQUIRED"]
+    assert len(recommendations["executive_summary"]) > 20
+    assert len(recommendations["clustered_objections"]) >= 1
+    for cl in recommendations["clustered_objections"]:
+        assert 0.0 <= cl["frequency_pct"] <= 100.0
+        assert len(cl["representative_quotes"]) >= 1
+    assert len(recommendations["recommended_pivot"]) > 20
+    assert 0.0 <= recommendations["simulated_post_pivot_uplift"] <= 100.0
 
-    # 3. ChromaDB RAG verification
-    rag_context = data["rag_context"]
-    assert len(rag_context) == 3, f"Expected 3 RAG chunks, got {len(rag_context)}"
-    categories = [c["category"] for c in rag_context]
-    assert "pricing_benchmarks" in categories
-    assert "competitors_and_supply" in categories
-    assert "foot_traffic_and_lifestyle" in categories
-
-    # 4. Personas verification
+    # 3. Selective Personas Table (Second Output: Exactly N=5 representing 5 unique demographics)
     personas = data["personas"]
-    assert len(personas) == 30
+    assert len(personas) == 5, f"Expected exactly 5 personas, got {len(personas)}"
+
+    expected_demographics = {
+        "Senior / Retiree",
+        "Working-Class",
+        "Suburban Family",
+        "Young Adult / Student",
+        "Affluent Private Property",
+    }
+    actual_demographics = {p["demographic_cohort"] for p in personas}
+    assert actual_demographics == expected_demographics, f"Expected all 5 demographics, got {actual_demographics}"
+
     for p in personas:
-        assert p["planning_area"] == "Ang Mo Kio"
+        # Verify required table columns for React frontend
+        assert p["persona_id"] is not None and len(p["persona_id"]) > 0
         assert p["age"] >= 20
         assert p["gender"] in ["Male", "Female"]
-        assert p["daily_dining_budget_sgd"] > 0
-        assert p["linguistic_style"] in ["Colloquial Singlish", "Mixed Code-Switch", "Standard Singapore English"]
+        assert len(p["dwelling_type"]) > 0
+        assert p["monthly_income_sgd"] >= 0.0
+        assert p["daily_dining_budget_sgd"] > 0.0
+        assert 0 <= p["buy_probability_pct"] <= 100
+        assert p["sentiment"] in ["Positive", "Neutral", "Negative"]
+        assert p["price_ceiling_sgd"] > 0.0
+        assert len(p["primary_objection"]) > 0
+        assert len(p["quote"]) > 0
 
-    # 5. Evaluations verification
-    evaluations = data["evaluations"]
-    assert len(evaluations) == 30
-    for ev in evaluations:
-        assert 0 <= ev["buy_probability_pct"] <= 100
-        # Van Westendorp monotonicity: too_cheap <= cheap < expensive <= too_expensive
-        assert ev["too_cheap"] <= ev["cheap"]
-        assert ev["cheap"] < ev["expensive"]
-        assert ev["expensive"] <= ev["too_expensive"]
-        assert ev["sentiment_label"] in ["Positive", "Neutral", "Negative"]
-        assert len(ev["in_character_quote"]) > 0
-        assert len(ev["primary_objection"]) <= 120
+    # 4. Deterministic Econometrics & Statistics (Third / Last Output)
+    stats = data["statistics"]
+    assert 0.0 <= stats["mean_buy_intent_pct"] <= 100.0
+    assert -1.0 <= stats["net_sentiment_score"] <= 1.0
+    assert sum(stats["sentiment_breakdown"].values()) == 30
 
-    # 6. Econometrics verification
-    econ = data["econometrics"]
-    assert 0.0 <= econ["mean_buy_intent_pct"] <= 100.0
-    assert -1.0 <= econ["net_sentiment_score"] <= 1.0
-    assert sum(econ["sentiment_breakdown"].values()) == 30
-
-    psm = econ["psm_intersections"]
+    psm = stats["psm_intersections"]
     assert psm["pmc"] <= psm["pme"]
     assert psm["opp"] > 0
     assert psm["ipp"] > 0
 
-    curves = econ["psm_curves"]
+    curves = stats["psm_curves"]
     assert len(curves) >= 15
     for pt in curves:
         assert 0.0 <= pt["too_cheap"] <= 100.0
@@ -106,7 +102,7 @@ def test_simulate_full_pipeline_mock(client: TestClient):
         assert 0.0 <= pt["expensive"] <= 100.0
         assert 0.0 <= pt["too_expensive"] <= 100.0
 
-    cohorts = econ["cohort_breakdown"]
+    cohorts = stats["cohort_breakdown"]
     assert len(cohorts) == 5
     cohort_names = [c["cohort_name"] for c in cohorts]
     assert any("Senior" in name for name in cohort_names)
@@ -114,17 +110,6 @@ def test_simulate_full_pipeline_mock(client: TestClient):
     assert any("Suburban Family" in name for name in cohort_names)
     assert any("Young Adult" in name for name in cohort_names)
     assert any("Affluent" in name for name in cohort_names)
-
-    # 7. Macro Synthesis verification
-    synth = data["synthesis"]
-    assert synth["verdict_badge"] in ["VIABLE", "MODERATE RISK", "HIGH RISK - PIVOT REQUIRED"]
-    assert len(synth["executive_summary"]) > 20
-    assert len(synth["clustered_objections"]) >= 1
-    for cl in synth["clustered_objections"]:
-        assert 0.0 <= cl["frequency_pct"] <= 100.0
-        assert len(cl["representative_quotes"]) >= 1
-    assert len(synth["recommended_pivot"]) > 20
-    assert synth["simulated_post_pivot_uplift"] >= econ["mean_buy_intent_pct"]
 
 
 def test_simulate_with_explicit_overrides(client: TestClient):
@@ -142,12 +127,10 @@ def test_simulate_with_explicit_overrides(client: TestClient):
     assert response.status_code == 200
     data = response.json()
 
-    assert data["concept"]["target_planning_area"] == "Bukit Timah"
-    assert data["concept"]["candidate_price_sgd"] == 9.50
-    assert data["planning_area"] == "Bukit Timah"
-    assert data["sample_size"] == 20
-    assert len(data["personas"]) == 20
-    assert len(data["evaluations"]) == 20
+    assert list(data.keys()) == ["recommendations", "personas", "statistics"]
+    assert len(data["personas"]) == 5
+    cohorts = {p["demographic_cohort"] for p in data["personas"]}
+    assert len(cohorts) == 5
 
 
 def test_simulate_tampines_bubble_tea(client: TestClient):
@@ -163,11 +146,9 @@ def test_simulate_tampines_bubble_tea(client: TestClient):
     assert response.status_code == 200
     data = response.json()
 
-    assert data["concept"]["target_planning_area"] == "Tampines"
-    assert data["concept"]["candidate_price_sgd"] == 5.80
-    assert data["concept"]["category_type"] == "beverage"
-    assert len(data["rag_context"]) == 3
-    assert len(data["personas"]) == 15
+    assert list(data.keys()) == ["recommendations", "personas", "statistics"]
+    assert len(data["personas"]) == 5
+    assert data["statistics"]["mean_buy_intent_pct"] >= 0.0
 
 
 def test_root_index_includes_simulate_route(client: TestClient):

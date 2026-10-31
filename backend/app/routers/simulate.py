@@ -8,6 +8,8 @@ Production FastAPI Router for SimSG's complete End-to-End Simulation Pipeline:
   4. Async Batch Persona Execution Engine (gpt-4o-mini, Semaphore(10))
   5. Deterministic Econometric & Statistical Engine (NumPy/SciPy PSM curves & cohorts)
   6. Macro Synthesis & Strategic Pivot Agent (gpt-4o-mini)
+  7. Selective Representative Personas (N=5 distinct demographic archetypes for React table)
+  8. Streamlined 3-part response: [recommendations, personas, statistics]
 """
 
 from __future__ import annotations
@@ -26,12 +28,16 @@ try:
         MacroSynthesisReport,
         PersonaEvaluationOutput,
         RAGChunk,
+        RepresentativePersona,
         SimulateRequest,
         SimulateResponse,
         SyntheticPersona,
     )
     from app.services.query_decomposer import decompose_query
-    from app.services.sampler import sample_synthetic_cohort
+    from app.services.sampler import (
+        sample_synthetic_cohort,
+        select_representative_demographic_personas,
+    )
     from app.services.econometrics import compute_econometrics
     from app.services.simulation_context import (
         SimulationContextService,
@@ -46,12 +52,16 @@ except ImportError:
         MacroSynthesisReport,
         PersonaEvaluationOutput,
         RAGChunk,
+        RepresentativePersona,
         SimulateRequest,
         SimulateResponse,
         SyntheticPersona,
     )
     from backend.app.services.query_decomposer import decompose_query
-    from backend.app.services.sampler import sample_synthetic_cohort
+    from backend.app.services.sampler import (
+        sample_synthetic_cohort,
+        select_representative_demographic_personas,
+    )
     from backend.app.services.econometrics import compute_econometrics
     from backend.app.services.simulation_context import (
         SimulationContextService,
@@ -73,7 +83,8 @@ router = APIRouter(
     description=(
         "Takes an unstructured user pitch, decomposes it, samples N=30 SingStat personas, "
         "retrieves ChromaDB qualitative context, executes concurrent LLM evaluations, "
-        "computes deterministic Van Westendorp PSM econometrics, and synthesizes strategic pivots."
+        "computes deterministic Van Westendorp PSM econometrics, and synthesizes strategic pivots. "
+        "Outputs streamlined views: 1) overall recommendations/insights, 2) selective N=5 demographic table, 3) statistics."
     ),
 )
 async def simulate(
@@ -210,16 +221,24 @@ async def simulate(
         ) from exc
 
     # -----------------------------------------------------------------------
-    # Step 7: Assemble Unified Response Model for React 19 Frontend
+    # Step 7: Select N=5 Representative Personas Portraying All 5 Demographics
+    # (Clean flat schema ready for direct React dashboard Table mapping)
     # -----------------------------------------------------------------------
-    return SimulateResponse(
-        concept=concept,
-        planning_area=concept.target_planning_area,
-        sample_size=len(personas),
-        seed=req.seed,
-        rag_context=rag_chunks,
+    representative_personas: List[RepresentativePersona] = select_representative_demographic_personas(
         personas=personas,
         evaluations=evaluations,
-        econometrics=econometrics,
-        synthesis=synthesis,
+        concept=concept,
+    )
+    logger.info(
+        f"Step 7 Complete: Selected {len(representative_personas)} representative personas portraying all 5 key demographics"
+    )
+
+    # -----------------------------------------------------------------------
+    # Step 8: Return Clean 3-Part Output: Recommendations, Personas Table, Statistics
+    # (Context, raw pitch decomposition, and raw prompt chunks omitted)
+    # -----------------------------------------------------------------------
+    return SimulateResponse(
+        recommendations=synthesis,
+        personas=[p.model_dump() if hasattr(p, "model_dump") else p for p in representative_personas],
+        statistics=econometrics,
     )

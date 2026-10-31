@@ -121,8 +121,6 @@ class SimulationRunResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------
 # Econometrics & Quantitative Analysis Schemas (Re-exports)
 # ---------------------------------------------------------------------------
 
@@ -153,14 +151,15 @@ except ImportError:
 # ---------------------------------------------------------------------------
 
 try:
-    from app.services.sampler import SyntheticPersona
+    from app.services.sampler import SyntheticPersona, RepresentativePersona
     from app.services.query_decomposer import DecomposedConcept, DecomposedQuery
 except ImportError:
     try:
-        from backend.app.services.sampler import SyntheticPersona
+        from backend.app.services.sampler import SyntheticPersona, RepresentativePersona
         from backend.app.services.query_decomposer import DecomposedConcept, DecomposedQuery
     except ImportError:
         SyntheticPersona = Any  # type: ignore
+        RepresentativePersona = Any  # type: ignore
         DecomposedConcept = Any  # type: ignore
         DecomposedQuery = Any  # type: ignore
 
@@ -180,8 +179,6 @@ except ImportError:
         PersonaEvaluationOutput = Any  # type: ignore
         ClusteredObjection = Any  # type: ignore
         MacroSynthesisReport = Any  # type: ignore
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -218,13 +215,37 @@ class SimulateRequest(BaseModel):
     )
 
 
+
+
+
 class SimulateResponse(BaseModel):
-    concept: DecomposedConcept
-    planning_area: str
-    sample_size: int
-    seed: Optional[int] = None
-    rag_context: list[RAGChunk]
-    personas: list[SyntheticPersona]
-    evaluations: list[PersonaEvaluationOutput]
-    econometrics: EconometricAnalysisResult
-    synthesis: MacroSynthesisReport
+    """
+    Unified focus group simulation response tailored for the React dashboard view:
+      1. recommendations: Overall recommendations & strategic insights (verdict, summary, pivots, objections)
+      2. personas: Selective list of N=5 representative resident personas portraying all 5 unique demographics
+      3. statistics: Deterministic econometric and statistical metrics (PSM curves, intersections, sentiment, cohorts)
+    """
+    recommendations: MacroSynthesisReport = Field(
+        ...,
+        description="Overall strategic recommendations, executive summary, verdict badge, and objection clusters",
+    )
+    personas: list[RepresentativePersona] = Field(
+        ...,
+        description="Selective JSON list of N=5 representative resident personas portraying all 5 unique demographics, formatted for React table rendering",
+    )
+    statistics: EconometricAnalysisResult = Field(
+        ...,
+        description="Deterministic econometric and statistical metrics (PSM curves, intersections, sentiment, cohort breakdown)",
+    )
+
+    @property
+    def synthesis(self) -> MacroSynthesisReport:
+        return self.recommendations
+
+    @property
+    def econometrics(self) -> EconometricAnalysisResult:
+        return self.statistics
+
+    @property
+    def insights(self) -> MacroSynthesisReport:
+        return self.recommendations

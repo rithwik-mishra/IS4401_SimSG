@@ -15,6 +15,8 @@ try:
     from app.services.sampler import (
         SyntheticPersona,
         sample_synthetic_cohort,
+        select_representative_demographic_personas,
+        select_representative_personas,
     )
     from app.services.simulation_context import (
         SimulationContextService,
@@ -38,6 +40,8 @@ except ImportError:
     from backend.app.services.sampler import (
         SyntheticPersona,
         sample_synthetic_cohort,
+        select_representative_demographic_personas,
+        select_representative_personas,
     )
     from backend.app.services.simulation_context import (
         SimulationContextService,
@@ -59,6 +63,8 @@ __all__ = [
     "decompose_query",
     "SyntheticPersona",
     "sample_synthetic_cohort",
+    "select_representative_demographic_personas",
+    "select_representative_personas",
     "SimulationContextService",
     "get_simulation_context_service",
     "EconometricAnalysisResult",
