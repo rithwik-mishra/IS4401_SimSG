@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f6f2">
+  <meta name="description" content="Explore a business idea through simulated Singapore consumer perspectives.">
+  <title>SimSG — Explore your next idea</title>
+  <link rel="icon" href="./assets/mark.png" type="image/png">
+  <link rel="stylesheet" href="./styles.css">
+  <script type="module" src="./js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#idea">Skip to business idea</a>
+  <main class="workspace">
+    <header class="brand-header">
+      <div class="brand-mark" aria-hidden="true"><img src="./assets/mark.png" alt="" width="46" height="46"></div>
+      <div><span class="brand-name">SimSG<span class="brand-dot">.</span></span></div>
+    </header>
+
+    <section class="panel input-panel" aria-labelledby="idea-heading">
+      <div class="section-top"><div><p class="eyebrow">YOUR NEXT IDEA</p><h1 id="idea-heading">What are you thinking of opening?</h1></div><span class="mode-tag" id="mode-tag" hidden></span></div>
+      <p class="intro-copy">Describe your concept and hear how simulated local consumers might respond.</p>
+      <form id="simulation-form">
+        <div class="input-grid">
+          <label class="field idea-field" for="idea"><span>Your business idea</span><textarea id="idea" name="raw_query" required maxlength="12000" placeholder="A S$7 artisanal kopi bar in Ang Mo Kio, serving cold brew and toast sets…">S$7 artisanal single-origin kopi bar in Ang Mo Kio with specialty cold brew and toast sets</textarea></label>
+          <div class="input-side">
+            <label class="field" for="price"><span>Price per item <small>optional</small></span><div class="money-input"><span>S$</span><input id="price" name="override_price" type="number" min="0" step="0.01" placeholder="Use the price in your idea"></div></label>
+            <label class="field" for="town"><span>Neighbourhood <small>optional</small></span><select id="town" name="override_town"><option value="">Use the location in your idea</option><option>Ang Mo Kio</option><option>Tampines</option><option>Bukit Timah</option><option>Jurong East</option><option>Bukit Merah</option><option>Outram</option></select></label>
+          </div>
+        </div>
+        <div id="advanced-options" class="advanced-options" hidden>
+          <label class="field" for="sample-size"><span>Number of respondents</span><input id="sample-size" name="sample_size" type="number" min="5" max="100" step="1" value="30"><small>Between 5 and 100 simulated people</small></label>
+          <label class="field" for="seed"><span>Repeatable sample <small>optional</small></span><input id="seed" name="seed" type="number" step="1" placeholder="Enter a seed number"><small>Use the same number to repeat the people sampled</small></label>
+          <label class="switch-field" for="use-ai"><span><strong>Use AI responses</strong><small>Turn off for rule-based responses</small></span><input id="use-ai" name="use_ai" type="checkbox" checked role="switch"></label>
+        </div>
+        <div class="form-footer"><p id="form-note" class="form-note" hidden></p><div class="form-actions"><button id="advanced-toggle" class="text-button" type="button" aria-expanded="false" aria-controls="advanced-options">More options <span aria-hidden="true">⌄</span></button><button id="submit-button" class="button primary" type="submit"><span id="submit-label">Simulate</span><span aria-hidden="true">↗</span></button></div></div>
+        <p id="request-status" class="request-status" role="status" aria-live="polite"></p>
+        <p id="request-error" class="error-message" role="alert" hidden></p>
+      </form>
+    </section>
+
+    <div id="results" class="results" aria-busy="false" hidden>
+      <p id="result-context" class="result-context"></p>
+      <section class="panel people-panel" aria-labelledby="people-heading">
+        <div class="section-top"><div><p class="eyebrow">THE PEOPLE BEHIND THE RESPONSE</p><h2 id="people-heading">Meet your simulated audience</h2></div><span class="subtle-label">Synthetic perspectives</span></div>
+        <div class="audience-composition"><h3>Who is represented</h3><div id="composition-chart"></div><p class="fine-print">Groups can overlap. Shares are rounded to whole percentages.</p></div>
+        <div class="respondent-summary"><p><strong id="respondent-count">—</strong> <span>responses in this report</span></p><p id="respondent-note" class="fine-print" hidden></p></div>
+        <div class="persona-heading"><h3>A closer look at individual group representative saying</h3><span>Hover or select a card to explore</span></div>
+        <div id="persona-area" class="persona-area"><div id="persona-cards" class="persona-cards"></div><div id="persona-detail" class="persona-detail" hidden></div></div>
+      </section>
+
+      <section class="recommendation-grid" aria-label="Verdict and summary">
+        <div class="panel verdict-panel"><p class="eyebrow">THE VERDICT</p><div id="verdict-content"></div></div>
+        <div class="panel summary-panel"><p class="eyebrow">WHAT THE RESPONSES SAY</p><h2>Your idea, at a glance</h2><p id="executive-summary" class="body-copy"></p><div id="adjustment-block" class="adjustment-block"><h3>Suggested adjustments</h3><p id="recommended-pivot" class="body-copy"></p><div id="post-adjustment" class="post-adjustment"></div></div></div>
+      </section>
+
+      <section class="panel concerns-panel" aria-labelledby="concerns-heading"><div class="section-top"><div><p class="eyebrow">WHAT MIGHT HOLD PEOPLE BACK</p><h2 id="concerns-heading">Main concerns</h2></div><span class="subtle-label">Estimated share of responses</span></div><div id="concerns-list" class="concerns-list"></div></section>
+
+      <section class="panel price-panel" aria-labelledby="price-heading"><div class="section-top"><div><p class="eyebrow">FINDING A PRICE THAT FITS</p><h2 id="price-heading">How does the price feel?</h2></div><span class="subtle-label">Prices in Singapore dollars</span></div><div id="price-legend" class="chart-legend" aria-label="Price reactions"></div><div id="price-chart" class="price-chart"></div><div id="price-points" class="price-points"></div><p class="fine-print">The shaded area is the returned acceptable price range. These are simulated estimates, not guaranteed selling prices.</p></section>
+
+      <section class="panel buying-panel" aria-labelledby="buying-heading"><div class="section-top"><div><p class="eyebrow">WHERE YOUR IDEA CONNECTS</p><h2 id="buying-heading">Who is more likely to buy?</h2></div><div class="headline-stat"><strong id="mean-intent">—</strong><span>overall average</span></div></div><div id="buying-chart"></div><p class="fine-print">Average simulated purchase intent, not actual sales. The same person may belong to more than one group.</p></section>
+
+      <section class="panel sentiment-panel" aria-labelledby="sentiment-heading"><div class="section-top"><div><p class="eyebrow">THE OVERALL REACTION</p><h2 id="sentiment-heading">How people feel about it</h2></div><div class="headline-stat"><strong id="sentiment-score">—</strong><span>sentiment score · −1 to +1</span></div></div><div id="sentiment-chart"></div></section>
+    </div>
+    <footer class="page-footer"><span class="footer-brand">SimSG.</span><span>Simulated insights to help you ask better questions.</span><span>Not a real consumer survey.</span></footer>
+  </main>
+</body>
+</html>
