@@ -5,7 +5,7 @@ Production FastAPI Router for SimSG's complete End-to-End Simulation Pipeline:
   1. Natural Language Query Decomposer (gpt-4o-mini / rule-based fallback)
   2. ChromaDB Layer 2 Qualitative RAG (simsg_layer2_rag)
   3. Monte Carlo Demographic Sampler (N=30 from SingStat & HES 2023)
-  4. Async Batch Persona Execution Engine (gpt-4o-mini, Semaphore(10))
+  4. Async Batch Persona Execution Engine (gpt-4o-mini, Semaphore(25))
   5. Deterministic Econometric & Statistical Engine (NumPy/SciPy PSM curves & cohorts)
   6. Macro Synthesis & Strategic Pivot Agent (gpt-4o-mini)
   7. Selective Representative Personas (N=5 distinct demographic archetypes for React table)
@@ -37,6 +37,7 @@ try:
     from app.services.sampler import (
         sample_synthetic_cohort,
         select_representative_demographic_personas,
+        format_all_demographic_personas,
     )
     from app.services.econometrics import compute_econometrics
     from app.services.simulation_context import (
@@ -61,6 +62,7 @@ except ImportError:
     from backend.app.services.sampler import (
         sample_synthetic_cohort,
         select_representative_demographic_personas,
+        format_all_demographic_personas,
     )
     from backend.app.services.econometrics import compute_econometrics
     from backend.app.services.simulation_context import (
@@ -167,7 +169,7 @@ async def simulate(
         ) from exc
 
     # -----------------------------------------------------------------------
-    # Step 4: Async Parallel Evaluation Engine (Bounded Concurrency Semaphore=10)
+    # Step 4: Async Parallel Evaluation Engine (Bounded Concurrency Semaphore=25)
     # -----------------------------------------------------------------------
     try:
         evaluations: List[PersonaEvaluationOutput] = await run_persona_evaluations(
@@ -175,6 +177,7 @@ async def simulate(
             concept=concept,
             rag_chunks=rag_chunks,
             use_mock=req.use_mock,
+            concurrency=25,
         )
         logger.info(f"Step 4 Complete: Evaluated {len(evaluations)} personas")
     except Exception as exc:
@@ -224,7 +227,7 @@ async def simulate(
     # Step 7: Select N=5 Representative Personas Portraying All 5 Demographics
     # (Clean flat schema ready for direct React dashboard Table mapping)
     # -----------------------------------------------------------------------
-    representative_personas: List[RepresentativePersona] = select_representative_demographic_personas(
+    representative_personas: List[RepresentativePersona] = format_all_demographic_personas(
         personas=personas,
         evaluations=evaluations,
         concept=concept,

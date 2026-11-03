@@ -690,6 +690,89 @@ def select_representative_demographic_personas(
     return selected
 
 
+def format_all_demographic_personas(
+    personas: Sequence[SyntheticPersona],
+    evaluations: Sequence[Any],
+    concept: Optional[Any] = None,
+) -> List[RepresentativePersona]:
+    """
+    Formats and returns all N evaluated resident personas mapped to their corresponding
+    Singapore demographic cohorts, preserving all individual evaluations, Singlish quotes,
+    budget thresholds, and sentiments for the React demographic view.
+    """
+    eval_map: Dict[str, Dict[str, Any]] = {}
+    for ev in evaluations:
+        ev_dict = ev.model_dump() if hasattr(ev, "model_dump") else (ev if isinstance(ev, dict) else dict(ev))
+        pid = ev_dict.get("persona_id")
+        if pid:
+            eval_map[pid] = ev_dict
+
+    def classify_cohort(p: SyntheticPersona) -> str:
+        age = p.age
+        d = p.dwelling_type.lower()
+        inc = p.monthly_household_income_sgd
+        arch = getattr(p, "archetype", "").lower()
+
+        if age >= 65 or arch == "retiree":
+            return "Senior / Retiree"
+        if 20 <= age <= 24 or arch == "student":
+            return "Young Adult / Student"
+        if d in ["condo", "landed"] or arch == "affluent_pro" or inc >= 10000:
+            return "Affluent Private Property"
+        if d in ["1-2 room", "3 room"] or arch == "working_class" or (age < 65 and inc < 5000):
+            return "Working-Class"
+        return "Suburban Family"
+
+    all_personas: List[RepresentativePersona] = []
+
+    for p in personas:
+        cohort_name = classify_cohort(p)
+        ev_data = eval_map.get(p.persona_id, {})
+
+        price_ceiling = (
+            ev_data.get("expensive")
+            or ev_data.get("too_expensive")
+            or round(p.daily_dining_budget_sgd * 0.4, 2)
+        )
+
+        quote_val = str(
+            ev_data.get("in_character_quote")
+            or ev_data.get("quote")
+            or "Considering the offering."
+        )
+        objection_val = str(
+            ev_data.get("primary_objection")
+            or "Price disparity vs hawker alternatives."
+        )
+        sentiment_val = str(
+            ev_data.get("sentiment_label")
+            or ev_data.get("sentiment")
+            or "Neutral"
+        )
+
+        rep = RepresentativePersona(
+            demographic_cohort=cohort_name,
+            persona_id=p.persona_id,
+            age=p.age,
+            gender=p.gender,
+            dwelling_type=p.dwelling_type,
+            monthly_income_sgd=round(p.monthly_household_income_sgd, 2),
+            daily_dining_budget_sgd=round(p.daily_dining_budget_sgd, 2),
+            buy_probability_pct=int(ev_data.get("buy_probability_pct", 50)),
+            sentiment=sentiment_val,
+            price_ceiling_sgd=float(round(price_ceiling, 2)),
+            primary_objection=objection_val,
+            quote=quote_val,
+            too_cheap=ev_data.get("too_cheap"),
+            cheap=ev_data.get("cheap"),
+            expensive=ev_data.get("expensive"),
+            too_expensive=ev_data.get("too_expensive"),
+        )
+        all_personas.append(rep)
+
+    return all_personas
+
+
 select_representative_personas = select_representative_demographic_personas
 
 # ---------------------------------------------------------------------------

@@ -8,6 +8,7 @@ Integrates modular routers and exposes API documentation at /docs.
 from __future__ import annotations
 
 import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -53,10 +54,25 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS middleware for React 19 frontend integration
+# CORS middleware for React 19 frontend integration and Vercel preview/production deployments
+default_origins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:3000",
+]
+
+env_cors = os.getenv("CORS_ORIGINS")
+if env_cors:
+    extra_origins = [orig.strip() for orig in env_cors.split(",") if orig.strip()]
+    allowed_origins = list(dict.fromkeys(default_origins + extra_origins))
+else:
+    allowed_origins = default_origins
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Adjust for specific origins in production
+    allow_origins=allowed_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

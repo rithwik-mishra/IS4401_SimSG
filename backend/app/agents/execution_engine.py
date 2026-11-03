@@ -6,7 +6,7 @@ Evaluates synthetic cohorts of Singapore residents (30 personas) against a
 decomposed business pitch and Layer 2 ChromaDB qualitative neighborhood context.
 
 Core Capabilities:
-  - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(10).
+  - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(25).
   - Uses `gpt-4o-mini` with structured JSON output enforcement.
   - Contextual prompt conditioning across demographic attributes, daily dining budget,
     price baselines, linguistic register, and local neighborhood conditions.
@@ -551,10 +551,11 @@ async def run_persona_evaluations(
     concept: DecomposedConcept,
     rag_chunks: list[Any] = None,
     use_mock: bool = False,
+    concurrency: int = 25,
 ) -> list[PersonaEvaluationOutput]:
     """
     Evaluates a cohort of synthetic personas against a candidate concept.
-    Runs evaluations concurrently bounded by asyncio.Semaphore(10).
+    Runs evaluations concurrently bounded by asyncio.Semaphore(concurrency) (default 25).
 
     Args:
         personas: List of 30 sampled SyntheticPersona profiles.
@@ -581,7 +582,7 @@ async def run_persona_evaluations(
         else:
             logger.info("No OpenAI API key found; running deterministic evaluation engine.")
 
-    sem = asyncio.Semaphore(10)
+    sem = asyncio.Semaphore(concurrency)
     tasks = [
         _evaluate_single_persona(
             sem=sem,

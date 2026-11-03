@@ -55,9 +55,9 @@ def test_simulate_full_pipeline_mock(client: TestClient):
     assert len(recommendations["recommended_pivot"]) > 20
     assert 0.0 <= recommendations["simulated_post_pivot_uplift"] <= 100.0
 
-    # 3. Selective Personas Table (Second Output: Exactly N=5 representing 5 unique demographics)
+    # 3. All N Personas Table (Second Output: All N resident voices)
     personas = data["personas"]
-    assert len(personas) == 5, f"Expected exactly 5 personas, got {len(personas)}"
+    assert len(personas) == 30, f"Expected all 30 personas, got {len(personas)}"
 
     expected_demographics = {
         "Senior / Retiree",
@@ -128,9 +128,9 @@ def test_simulate_with_explicit_overrides(client: TestClient):
     data = response.json()
 
     assert list(data.keys()) == ["recommendations", "personas", "statistics"]
-    assert len(data["personas"]) == 5
+    assert len(data["personas"]) == 20
     cohorts = {p["demographic_cohort"] for p in data["personas"]}
-    assert len(cohorts) == 5
+    assert len(cohorts) >= 3
 
 
 def test_simulate_tampines_bubble_tea(client: TestClient):
@@ -147,7 +147,7 @@ def test_simulate_tampines_bubble_tea(client: TestClient):
     data = response.json()
 
     assert list(data.keys()) == ["recommendations", "personas", "statistics"]
-    assert len(data["personas"]) == 5
+    assert len(data["personas"]) == 15
     assert data["statistics"]["mean_buy_intent_pct"] >= 0.0
 
 
