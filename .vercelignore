@@ -1,0 +1,13 @@
+backend/tests/
+backend/.pytest_cache/
+backend/pipeline/
+backend/scripts/
+backend/data/sheets/raw/
+backend/data/sheets/cleaned/
+backend/data/sheets/checks/
+backend/data/runs/
+backend/requirements-dev.txt
+backend/.env
+backend/.env.*
+node_modules/
+

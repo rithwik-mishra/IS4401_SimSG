@@ -29,8 +29,6 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import numpy as np
 import pandas as pd
 from pydantic import BaseModel, Field
-from scipy import optimize
-from scipy.interpolate import interp1d
 
 logger = logging.getLogger("simsg.econometrics")
 
@@ -381,16 +379,10 @@ def _find_curve_intersection(
 
         # Crossing between p1 and p2: d1 and d2 have opposite signs
         if (d1 > 0 and d2 < 0) or (d1 < 0 and d2 > 0):
-            try:
-                # Continuous linear interpolation function over segment
-                f_seg = interp1d([p1, p2], [d1, d2], kind="linear", fill_value="extrapolate")
-                root = optimize.brentq(f_seg, p1, p2)
-                roots.append(float(root))
-            except Exception:
-                # Analytic fallback linear interpolation
-                t = d1 / (d1 - d2)
-                root = p1 + t * (p2 - p1)
-                roots.append(float(root))
+            # Analytic linear root finding: d1 + ((d2 - d1) / (p2 - p1)) * (root - p1) == 0
+            t = d1 / (d1 - d2)
+            root = p1 + t * (p2 - p1)
+            roots.append(float(root))
         elif np.isclose(d1, 0.0, atol=1e-5):
             roots.append(float(p1))
 

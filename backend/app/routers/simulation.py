@@ -45,8 +45,12 @@ except ImportError:
         get_simulation_context_service,
     )
 
-from backend.agents.sampler import list_areas, sample_personas
-from backend.agents.respondent import preview_panel, run_panel, fetch_rag_context
+try:
+    from backend.agents.sampler import list_areas, sample_personas
+    from backend.agents.respondent import preview_panel, run_panel, fetch_rag_context
+except ImportError:
+    from agents.sampler import list_areas, sample_personas
+    from agents.respondent import preview_panel, run_panel, fetch_rag_context
 
 router = APIRouter(
     prefix="/simulation",

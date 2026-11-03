@@ -1,0 +1,12 @@
+tests/
+.pytest_cache/
+pipeline/
+scripts/
+data/sheets/raw/
+data/sheets/cleaned/
+data/sheets/checks/
+data/runs/
+.env
+.env.*
+requirements-dev.txt
+

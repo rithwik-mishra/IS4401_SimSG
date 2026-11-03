@@ -2,8 +2,7 @@
 
 Singapore micro-SME AI focus group simulation platform. SimSG builds synthetic
 residents (personas) from Singapore census / household data, grounds them in local
-neighborhood market reality via ChromaDB Layer 2 qualitative RAG, and has each persona
-answer a market-research question through an LLM.
+neighborhood market reality via ChromaDB Layer 2 qualitative RAG, and has each persona answer a market-research question through an LLM.
 
 All commands below are run from the `backend/` folder.
 
