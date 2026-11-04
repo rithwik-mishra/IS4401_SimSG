@@ -279,6 +279,14 @@ class SimulatePreviewResponse(BaseModel):
         ...,
         description="'llm' if /api/simulate would call the AI for these personas, 'rule_based' if it would use the offline formulas (no API key, or use_mock)",
     )
+    llm_provider: Optional[str] = Field(
+        default=None,
+        description="AI provider the run would use (SIMSG_PROVIDER: 'openai' or 'soclaas'); null when rule_based",
+    )
+    llm_model: Optional[str] = Field(
+        default=None,
+        description="Model the run would use (SIMSG_MODEL or SOCLAAS_MODEL); null when rule_based",
+    )
     concept: DecomposedConcept = Field(..., description="The pitch after step 1 (name, category, price, town)")
     rag_chunks: list[RAGChunk] = Field(..., description="ChromaDB context from step 2, as placed in every prompt")
     system_prompt: str = Field(..., description="System prompt shared by every persona")

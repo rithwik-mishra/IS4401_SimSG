@@ -14,7 +14,8 @@ Supports user overrides:
   - override_town: Optional[str]
 
 Model:
-  - Uses `gpt-4o-mini` with structured JSON parsing when OPEN_API_KEY / OPENAI_API_KEY is available.
+  - Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL) with structured JSON
+    parsing when that provider's API key is set.
   - Automatically falls back to deterministic rule-based/regex extraction on API errors,
     network failures, or missing credentials so offline tests and dry-runs never crash.
 """
@@ -29,8 +30,26 @@ import re
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple
 
+from dataclasses import replace
+
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
+
+# Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
+try:
+    from app.services.llm_settings import (
+        DEFAULT_OPENAI_MODEL,
+        LLMSettings,
+        describe_missing_provider,
+        get_llm_settings,
+    )
+except ImportError:
+    from backend.app.services.llm_settings import (
+        DEFAULT_OPENAI_MODEL,
+        LLMSettings,
+        describe_missing_provider,
+        get_llm_settings,
+    )
 
 logger = logging.getLogger(__name__)
 
@@ -322,23 +341,20 @@ def _normalize_town(town_input: Optional[str]) -> str:
 class QueryDecomposer:
     """
     Decomposes unstructured user pitches into structured concept attributes.
-    Pulls OPEN_API_KEY (with fallback to OPENAI_API_KEY) and calls `gpt-4o-mini`.
+    Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...).
     Provides a seamless deterministic fallback if credentials are absent or if an error occurs.
     """
 
-    def __init__(self, api_key: Optional[str] = None, model: str = "gpt-4o-mini") -> None:
-        self.model = model
-        # Explicit priority: passed api_key -> OPEN_API_KEY -> OPENAI_API_KEY
-        self.api_key = (
-            api_key
-            or os.getenv("OPEN_API_KEY")
-            or os.getenv("OPENAI_API_KEY")
-        )
-        if self.api_key:
-            self.api_key = self.api_key.strip()
-            # Handle placeholder values in template .env
-            if self.api_key.startswith("your_") or self.api_key == "":
-                self.api_key = None
+    def __init__(self, api_key: Optional[str] = None, model: Optional[str] = None) -> None:
+        settings = get_llm_settings()
+        # An explicitly passed key means: use OpenAI with that key
+        if api_key and api_key.strip() and not api_key.strip().startswith("your_"):
+            settings = LLMSettings(provider="openai", model=model or DEFAULT_OPENAI_MODEL, api_key=api_key.strip())
+        elif settings and model:
+            settings = replace(settings, model=model)
+        self.settings: Optional[LLMSettings] = settings
+        self.api_key = settings.api_key if settings else None
+        self.model = settings.model if settings else (model or DEFAULT_OPENAI_MODEL)
 
     def decompose(
         self,
@@ -348,7 +364,7 @@ class QueryDecomposer:
         use_mock: bool = False,
     ) -> DecomposedConcept:
         """
-        Decompose pitch using gpt-4o-mini structured parsing, falling back to rule-based.
+        Decompose pitch using the configured model's structured parsing, falling back to rule-based.
         """
         if use_mock:
             logger.info("use_mock=True: using deterministic rule-based extractor.")
@@ -366,14 +382,15 @@ class QueryDecomposer:
                 category_type="beverage",
             )
 
-        if not self.api_key:
-            logger.info("No OpenAI API key found; using deterministic rule-based extractor.")
+        if not self.settings:
+            logger.info(f"Pitch reader: {describe_missing_provider()}; using deterministic rule-based extractor.")
             return decompose_query_rule_based(raw_query, override_price, override_town)
 
         try:
             from openai import OpenAI
 
-            client = OpenAI(api_key=self.api_key)
+            client = OpenAI(**self.settings.client_kwargs())
+            logger.info(f"Pitch reader: provider={self.settings.provider}, model={self.model}")
 
             system_prompt = (
                 "You are an expert market research analyst for Singapore micro-SMEs and consumer businesses.\n"

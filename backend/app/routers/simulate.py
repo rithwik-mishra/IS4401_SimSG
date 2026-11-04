@@ -2,12 +2,13 @@
 backend/app/routers/simulate.py
 ---------------------------------
 Production FastAPI Router for SimSG's complete End-to-End Simulation Pipeline:
-  1. Natural Language Query Decomposer (gpt-4o-mini / rule-based fallback)
+  (AI stages use the provider/model from backend/.env: SIMSG_PROVIDER, SIMSG_MODEL)
+  1. Natural Language Query Decomposer (configured model / rule-based fallback)
   2. ChromaDB Layer 2 Qualitative RAG (simsg_layer2_rag)
   3. Monte Carlo Demographic Sampler (N=30 from SingStat & HES 2023)
-  4. Async Batch Persona Execution Engine (gpt-4o-mini, Semaphore(25))
+  4. Async Batch Persona Execution Engine (configured model, Semaphore(25))
   5. Deterministic Econometric & Statistical Engine (NumPy/SciPy PSM curves & cohorts)
-  6. Macro Synthesis & Strategic Pivot Agent (gpt-4o-mini)
+  6. Macro Synthesis & Strategic Pivot Agent (configured model)
   7. Selective Representative Personas (N=5 distinct demographic archetypes for React table)
   8. Streamlined 3-part response: [recommendations, personas, statistics]
 """
@@ -50,10 +51,10 @@ try:
     from app.agents.execution_engine import (
         SYSTEM_PROMPT,
         build_persona_prompt,
-        get_openai_api_key,
         run_persona_evaluations,
     )
     from app.agents.synthesis_agent import generate_macro_synthesis
+    from app.services.llm_settings import get_llm_settings
 except ImportError:
     from backend.app.schemas import (
         DecomposedConcept,
@@ -82,10 +83,10 @@ except ImportError:
     from backend.app.agents.execution_engine import (
         SYSTEM_PROMPT,
         build_persona_prompt,
-        get_openai_api_key,
         run_persona_evaluations,
     )
     from backend.app.agents.synthesis_agent import generate_macro_synthesis
+    from backend.app.services.llm_settings import get_llm_settings
 
 router = APIRouter(
     prefix="/api",
@@ -300,7 +301,8 @@ def simulate_preview(
     concept, rag_chunks, seed, personas = _prepare_inputs(req, context_service)
 
     # Same condition run_persona_evaluations uses to decide between the AI and the offline formulas
-    persona_engine = "llm" if (not req.use_mock and get_openai_api_key()) else "rule_based"
+    settings = None if req.use_mock else get_llm_settings()
+    persona_engine = "llm" if settings else "rule_based"
 
     previews = [
         PersonaPromptPreview(
@@ -309,11 +311,16 @@ def simulate_preview(
         )
         for p in personas
     ]
-    logger.info(f"Preview Complete: {len(previews)} persona prompts (seed={seed}, engine={persona_engine})")
+    logger.info(
+        f"Preview Complete: {len(previews)} persona prompts (seed={seed}, engine={persona_engine}"
+        + (f", provider={settings.provider}, model={settings.model})" if settings else ")")
+    )
 
     return SimulatePreviewResponse(
         seed=seed,
         persona_engine=persona_engine,
+        llm_provider=settings.provider if settings else None,
+        llm_model=settings.model if settings else None,
         concept=concept,
         rag_chunks=rag_chunks,
         system_prompt=SYSTEM_PROMPT,

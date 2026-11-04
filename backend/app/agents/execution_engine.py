@@ -7,7 +7,7 @@ decomposed business pitch and Layer 2 ChromaDB qualitative neighborhood context.
 
 Core Capabilities:
   - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(25).
-  - Uses `gpt-4o-mini` with structured JSON output enforcement.
+  - Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL) with structured JSON output enforcement.
   - Contextual prompt conditioning across demographic attributes, daily dining budget,
     price baselines, linguistic register, and local neighborhood conditions.
   - Monotonicity post-processing enforcing Van Westendorp price thresholds:
@@ -43,22 +43,6 @@ else:
     load_dotenv()
 
 
-def get_openai_api_key(passed_key: Optional[str] = None) -> Optional[str]:
-    """
-    Resolves OpenAI API key with explicit priority:
-    1. passed_key
-    2. OPEN_API_KEY from backend/.env
-    3. OPENAI_API_KEY from backend/.env
-    """
-    key = passed_key or os.getenv("OPEN_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if key:
-        key = key.strip()
-        if key.startswith("your_") or key == "":
-            return None
-        return key
-    return None
-
-
 # ---------------------------------------------------------------------------
 # Schema Imports (Robust across package relative and absolute paths)
 # ---------------------------------------------------------------------------
@@ -72,6 +56,12 @@ except ImportError:
     except ImportError:
         SyntheticPersona = Any  # type: ignore
         DecomposedConcept = Any  # type: ignore
+
+# Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
+try:
+    from app.services.llm_settings import describe_missing_provider, get_llm_settings
+except ImportError:
+    from backend.app.services.llm_settings import describe_missing_provider, get_llm_settings
 
 
 # ---------------------------------------------------------------------------
@@ -472,6 +462,7 @@ async def _evaluate_single_persona(
     concept: DecomposedConcept,
     rag_chunks: Optional[List[Any]],
     use_mock: bool,
+    model: Optional[str] = None,
 ) -> PersonaEvaluationOutput:
     """Evaluates a single persona with bounded concurrency and fallback."""
     if use_mock or client is None:
@@ -488,7 +479,7 @@ async def _evaluate_single_persona(
             # Attempt structured output via json_schema
             try:
                 response = await client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model=model,
                     messages=messages,
                     response_format={
                         "type": "json_schema",
@@ -503,7 +494,7 @@ async def _evaluate_single_persona(
             except Exception as schema_err:
                 logger.debug(f"json_schema mode failed ({schema_err}); trying json_object.")
                 response = await client.chat.completions.create(
-                    model="gpt-4o-mini",
+                    model=model,
                     messages=messages,
                     response_format={"type": "json_object"},
                     temperature=0.7,
@@ -570,17 +561,20 @@ async def run_persona_evaluations(
         return []
 
     client = None
+    model: Optional[str] = None
     if not use_mock:
-        api_key = get_openai_api_key()
-        if api_key:
+        settings = get_llm_settings()
+        if settings:
             try:
                 from openai import AsyncOpenAI
-                client = AsyncOpenAI(api_key=api_key)
+                client = AsyncOpenAI(**settings.client_kwargs())
+                model = settings.model
+                logger.info(f"Persona engine: provider={settings.provider}, model={settings.model}")
             except Exception as e:
                 logger.warning(f"Could not initialize AsyncOpenAI: {e}; falling back to mock.")
                 client = None
         else:
-            logger.info("No OpenAI API key found; running deterministic evaluation engine.")
+            logger.info(f"Persona engine: {describe_missing_provider()}; running deterministic evaluation engine.")
 
     sem = asyncio.Semaphore(concurrency)
     tasks = [
@@ -591,6 +585,7 @@ async def run_persona_evaluations(
             concept=concept,
             rag_chunks=rag_chunks,
             use_mock=use_mock,
+            model=model,
         )
         for p in personas
     ]

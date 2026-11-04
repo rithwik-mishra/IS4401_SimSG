@@ -7,7 +7,8 @@ demographic cohort breakdowns, and Van Westendorp Price Sensitivity Meter (PSM)
 econometric curves.
 
 Core Capabilities:
-  - Synthesizes findings using `gpt-4o-mini` with structured JSON output enforcement.
+  - Synthesizes findings using the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL)
+    with structured JSON output enforcement.
   - Generates clear strategic verdict: "VIABLE", "MODERATE RISK", or "HIGH RISK - PIVOT REQUIRED".
   - Clusters qualitative persona objections with observed cohort frequency and direct quotes.
   - Delivers actionable Singapore-specific operational pivots (pricing adjustment to OPP,
@@ -43,20 +44,11 @@ else:
     load_dotenv()
 
 
-def get_openai_api_key(passed_key: Optional[str] = None) -> Optional[str]:
-    """
-    Resolves OpenAI API key with explicit priority:
-    1. passed_key
-    2. OPEN_API_KEY from backend/.env
-    3. OPENAI_API_KEY from backend/.env
-    """
-    key = passed_key or os.getenv("OPEN_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if key:
-        key = key.strip()
-        if key.startswith("your_") or key == "":
-            return None
-        return key
-    return None
+# Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
+try:
+    from app.services.llm_settings import describe_missing_provider, get_llm_settings
+except ImportError:
+    from backend.app.services.llm_settings import describe_missing_provider, get_llm_settings
 
 
 # ---------------------------------------------------------------------------
@@ -424,7 +416,7 @@ async def generate_macro_synthesis(
 ) -> MacroSynthesisReport:
     """
     Generates the macro synthesis report and strategic pivot recommendations.
-    Uses `gpt-4o-mini` with structured JSON enforcement, falling back gracefully
+    Uses the configured provider/model with structured JSON enforcement, falling back gracefully
     to deterministic rule-based synthesis if credentials are absent or errors occur.
 
     Args:
@@ -439,25 +431,26 @@ async def generate_macro_synthesis(
     if use_mock:
         return generate_macro_synthesis_rule_based(concept, evaluations, econometrics)
 
-    api_key = get_openai_api_key()
-    if not api_key:
-        logger.info("No OpenAI API key found; generating deterministic macro synthesis report.")
+    settings = get_llm_settings()
+    if not settings:
+        logger.info(f"Report writer: {describe_missing_provider()}; generating deterministic macro synthesis report.")
         return generate_macro_synthesis_rule_based(concept, evaluations, econometrics)
 
     try:
         from openai import AsyncOpenAI
 
-        client = AsyncOpenAI(api_key=api_key)
+        client = AsyncOpenAI(**settings.client_kwargs())
+        logger.info(f"Report writer: provider={settings.provider}, model={settings.model}")
         prompt = build_synthesis_prompt(concept, evaluations, econometrics)
         messages = [
             {"role": "system", "content": SYNTHESIS_SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ]
 
-        # Call gpt-4o-mini with structured output
+        # Call the configured model with structured output
         try:
             response = await client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=settings.model,
                 messages=messages,
                 response_format={
                     "type": "json_schema",
@@ -472,7 +465,7 @@ async def generate_macro_synthesis(
         except Exception as schema_err:
             logger.debug(f"Synthesis json_schema failed ({schema_err}); trying json_object.")
             response = await client.chat.completions.create(
-                model="gpt-4o-mini",
+                model=settings.model,
                 messages=messages,
                 response_format={"type": "json_object"},
                 temperature=0.6,
