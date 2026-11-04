@@ -261,3 +261,25 @@ class SimulateResponse(BaseModel):
     @property
     def insights(self) -> MacroSynthesisReport:
         return self.recommendations
+
+
+# ---------------------------------------------------------------------------
+# Pipeline Preview Schemas (POST /api/simulate/preview)
+# Shows what /api/simulate would send to the persona AI, without running it.
+# ---------------------------------------------------------------------------
+
+class PersonaPromptPreview(BaseModel):
+    persona: SyntheticPersona = Field(..., description="The sampled persona, exactly as the persona engine receives it")
+    user_prompt: str = Field(..., description="The prompt this persona would be sent")
+
+
+class SimulatePreviewResponse(BaseModel):
+    seed: int = Field(..., description="Seed used to draw the personas; send it to /api/simulate to run these exact personas")
+    persona_engine: str = Field(
+        ...,
+        description="'llm' if /api/simulate would call the AI for these personas, 'rule_based' if it would use the offline formulas (no API key, or use_mock)",
+    )
+    concept: DecomposedConcept = Field(..., description="The pitch after step 1 (name, category, price, town)")
+    rag_chunks: list[RAGChunk] = Field(..., description="ChromaDB context from step 2, as placed in every prompt")
+    system_prompt: str = Field(..., description="System prompt shared by every persona")
+    personas: list[PersonaPromptPreview] = Field(..., description="Each persona and the exact prompt it would be sent")
