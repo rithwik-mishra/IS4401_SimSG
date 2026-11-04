@@ -97,6 +97,19 @@ def test_persona_prompts_have_no_style_or_language(client: TestClient, no_api_ke
         assert "standard Singapore English" in prompt
 
 
+def test_persona_prompts_use_town_prices_not_fixed_references(client: TestClient, no_api_key):
+    """The fixed kopi S$1.30 / cafe S$6.50 line is gone; the town's ChromaDB pricing passage stays."""
+    data = client.post("/api/simulate/preview", json=_payload()).json()
+    pricing = [c["text"] for c in data["rag_chunks"] if c["category"] == "pricing_benchmarks"]
+    assert len(pricing) == 1
+    for item in data["personas"]:
+        prompt = item["user_prompt"]
+        assert "Reference Baselines" not in prompt
+        assert "reference price" not in prompt.lower()
+        assert pricing[0] in prompt
+        assert "described in the neighbourhood context" in prompt
+
+
 def test_preview_personas_match_simulate(client: TestClient, no_api_key):
     preview = client.post("/api/simulate/preview", json=_payload()).json()
     run = client.post("/api/simulate", json=_payload()).json()

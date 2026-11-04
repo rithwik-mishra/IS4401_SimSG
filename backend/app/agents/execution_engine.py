@@ -9,7 +9,7 @@ Core Capabilities:
   - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(25).
   - Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL) with structured JSON output enforcement.
   - Contextual prompt conditioning across demographic attributes, daily dining budget,
-    price baselines, and local neighborhood conditions.
+    and local neighborhood conditions (including local prices from ChromaDB).
   - Monotonicity post-processing enforcing Van Westendorp price thresholds:
       too_cheap <= cheap < expensive <= too_expensive
   - Resilient offline fallback: Deterministic rule-based evaluation when API key is
@@ -231,7 +231,7 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
 # Prompt Construction
 # ---------------------------------------------------------------------------
 SYSTEM_PROMPT = """You are an advanced consumer simulation agent representing an authentic Singapore resident in an empirical market research focus group.
-You MUST strictly adopt the persona's demographic background, dwelling, household income, daily dining budget, and reference price anchors.
+You MUST strictly adopt the persona's demographic background, dwelling, household income, and daily dining budget.
 You are evaluating a proposed business concept planned for your neighborhood.
 Evaluate whether you would realistically buy this offering at the proposed candidate price, how likely you are to purchase (0-100%), and provide your 4 Van Westendorp price thresholds (in SGD).
 Your responses must be grounded in Singapore's local consumer reality (hawker vs cafe price gaps, CDC voucher habits, neighborhood foot traffic).
@@ -281,7 +281,6 @@ Dwelling: {persona.dwelling_type}
 Monthly Household Income: S${persona.monthly_household_income_sgd:,.0f} ({persona.income_bracket})
 Consumer Archetype: {persona.archetype}
 Daily Dining Budget: S${persona.daily_dining_budget_sgd:.2f}
-Reference Baselines: Traditional Hawker Kopi S${persona.hawker_baseline_kopi_sgd:.2f} | Specialty Cafe Coffee S${persona.cafe_baseline_coffee_sgd:.2f}
 
 --- PROPOSED BUSINESS CONCEPT ---
 Concept Name: {concept.concept_name}
@@ -294,7 +293,7 @@ Target Planning Area: {concept.target_planning_area}
 {rag_text}
 
 --- YOUR TASK ---
-Adopt this persona completely. Consider your daily dining budget of S${persona.daily_dining_budget_sgd:.2f}, your reference price baselines, and local alternatives in {concept.target_planning_area}.
+Adopt this persona completely. Consider your daily dining budget of S${persona.daily_dining_budget_sgd:.2f} and the local prices and alternatives in {concept.target_planning_area} described in the neighbourhood context above.
 Answer the following in character:
 1. `persona_id`: "{persona.persona_id}"
 2. `buy_probability_pct`: An integer from 0 to 100 representing how likely you are to buy this product at the candidate price of S${concept.candidate_price_sgd:.2f} during a typical week.

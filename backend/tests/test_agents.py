@@ -147,7 +147,7 @@ def test_persona_evaluation_output_negative_clamping():
 # ===========================================================================
 
 def test_build_persona_prompt_contains_all_demographics():
-    """Verify the generated prompt includes demographic attributes, budget, and baselines."""
+    """Verify the generated prompt includes demographic attributes, budget, concept and RAG context."""
     cohort = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=123)
     p = cohort[0]
     concept = decompose_query_rule_based("Artisanal Cold Brew Coffee for $6.50 in Ang Mo Kio")
@@ -164,8 +164,11 @@ def test_build_persona_prompt_contains_all_demographics():
     assert p.dwelling_type in prompt
     assert p.archetype in prompt
     assert f"S${p.daily_dining_budget_sgd:.2f}" in prompt
-    assert f"S${p.hawker_baseline_kopi_sgd:.2f}" in prompt
-    assert f"S${p.cafe_baseline_coffee_sgd:.2f}" in prompt
+    # Fixed kopi/cafe reference prices were dropped (unsourced); local prices come from the RAG context
+    # (checked by wording, not numbers: this pitch's own price S$6.50 equals the old cafe reference)
+    assert "Reference Baselines" not in prompt
+    assert "Traditional Hawker Kopi" not in prompt
+    assert "Specialty Cafe Coffee" not in prompt
     # Speaking style was dropped (no research basis); the prompt must not carry it
     assert "Linguistic Style" not in prompt
 
@@ -198,6 +201,10 @@ def test_system_prompt_contains_ground_rule(rule):
 
 def test_system_prompt_has_no_speaking_style():
     assert "linguistic style" not in SYSTEM_PROMPT.lower()
+
+
+def test_system_prompt_has_no_reference_price_anchors():
+    assert "reference price" not in SYSTEM_PROMPT.lower()
 
 
 @pytest.mark.parametrize("price", [1.0, 4.5, 7.0, 25.0])  # covers Positive, Neutral and Negative answers
