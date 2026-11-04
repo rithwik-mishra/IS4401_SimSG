@@ -7,6 +7,7 @@ Unit & Integration Tests for SimSG Agent Modules:
 """
 
 import asyncio
+import re
 import pytest
 from typing import List
 
@@ -17,6 +18,8 @@ try:
         MacroSynthesisReport,
     )
     from app.agents.execution_engine import (
+        SYSTEM_PROMPT,
+        evaluate_persona_rule_based,
         repair_price_monotonicity,
         run_persona_evaluations,
         build_persona_prompt,
@@ -37,6 +40,8 @@ except ImportError:
         MacroSynthesisReport,
     )
     from backend.app.agents.execution_engine import (
+        SYSTEM_PROMPT,
+        evaluate_persona_rule_based,
         repair_price_monotonicity,
         run_persona_evaluations,
         build_persona_prompt,
@@ -161,7 +166,8 @@ def test_build_persona_prompt_contains_all_demographics():
     assert f"S${p.daily_dining_budget_sgd:.2f}" in prompt
     assert f"S${p.hawker_baseline_kopi_sgd:.2f}" in prompt
     assert f"S${p.cafe_baseline_coffee_sgd:.2f}" in prompt
-    assert p.linguistic_style in prompt
+    # Speaking style was dropped (no research basis); the prompt must not carry it
+    assert "Linguistic Style" not in prompt
 
     # Concept checks
     assert concept.concept_name in prompt
@@ -171,6 +177,56 @@ def test_build_persona_prompt_contains_all_demographics():
     # RAG checks
     assert "pricing_benchmarks" in prompt.lower() or "pricing norms" in prompt.lower()
     assert "Hawker kopi ranges from $1.20" in prompt
+
+
+# Ground rules taken from respondent.py, which the persona AI must always be told
+PROMPT_GROUND_RULES = [
+    "most real people say no to most new products",
+    "say you would not buy",
+    "Do not invent other facts about yourself",
+    "for the whole household, combined, not just you",
+]
+
+# Singlish markers that must not appear now that quotes are standard English
+SINGLISH = re.compile(r"\b(lah|lor|leh|wah|shiok|siao|okay-lah|kopitiam|steady)\b", re.IGNORECASE)
+
+
+@pytest.mark.parametrize("rule", PROMPT_GROUND_RULES)
+def test_system_prompt_contains_ground_rule(rule):
+    assert rule in SYSTEM_PROMPT
+
+
+def test_system_prompt_has_no_speaking_style():
+    assert "linguistic style" not in SYSTEM_PROMPT.lower()
+
+
+@pytest.mark.parametrize("price", [1.0, 4.5, 7.0, 25.0])  # covers Positive, Neutral and Negative answers
+def test_backup_quotes_are_standard_english(price):
+    """The no-key backup writes standard English, even for personas the old sampler labels Singlish."""
+    concept = decompose_query_rule_based("Artisanal kopi bar in Ang Mo Kio", override_price=price)
+    personas = sample_synthetic_cohort("Ang Mo Kio", n=60, seed=1)
+    assert "Colloquial Singlish" in {p.linguistic_style for p in personas}
+
+    for persona in personas:
+        result = evaluate_persona_rule_based(persona, concept)
+        assert not SINGLISH.search(result.in_character_quote), result.in_character_quote
+        assert not SINGLISH.search(result.primary_objection), result.primary_objection
+
+
+def test_simulate_output_has_no_singlish(client):
+    """A full no-key /api/simulate run: quotes, objections and grouped quotes are standard English."""
+    payload = {
+        "raw_query": "S$7 artisanal single-origin kopi bar in Ang Mo Kio with specialty cold brew and toast sets",
+        "override_town": "Ang Mo Kio",
+        "sample_size": 30,
+        "seed": 12345,
+    }
+    data = client.post("/api/simulate", json=payload).json()
+    texts = [p["quote"] for p in data["personas"]] + [p["primary_objection"] for p in data["personas"]]
+    for cluster in data["recommendations"]["clustered_objections"]:
+        texts += cluster["representative_quotes"]
+    for text in texts:
+        assert not SINGLISH.search(text), text
 
 
 # ===========================================================================

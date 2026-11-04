@@ -697,7 +697,7 @@ def format_all_demographic_personas(
 ) -> List[RepresentativePersona]:
     """
     Formats and returns all N evaluated resident personas mapped to their corresponding
-    Singapore demographic cohorts, preserving all individual evaluations, Singlish quotes,
+    Singapore demographic cohorts, preserving all individual evaluations, quotes,
     budget thresholds, and sentiments for the React demographic view.
     """
     eval_map: Dict[str, Dict[str, Any]] = {}

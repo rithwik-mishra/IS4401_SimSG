@@ -96,7 +96,7 @@ export function PersonaMessage({
         </div>
       </div>
 
-      {/* Singlish Reaction Quote Bubble */}
+      {/* Reaction Quote Bubble */}
       <div className="mt-4 relative rounded-xl bg-[#fafbf8] p-3.5 text-xs sm:text-[13px] text-[#263c35] italic border-l-2 border-[#b7cda5]">
         <MessageSquareQuote className="h-4 w-4 inline mr-1 text-[#b7cda5] not-italic" />
         "{persona.quote}"

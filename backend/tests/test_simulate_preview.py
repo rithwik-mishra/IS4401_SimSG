@@ -86,6 +86,17 @@ def test_preview_without_key(client: TestClient, no_api_key):
             assert text in prompt
 
 
+def test_persona_prompts_have_no_style_or_language(client: TestClient, no_api_key):
+    """Singlish was dropped: no speaking style or home language, quotes asked for in standard English."""
+    data = client.post("/api/simulate/preview", json=_payload()).json()
+    for item in data["personas"]:
+        prompt = item["user_prompt"]
+        assert "Linguistic Style" not in prompt
+        assert "Primary Home Language" not in prompt
+        assert "Singlish" not in prompt
+        assert "standard Singapore English" in prompt
+
+
 def test_preview_personas_match_simulate(client: TestClient, no_api_key):
     preview = client.post("/api/simulate/preview", json=_payload()).json()
     run = client.post("/api/simulate", json=_payload()).json()
@@ -107,6 +118,7 @@ def test_preview_prompts_match_what_simulate_sends(client: TestClient, fake_ai):
     run = client.post("/api/simulate", json=_payload())
     assert run.status_code == 200, run.text
 
+    # Every persona call carries exactly SYSTEM_PROMPT (incl. the ground rules checked in test_agents.py)
     persona_calls = [m for m in fake_ai if m[0]["content"] == SYSTEM_PROMPT]
     assert len(persona_calls) == 30
     sent_prompts = sorted(m[1]["content"] for m in persona_calls)

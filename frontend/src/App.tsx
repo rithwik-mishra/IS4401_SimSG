@@ -79,7 +79,7 @@ export function App() {
     {
       id: "agents",
       title: "4. Async Batch Persona Evaluation Engine",
-      description: "Executing concurrent LLM persona evaluations with Singlish reactions and price thresholds.",
+      description: "Executing concurrent LLM persona evaluations with reactions and price thresholds.",
       status: "pending",
     },
     {

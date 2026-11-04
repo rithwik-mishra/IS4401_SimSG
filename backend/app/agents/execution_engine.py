@@ -9,7 +9,7 @@ Core Capabilities:
   - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(25).
   - Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL) with structured JSON output enforcement.
   - Contextual prompt conditioning across demographic attributes, daily dining budget,
-    price baselines, linguistic register, and local neighborhood conditions.
+    price baselines, and local neighborhood conditions.
   - Monotonicity post-processing enforcing Van Westendorp price thresholds:
       too_cheap <= cheap < expensive <= too_expensive
   - Resilient offline fallback: Deterministic rule-based evaluation when API key is
@@ -105,7 +105,7 @@ class PersonaEvaluationOutput(BaseModel):
     )
     in_character_quote: str = Field(
         ...,
-        description="Authentic reaction quote matching persona linguistic style",
+        description="Authentic reaction quote in standard Singapore English",
     )
     primary_objection: str = Field(
         ...,
@@ -231,7 +231,7 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
 # Prompt Construction
 # ---------------------------------------------------------------------------
 SYSTEM_PROMPT = """You are an advanced consumer simulation agent representing an authentic Singapore resident in an empirical market research focus group.
-You MUST strictly adopt the persona's demographic background, dwelling, household income, daily dining budget, reference price anchors, and linguistic style.
+You MUST strictly adopt the persona's demographic background, dwelling, household income, daily dining budget, and reference price anchors.
 You are evaluating a proposed business concept planned for your neighborhood.
 Evaluate whether you would realistically buy this offering at the proposed candidate price, how likely you are to purchase (0-100%), and provide your 4 Van Westendorp price thresholds (in SGD).
 Your responses must be grounded in Singapore's local consumer reality (hawker vs cafe price gaps, CDC voucher habits, neighborhood foot traffic).
@@ -282,8 +282,6 @@ Monthly Household Income: S${persona.monthly_household_income_sgd:,.0f} ({person
 Consumer Archetype: {persona.archetype}
 Daily Dining Budget: S${persona.daily_dining_budget_sgd:.2f}
 Reference Baselines: Traditional Hawker Kopi S${persona.hawker_baseline_kopi_sgd:.2f} | Specialty Cafe Coffee S${persona.cafe_baseline_coffee_sgd:.2f}
-Primary Home Language: {persona.home_language}
-Linguistic Style: {persona.linguistic_style}
 
 --- PROPOSED BUSINESS CONCEPT ---
 Concept Name: {concept.concept_name}
@@ -306,7 +304,7 @@ Answer the following in character:
 6. `too_expensive`: Price in SGD where you would completely refuse to purchase because it is unreasonably expensive.
 (Note: your thresholds should logically satisfy: too_cheap <= cheap < expensive <= too_expensive).
 7. `sentiment_label`: "Positive", "Neutral", or "Negative" reflecting your general reaction to this business concept.
-8. `in_character_quote`: A short 1-2 sentence authentic reaction quote spoken in your specified linguistic style ({persona.linguistic_style}).
+8. `in_character_quote`: A short 1-2 sentence authentic reaction quote, written in standard Singapore English.
 9. `primary_objection`: Your main hesitation, criticism, or constraint in 120 characters or fewer (e.g. "Price too high for daily kopi", "Prefer traditional hawker stall", "No CDC vouchers accepted").
 """
 
@@ -407,41 +405,16 @@ def evaluate_persona_rule_based(
     else:
         sentiment = "Negative"
 
-    # Authentic in-character quote & primary objection based on linguistic style
-    ling_style = getattr(persona, "linguistic_style", "Mixed Code-Switch")
-    kopi_base = getattr(persona, "hawker_baseline_kopi_sgd", 1.30)
-    concept_name = getattr(concept, "concept_name", "this concept")
-
-    if ling_style == "Colloquial Singlish":
-        if sentiment == "Positive":
-            quote = f"S${cand_p:.2f} steady lah! If standard is good, will definitely come down support one."
-            objection = f"None, price is fair for {concept_name}."
-        elif sentiment == "Neutral":
-            quote = f"Can try once in a while lor, but every day spend S${cand_p:.2f} my wallet cannot take it lah."
-            objection = "Price is a bit steep for daily breakfast or routine dining."
-        else:
-            quote = f"Wah lau S${cand_p:.2f} so ex! Better go downstairs coffeeshop drink kopi S${kopi_base:.2f} more shiok."
-            objection = "Too expensive compared to traditional hawker alternatives."
-    elif ling_style == "Mixed Code-Switch":
-        if sentiment == "Positive":
-            quote = f"S${cand_p:.2f} is actually quite reasonable for {concept_name}, I will definitely drop by to try."
-            objection = f"None, reasonable price for {concept_name}."
-        elif sentiment == "Neutral":
-            quote = f"Pricing is okay-lah, maybe buy on weekends as a treat but not for everyday dining."
-            objection = "Price slightly high for everyday routine meals."
-        else:
-            quote = f"S${cand_p:.2f} is a bit steep lah, better options available around the neighbourhood."
-            objection = "High price barrier relative to neighborhood food options."
-    else:  # Standard Singapore English
-        if sentiment == "Positive":
-            quote = f"At S${cand_p:.2f}, this represents good value for money and fits nicely into my weekly budget."
-            objection = "None, highly competitive pricing."
-        elif sentiment == "Neutral":
-            quote = f"The S${cand_p:.2f} price point is acceptable, though whether I return depends on actual quality."
-            objection = "Price is marginally high for frequent repeat visits."
-        else:
-            quote = f"S${cand_p:.2f} is difficult to justify when comparable quality options exist nearby at a lower price."
-            objection = "Poor value proposition compared to existing alternatives."
+    # Quote & primary objection in standard Singapore English, chosen by sentiment
+    if sentiment == "Positive":
+        quote = f"At S${cand_p:.2f}, this represents good value for money and fits nicely into my weekly budget."
+        objection = "None, highly competitive pricing."
+    elif sentiment == "Neutral":
+        quote = f"The S${cand_p:.2f} price point is acceptable, though whether I return depends on actual quality."
+        objection = "Price is marginally high for frequent repeat visits."
+    else:
+        quote = f"S${cand_p:.2f} is difficult to justify when comparable quality options exist nearby at a lower price."
+        objection = "Poor value proposition compared to existing alternatives."
 
     return PersonaEvaluationOutput(
         persona_id=persona.persona_id,
