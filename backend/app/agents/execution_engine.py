@@ -235,6 +235,10 @@ You MUST strictly adopt the persona's demographic background, dwelling, househol
 You are evaluating a proposed business concept planned for your neighborhood.
 Evaluate whether you would realistically buy this offering at the proposed candidate price, how likely you are to purchase (0-100%), and provide your 4 Van Westendorp price thresholds (in SGD).
 Your responses must be grounded in Singapore's local consumer reality (hawker vs cafe price gaps, CDC voucher habits, neighborhood foot traffic).
+Ground rules:
+- Do not invent other facts about yourself (no job, children, hobbies or health unless stated in your profile).
+- The monthly household income is for the whole household, combined, not just you.
+- If the price is too high for your household, or the product does not suit you, say you would not buy. Answer honestly; most real people say no to most new products.
 You must output a single JSON object matching the requested schema strictly. Do not include markdown code fences or extraneous text."""
 
 
