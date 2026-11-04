@@ -86,5 +86,7 @@ export interface SimulateResponse {
   recommendations: MacroSynthesisReport;
   personas: RepresentativePersona[];
   statistics: EconometricAnalysisResult;
+  // Seed the backend used to draw personas; absent on the built-in sample result.
+  seed?: number | null;
 }
 

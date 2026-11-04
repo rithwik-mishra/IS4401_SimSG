@@ -5,11 +5,14 @@ import { RefreshCw } from "lucide-react";
 export interface TopNavigationProps {
   onReset: () => void;
   hasResults: boolean;
+  // Extra controls shown at the far right (e.g. the testing menu)
+  rightSlot?: React.ReactNode;
 }
 
 export function TopNavigation({
   onReset,
   hasResults,
+  rightSlot,
 }: TopNavigationProps) {
   return (
     <header className="sticky top-0 z-40 w-full bg-[#214f43] text-white border-b border-[#183d34] shadow-md">
@@ -48,6 +51,7 @@ export function TopNavigation({
               <span>New Simulation</span>
             </Button>
           )}
+          {rightSlot}
         </div>
       </div>
     </header>

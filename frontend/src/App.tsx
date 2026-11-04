@@ -35,6 +35,7 @@ import {
   LineChart as LineChartIcon,
   Filter,
 } from "lucide-react";
+import { TestingMenu, MAX_SEED } from "@/components/features/testing-menu";
 
 export function App() {
   const [query, setQuery] = useState(
@@ -44,6 +45,8 @@ export function App() {
   const [sampleSize, setSampleSize] = useState<number>(30);
   const [showOptions, setShowOptions] = useState<boolean>(false);
   const [cohortFilter, setCohortFilter] = useState<string>("all");
+  // Testing only: optional seed; empty means "let the backend pick one".
+  const [seedInput, setSeedInput] = useState<string>("");
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -125,10 +128,12 @@ export function App() {
       });
 
     // Start API request asynchronously
+    const parsedSeed = seedInput.trim() === "" ? null : Number(seedInput);
     const requestPayload: SimulateRequest = {
       raw_query: query.trim(),
       override_town: overrideTown === "all" ? null : overrideTown,
       sample_size: sampleSize,
+      seed: parsedSeed !== null && Number.isSafeInteger(parsedSeed) && parsedSeed <= MAX_SEED ? parsedSeed : null,
       use_mock: false,
     };
 
@@ -288,6 +293,14 @@ export function App() {
       <TopNavigation
         onReset={handleReset}
         hasResults={!!results}
+        rightSlot={
+          <TestingMenu
+            seedInput={seedInput}
+            onSeedInputChange={setSeedInput}
+            lastSeed={results?.seed}
+            disabled={isLoading}
+          />
+        }
       />
 
       <main className="flex-1 mx-auto w-full max-w-7xl px-4 sm:px-6 py-6 sm:py-8 space-y-8">

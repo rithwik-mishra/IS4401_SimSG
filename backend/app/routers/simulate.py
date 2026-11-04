@@ -15,6 +15,7 @@ Production FastAPI Router for SimSG's complete End-to-End Simulation Pipeline:
 from __future__ import annotations
 
 import logging
+import secrets
 from typing import Any, List
 from fastapi import APIRouter, Depends, HTTPException, status
 
@@ -148,14 +149,20 @@ async def simulate(
 
     # -----------------------------------------------------------------------
     # Step 3: Monte Carlo Demographic Sampling (N=30)
+    # Always sample with a concrete seed so any run can be repeated:
+    # use the caller's seed, or pick one and return it in the response.
     # -----------------------------------------------------------------------
+    seed: int = req.seed if req.seed is not None else secrets.randbelow(1_000_000)
     try:
         personas: List[SyntheticPersona] = sample_synthetic_cohort(
             planning_area=concept.target_planning_area,
             n=req.sample_size,
-            seed=req.seed,
+            seed=seed,
         )
-        logger.info(f"Step 3 Complete: Sampled {len(personas)} synthetic personas for {concept.target_planning_area}")
+        logger.info(
+            f"Step 3 Complete: Sampled {len(personas)} synthetic personas for {concept.target_planning_area} "
+            f"(seed={seed}, {'given' if req.seed is not None else 'generated'})"
+        )
     except ValueError as val_err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -244,4 +251,5 @@ async def simulate(
         recommendations=synthesis,
         personas=[p.model_dump() if hasattr(p, "model_dump") else p for p in representative_personas],
         statistics=econometrics,
+        seed=seed,
     )

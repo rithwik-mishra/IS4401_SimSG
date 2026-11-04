@@ -41,8 +41,9 @@ def test_simulate_full_pipeline_mock(client: TestClient):
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     data = response.json()
 
-    # 1. Output structure verification: strictly 3 top-level keys
-    assert list(data.keys()) == ["recommendations", "personas", "statistics"]
+    # 1. Output structure verification: 3 content sections plus the seed used
+    assert list(data.keys()) == ["recommendations", "personas", "statistics", "seed"]
+    assert data["seed"] == 42
 
     # 2. Recommendations & Strategic Insights (First Output)
     recommendations = data["recommendations"]
@@ -127,7 +128,7 @@ def test_simulate_with_explicit_overrides(client: TestClient):
     assert response.status_code == 200
     data = response.json()
 
-    assert list(data.keys()) == ["recommendations", "personas", "statistics"]
+    assert list(data.keys()) == ["recommendations", "personas", "statistics", "seed"]
     assert len(data["personas"]) == 20
     cohorts = {p["demographic_cohort"] for p in data["personas"]}
     assert len(cohorts) >= 3
@@ -146,7 +147,7 @@ def test_simulate_tampines_bubble_tea(client: TestClient):
     assert response.status_code == 200
     data = response.json()
 
-    assert list(data.keys()) == ["recommendations", "personas", "statistics"]
+    assert list(data.keys()) == ["recommendations", "personas", "statistics", "seed"]
     assert len(data["personas"]) == 15
     assert data["statistics"]["mean_buy_intent_pct"] >= 0.0
 

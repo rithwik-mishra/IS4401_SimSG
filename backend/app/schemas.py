@@ -207,7 +207,12 @@ class SimulateRequest(BaseModel):
     )
     seed: Optional[int] = Field(
         default=None,
-        description="Optional random seed for deterministic demographic reproducibility",
+        ge=0,
+        le=2_147_483_647,
+        description=(
+            "Optional random seed for persona sampling. The same seed redraws the same personas. "
+            "If omitted, the server picks one and returns it in the response."
+        ),
     )
     use_mock: bool = Field(
         default=False,
@@ -236,6 +241,13 @@ class SimulateResponse(BaseModel):
     statistics: EconometricAnalysisResult = Field(
         ...,
         description="Deterministic econometric and statistical metrics (PSM curves, intersections, sentiment, cohort breakdown)",
+    )
+    seed: int = Field(
+        ...,
+        description=(
+            "Seed used to draw the personas. Send it back as `seed` to redraw the same personas. "
+            "Without an API key the whole result repeats; with one, the AI answers can still differ."
+        ),
     )
 
     @property
