@@ -33,7 +33,7 @@ from typing import Any, Dict, List, Literal, Optional, Tuple
 from dataclasses import replace
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 # Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
 try:
@@ -100,6 +100,9 @@ CategoryType = Literal[
 # ---------------------------------------------------------------------------
 class DecomposedConcept(BaseModel):
     """Structured attributes decomposed from a business concept pitch."""
+
+    # True only when the AI read the pitch (False = rule-based extractor). Not part of the data or JSON schema.
+    _used_ai: bool = PrivateAttr(default=False)
 
     concept_name: str = Field(
         ...,
@@ -446,6 +449,7 @@ class QueryDecomposer:
             if override_town is not None:
                 parsed.target_planning_area = _normalize_town(override_town)  # type: ignore[assignment]
 
+            parsed._used_ai = True
             return parsed
 
         except Exception as exc:

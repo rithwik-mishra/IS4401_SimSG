@@ -20,6 +20,7 @@ from fastapi.testclient import TestClient
 from app.agents.execution_engine import SYSTEM_PROMPT
 from app.agents.synthesis_agent import SYNTHESIS_SYSTEM_PROMPT
 from app.services.llm_settings import DEFAULT_OPENAI_MODEL, get_llm_settings
+from app.services.query_decomposer import DecomposedConcept
 
 PAYLOAD = {
     "raw_query": "S$7 artisanal single-origin kopi bar in Ang Mo Kio",
@@ -175,3 +176,126 @@ def test_preview_reports_provider_and_model(client: TestClient, monkeypatch, rec
     data = client.post("/api/simulate/preview", json=PAYLOAD).json()
     assert (data["persona_engine"], data["llm_provider"], data["llm_model"]) == ("llm", "openai", "test-model-123")
     assert [stage for stage, _ in recorder.calls] == ["pitch"]  # preview never calls the persona AI
+
+
+# ---------------------------------------------------------------------------
+# GET /api/ai-status: the AI model shown in the frontend's Testing panel (never the key)
+# ---------------------------------------------------------------------------
+
+def test_no_key_reports_backup_logic(client: TestClient):
+    data = client.get("/api/ai-status").json()
+    assert data == {
+        "persona_engine": "rule_based",
+        "llm_provider": None,
+        "llm_model": None,
+        "reason": "no usable API key for SIMSG_PROVIDER=openai",
+    }
+
+
+def test_openai_key_reports_model(client: TestClient, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-secret-test-value")
+    monkeypatch.setenv("SIMSG_MODEL", "gpt-4.1-mini")
+    response = client.get("/api/ai-status")
+    assert response.status_code == 200
+    assert response.json() == {
+        "persona_engine": "llm",
+        "llm_provider": "openai",
+        "llm_model": "gpt-4.1-mini",
+        "reason": None,
+    }
+    assert "sk-secret-test-value" not in response.text
+
+
+def test_soclaas_reports_model(client: TestClient, monkeypatch):
+    monkeypatch.setenv("SIMSG_PROVIDER", "soclaas")
+    monkeypatch.setenv("SOCLAAS_API_KEY", "soc-secret")
+    monkeypatch.setenv("SOCLAAS_BASE_URL", "https://soc.example/v1")
+    monkeypatch.setenv("SOCLAAS_MODEL", "soc-model")
+    response = client.get("/api/ai-status")
+    assert response.json()["persona_engine"] == "llm"
+    assert (response.json()["llm_provider"], response.json()["llm_model"]) == ("soclaas", "soc-model")
+    assert "soc-secret" not in response.text
+
+
+def test_placeholder_key_counts_as_missing(client: TestClient, monkeypatch):
+    monkeypatch.setenv("OPENAI_API_KEY", "your_openai_key_here")
+    assert client.get("/api/ai-status").json()["persona_engine"] == "rule_based"
+
+
+def test_status_matches_preview(client: TestClient, monkeypatch, recorder):
+    """The Testing panel and the preview agree on which engine a run would use."""
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    monkeypatch.setenv("SIMSG_MODEL", "test-model-123")
+    status = client.get("/api/ai-status").json()
+    preview = client.post("/api/simulate/preview", json=PAYLOAD).json()
+    assert (status["persona_engine"], status["llm_provider"], status["llm_model"]) == (
+        preview["persona_engine"], preview["llm_provider"], preview["llm_model"]
+    )
+
+
+# ---------------------------------------------------------------------------
+# ai_usage in /api/simulate: which steps the AI answered in the last run (Testing panel "Last run")
+# ---------------------------------------------------------------------------
+
+def test_no_key_run_reports_every_step_as_backup(client: TestClient, recorder):
+    data = client.post("/api/simulate", json=PAYLOAD).json()
+    assert data["ai_usage"] == {"pitch_reader": "backup", "persona_ai": 0, "persona_backup": 10, "report_writer": "backup"}
+    assert recorder.calls == []
+
+
+def test_run_reports_each_step_separately(client: TestClient, monkeypatch, recorder):
+    """recorder: the pitch reader fails, every persona answers, the report gets unusable JSON."""
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    data = client.post("/api/simulate", json=PAYLOAD).json()
+    assert data["ai_usage"] == {"pitch_reader": "backup", "persona_ai": 10, "persona_backup": 0, "report_writer": "backup"}
+
+
+def test_run_counts_personas_that_fell_back(client: TestClient, monkeypatch):
+    """Two personas' AI calls fail; the rest answer; the pitch reader and report writer both succeed."""
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    limits = json.dumps({"persona_id": "x", "too_cheap": 2.0, "cheap": 3.5, "expensive": 6.0, "too_expensive": 8.0})
+    decision = json.dumps({"persona_id": "x", "buy_probability_pct": 40, "sentiment_label": "Neutral",
+                           "in_character_quote": "Maybe once in a while.", "primary_objection": "Price"})
+    report = json.dumps({
+        "verdict_badge": "MODERATE RISK", "executive_summary": "One. Two. Three.",
+        "clustered_objections": [{"theme": "Price", "frequency_pct": 50, "representative_quotes": ["Too much."]}],
+        "recommended_pivot": "Lower the price.", "simulated_post_pivot_uplift": 40,
+    })
+
+    def reply(content):
+        return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(content=content))])
+
+    class FakeAsyncOpenAI:
+        def __init__(self, **kwargs):
+            async def create(**kw):
+                msgs = kw["messages"]
+                if msgs[0]["content"] == SYNTHESIS_SYSTEM_PROMPT:
+                    return reply(report)
+                if "-001)" in msgs[1]["content"] or "-002)" in msgs[1]["content"]:
+                    raise RuntimeError("simulated rate limit")
+                return reply(limits if len(msgs) == 2 else decision)
+            self.chat = SimpleNamespace(completions=SimpleNamespace(create=create))
+
+    class FakeOpenAI:
+        def __init__(self, **kwargs):
+            def parse(**kw):
+                parsed = DecomposedConcept(concept_name="Kopi Bar", concept_description="Kopi bar.",
+                                           target_planning_area="Ang Mo Kio", candidate_price_sgd=7.0,
+                                           category_type="beverage")
+                return SimpleNamespace(choices=[SimpleNamespace(message=SimpleNamespace(parsed=parsed))])
+            self.beta = SimpleNamespace(chat=SimpleNamespace(completions=SimpleNamespace(parse=parse)))
+
+    monkeypatch.setattr(openai, "AsyncOpenAI", FakeAsyncOpenAI)
+    monkeypatch.setattr(openai, "OpenAI", FakeOpenAI)
+
+    data = client.post("/api/simulate", json=PAYLOAD).json()
+    assert data["ai_usage"] == {"pitch_reader": "ai", "persona_ai": 8, "persona_backup": 2, "report_writer": "ai"}
+
+
+def test_use_mock_run_reports_backup_even_with_key(client: TestClient, monkeypatch, recorder):
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
+    data = client.post("/api/simulate", json={**PAYLOAD, "use_mock": True}).json()
+    assert data["ai_usage"]["pitch_reader"] == "backup"
+    assert data["ai_usage"]["persona_ai"] == 0
+    assert data["ai_usage"]["report_writer"] == "backup"
+    assert recorder.calls == []

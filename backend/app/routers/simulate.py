@@ -34,6 +34,8 @@ try:
         SimulateRequest,
         SimulateResponse,
         SimulatePreviewResponse,
+        AIStatusResponse,
+        AIUsage,
         PersonaPromptPreview,
         SyntheticPersona,
     )
@@ -55,7 +57,7 @@ try:
         run_persona_evaluations,
     )
     from app.agents.synthesis_agent import generate_macro_synthesis
-    from app.services.llm_settings import get_llm_settings
+    from app.services.llm_settings import describe_missing_provider, get_llm_settings
 except ImportError:
     from backend.app.schemas import (
         DecomposedConcept,
@@ -67,6 +69,8 @@ except ImportError:
         SimulateRequest,
         SimulateResponse,
         SimulatePreviewResponse,
+        AIStatusResponse,
+        AIUsage,
         PersonaPromptPreview,
         SyntheticPersona,
     )
@@ -88,12 +92,29 @@ except ImportError:
         run_persona_evaluations,
     )
     from backend.app.agents.synthesis_agent import generate_macro_synthesis
-    from backend.app.services.llm_settings import get_llm_settings
+    from backend.app.services.llm_settings import describe_missing_provider, get_llm_settings
 
 router = APIRouter(
     prefix="/api",
     tags=["SimSG End-to-End Simulation Engine"],
 )
+
+
+@router.get(
+    "/ai-status",
+    response_model=AIStatusResponse,
+    summary="Which AI Model Runs Would Use",
+    description=(
+        "Reports whether /api/simulate would call the AI (provider and model from backend/.env) "
+        "or use the rule-based backup because no usable API key is set. Never returns the key itself. "
+        "Read at request time, so it reflects the server's current settings."
+    ),
+)
+def ai_status() -> AIStatusResponse:
+    settings = get_llm_settings()
+    if settings is None:
+        return AIStatusResponse(persona_engine="rule_based", reason=describe_missing_provider())
+    return AIStatusResponse(persona_engine="llm", llm_provider=settings.provider, llm_model=settings.model)
 
 
 def _prepare_inputs(
@@ -278,11 +299,25 @@ async def simulate(
     # Step 8: Return Clean 3-Part Output: Recommendations, Personas Table, Statistics
     # (Context, raw pitch decomposition, and raw prompt chunks omitted)
     # -----------------------------------------------------------------------
+    # Which steps the AI actually answered (each falls back to its rule-based backup on its own)
+    persona_ai = sum(1 for e in evaluations if getattr(e, "_used_ai", False))
+    ai_usage = AIUsage(
+        pitch_reader="ai" if getattr(concept, "_used_ai", False) else "backup",
+        persona_ai=persona_ai,
+        persona_backup=len(evaluations) - persona_ai,
+        report_writer="ai" if getattr(synthesis, "_used_ai", False) else "backup",
+    )
+    logger.info(
+        f"AI usage: pitch={ai_usage.pitch_reader}, personas={persona_ai} AI / {ai_usage.persona_backup} backup, "
+        f"report={ai_usage.report_writer}"
+    )
+
     return SimulateResponse(
         recommendations=synthesis,
         personas=[p.model_dump() if hasattr(p, "model_dump") else p for p in representative_personas],
         statistics=econometrics,
         seed=seed,
+        ai_usage=ai_usage,
     )
 
 

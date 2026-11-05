@@ -82,11 +82,20 @@ export interface EconometricAnalysisResult {
   cohort_breakdown: CohortBreakdown[];
 }
 
+/** Which pipeline steps the AI answered in a run, and which used the rule-based backup. */
+export interface AIUsage {
+  pitch_reader: 'ai' | 'backup';
+  persona_ai: number;
+  persona_backup: number;
+  report_writer: 'ai' | 'backup';
+}
+
 export interface SimulateResponse {
   recommendations: MacroSynthesisReport;
   personas: RepresentativePersona[];
   statistics: EconometricAnalysisResult;
   // Seed the backend used to draw personas; absent on the built-in sample result.
   seed?: number | null;
+  ai_usage?: AIUsage | null;
 }
 

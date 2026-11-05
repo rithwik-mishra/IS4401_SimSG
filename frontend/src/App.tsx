@@ -298,6 +298,7 @@ export function App() {
             seedInput={seedInput}
             onSeedInputChange={setSeedInput}
             lastSeed={results?.seed}
+            lastAIUsage={results?.ai_usage}
             disabled={isLoading}
           />
         }

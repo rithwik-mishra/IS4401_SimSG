@@ -28,7 +28,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, PrivateAttr, field_validator
 
 logger = logging.getLogger("simsg.synthesis_agent")
 
@@ -105,6 +105,9 @@ class MacroSynthesisReport(BaseModel):
     """
     Consolidated strategic verdict and executive recommendation report.
     """
+
+    # True only when the AI wrote the report (False = rule-based report). Not part of the data or JSON schema.
+    _used_ai: bool = PrivateAttr(default=False)
 
     verdict_badge: Literal["VIABLE", "MODERATE RISK", "HIGH RISK - PIVOT REQUIRED"] = Field(
         ...,
@@ -477,7 +480,9 @@ async def generate_macro_synthesis(
             raw_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text)
 
         data = json.loads(raw_text)
-        return MacroSynthesisReport(**data)
+        report = MacroSynthesisReport(**data)
+        report._used_ai = True
+        return report
 
     except Exception as exc:
         logger.warning(

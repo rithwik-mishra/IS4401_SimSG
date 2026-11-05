@@ -3,6 +3,20 @@ import { SAMPLE_SIMULATION_RESULT } from '../data/sampleOutput';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
+export interface AIStatus {
+  persona_engine: 'llm' | 'rule_based';
+  llm_provider: string | null;
+  llm_model: string | null;
+  reason: string | null;
+}
+
+/** Which AI model the backend would use right now (or none: backup logic). */
+export async function getAIStatus(signal?: AbortSignal): Promise<AIStatus> {
+  const response = await fetch(`${API_BASE_URL}/api/ai-status`, { signal });
+  if (!response.ok) throw new Error(`AI status request failed with status ${response.status}`);
+  return response.json();
+}
+
 export async function runSimulation(
   request: SimulateRequest,
   options?: { signal?: AbortSignal; allowMockFallback?: boolean }

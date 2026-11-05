@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 import logging
 
 class ArchetypeWeights(BaseModel):
@@ -223,6 +223,14 @@ class SimulateRequest(BaseModel):
 
 
 
+class AIUsage(BaseModel):
+    """Which pipeline steps the AI actually answered in this run, and which used the rule-based backup."""
+    pitch_reader: Literal["ai", "backup"] = Field(..., description="Step 1: who read the pitch")
+    persona_ai: int = Field(..., ge=0, description="Step 4: personas answered by the AI (both interview parts)")
+    persona_backup: int = Field(..., ge=0, description="Step 4: personas that used the backup (no key, use_mock, or an AI error)")
+    report_writer: Literal["ai", "backup"] = Field(..., description="Step 6: who wrote the report")
+
+
 class SimulateResponse(BaseModel):
     """
     Unified focus group simulation response tailored for the React dashboard view:
@@ -249,6 +257,10 @@ class SimulateResponse(BaseModel):
             "Without an API key the whole result repeats; with one, the AI answers can still differ."
         ),
     )
+    ai_usage: Optional[AIUsage] = Field(
+        default=None,
+        description="Which steps the AI answered and which fell back to the rule-based backup (shown in the Testing panel)",
+    )
 
     @property
     def synthesis(self) -> MacroSynthesisReport:
@@ -261,6 +273,20 @@ class SimulateResponse(BaseModel):
     @property
     def insights(self) -> MacroSynthesisReport:
         return self.recommendations
+
+
+# ---------------------------------------------------------------------------
+# AI Status (GET /api/ai-status), shown in the frontend's Testing panel
+# ---------------------------------------------------------------------------
+
+class AIStatusResponse(BaseModel):
+    persona_engine: str = Field(
+        ...,
+        description="'llm' if runs would call the AI, 'rule_based' if they would use the backup formulas (no usable key)",
+    )
+    llm_provider: Optional[str] = Field(default=None, description="SIMSG_PROVIDER in use ('openai' or 'soclaas'); null when rule_based")
+    llm_model: Optional[str] = Field(default=None, description="Model every AI stage would use; null when rule_based")
+    reason: Optional[str] = Field(default=None, description="Why no AI is used (e.g. no usable API key); null when llm")
 
 
 # ---------------------------------------------------------------------------

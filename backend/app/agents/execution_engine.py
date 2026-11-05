@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, PrivateAttr, field_validator
 
 logger = logging.getLogger("simsg.execution_engine")
 
@@ -70,6 +70,9 @@ class PersonaEvaluationOutput(BaseModel):
     """
     Individual synthetic resident evaluation output for a business concept pitch.
     """
+
+    # True only when both AI calls answered (False = rule-based backup). Not part of the data or JSON schema.
+    _used_ai: bool = PrivateAttr(default=False)
 
     persona_id: str = Field(..., description="Unique persona identifier (e.g. 'AMK-001')")
     buy_probability_pct: int = Field(
@@ -550,7 +553,7 @@ async def _evaluate_single_persona(
             ]
             decision = await _ask_json(client, model, part2_messages, "persona_purchase", PURCHASE_SCHEMA)
 
-            return PersonaEvaluationOutput(
+            result = PersonaEvaluationOutput(
                 persona_id=persona.persona_id,
                 buy_probability_pct=decision.get("buy_probability_pct", 50),
                 too_cheap=tc,
@@ -561,6 +564,8 @@ async def _evaluate_single_persona(
                 in_character_quote=str(decision.get("in_character_quote", "")),
                 primary_objection=str(decision.get("primary_objection", "None"))[:120],
             )
+            result._used_ai = True
+            return result
         except Exception as exc:
             logger.warning(
                 f"LLM evaluation failed for persona {persona.persona_id} ({exc}); using rule-based fallback."
