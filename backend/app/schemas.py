@@ -270,7 +270,14 @@ class SimulateResponse(BaseModel):
 
 class PersonaPromptPreview(BaseModel):
     persona: SyntheticPersona = Field(..., description="The sampled persona, exactly as the persona engine receives it")
-    user_prompt: str = Field(..., description="The prompt this persona would be sent")
+    price_limits_prompt: str = Field(
+        ...,
+        description="Part 1 of the interview: the concept with its price hidden, asking only for the 4 price limits",
+    )
+    purchase_prompt: str = Field(
+        ...,
+        description="Part 2, sent in the same conversation after the AI's part 1 answer: reveals the price and asks for buy %, reaction and objection",
+    )
 
 
 class SimulatePreviewResponse(BaseModel):
@@ -290,4 +297,4 @@ class SimulatePreviewResponse(BaseModel):
     concept: DecomposedConcept = Field(..., description="The pitch after step 1 (name, category, price, town)")
     rag_chunks: list[RAGChunk] = Field(..., description="ChromaDB context from step 2, as placed in every prompt")
     system_prompt: str = Field(..., description="System prompt shared by every persona")
-    personas: list[PersonaPromptPreview] = Field(..., description="Each persona and the exact prompt it would be sent")
+    personas: list[PersonaPromptPreview] = Field(..., description="Each persona and the exact two prompts it would be sent")

@@ -7,8 +7,10 @@ Unit & Integration Tests for SimSG Agent Modules:
 """
 
 import asyncio
+import json
 import re
 import pytest
+from types import SimpleNamespace
 from typing import List
 
 try:
@@ -22,7 +24,11 @@ try:
         evaluate_persona_rule_based,
         repair_price_monotonicity,
         run_persona_evaluations,
-        build_persona_prompt,
+        build_price_limits_prompt,
+        build_purchase_prompt,
+        hide_prices,
+        PRICE_HIDDEN,
+        _evaluate_single_persona,
         format_rag_context,
     )
     from app.agents.synthesis_agent import (
@@ -44,7 +50,11 @@ except ImportError:
         evaluate_persona_rule_based,
         repair_price_monotonicity,
         run_persona_evaluations,
-        build_persona_prompt,
+        build_price_limits_prompt,
+        build_purchase_prompt,
+        hide_prices,
+        PRICE_HIDDEN,
+        _evaluate_single_persona,
         format_rag_context,
     )
     from backend.app.agents.synthesis_agent import (
@@ -157,7 +167,7 @@ def test_build_persona_prompt_contains_all_demographics():
         {"category": "competitors_and_supply", "text": "Yakun and Toast Box operate at AMK Hub."},
     ]
 
-    prompt = build_persona_prompt(p, concept, rag_chunks)
+    prompt = build_price_limits_prompt(p, concept, rag_chunks)
 
     # Demographic checks
     assert str(p.age) in prompt
@@ -180,14 +190,117 @@ def test_build_persona_prompt_contains_all_demographics():
     assert "not your personal limit" in prompt
     assert "Daily Dining Budget" not in prompt
 
-    # Concept checks
-    assert concept.concept_name in prompt
-    assert "S$6.50" in prompt
+    # Concept checks: part 1 hides the seller's price everywhere, including inside the pitch text
+    assert hide_prices(concept.concept_name) in prompt
     assert "Ang Mo Kio" in prompt
+    assert "6.50" not in prompt
+    assert "Candidate Price" not in prompt
+    assert PRICE_HIDDEN in prompt
+    assert "too_expensive" in prompt
+    assert "buy_probability_pct" not in prompt
 
-    # RAG checks
+    # RAG checks: local prices stay, they are reference points rather than the seller's price
     assert "pricing_benchmarks" in prompt.lower() or "pricing norms" in prompt.lower()
     assert "Hawker kopi ranges from $1.20" in prompt
+
+
+def test_purchase_prompt_reveals_price_and_asks_decision_only():
+    p = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=123)[0]
+    concept = decompose_query_rule_based("Artisanal Cold Brew Coffee for $6.50 in Ang Mo Kio")
+    prompt = build_purchase_prompt(p, concept)
+    assert "S$6.50" in prompt
+    assert p.persona_id in prompt
+    for field in ("buy_probability_pct", "sentiment_label", "in_character_quote", "primary_objection"):
+        assert field in prompt
+    for field in ("too_cheap", "`cheap`", "`expensive`", "too_expensive"):
+        assert field not in prompt
+
+
+@pytest.mark.parametrize(
+    "pitch",
+    [
+        "S$7 artisanal single-origin kopi bar in Ang Mo Kio with specialty cold brew and toast sets",
+        "Cold brew kiosk in Tampines for $6.50",
+        "Tonkotsu ramen in Jurong East for SGD 12.50",
+        "Bubble tea at 4.5 dollars in Outram",
+    ],
+)
+def test_price_limits_prompt_never_shows_the_pitch_price(pitch):
+    p = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=1)[0]
+    concept = decompose_query_rule_based(pitch)
+    prompt = build_price_limits_prompt(p, concept, rag_chunks=None)
+    price = concept.candidate_price_sgd
+    for shown in (f"{price:.2f}", f"{price:g}"):
+        amount = re.escape(shown) + r"(?![\d])"
+        assert not re.search(r"\$" + amount, prompt), shown
+        assert not re.search(amount + r"\s*dollars", prompt), shown
+        assert not re.search(r"SGD\s*" + amount, prompt), shown
+
+
+class _TwoPartFakeClient:
+    """Fake AsyncOpenAI: answers part 1 with price limits and part 2 with a decision, recording each call."""
+
+    def __init__(self):
+        self.calls = []
+
+        async def create(**kwargs):
+            self.calls.append(kwargs["messages"])
+            if len(kwargs["messages"]) == 2:
+                content = {"persona_id": "x", "too_cheap": 2.0, "cheap": 3.5, "expensive": 6.0, "too_expensive": 8.0}
+            else:
+                content = {"persona_id": "x", "buy_probability_pct": 35, "sentiment_label": "Neutral",
+                           "in_character_quote": "Maybe once in a while.", "primary_objection": "Price"}
+            msg = SimpleNamespace(content=json.dumps(content))
+            return SimpleNamespace(choices=[SimpleNamespace(message=msg)])
+
+        self.chat = SimpleNamespace(completions=SimpleNamespace(create=create))
+
+
+def test_two_part_interview_asks_limits_before_revealing_price():
+    persona = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=5)[0]
+    concept = decompose_query_rule_based("S$7 artisanal kopi bar in Ang Mo Kio")
+    fake = _TwoPartFakeClient()
+    result = asyncio.run(_evaluate_single_persona(
+        asyncio.Semaphore(1), fake, persona, concept, rag_chunks=None, use_mock=False, model="m"))
+
+    assert len(fake.calls) == 2
+    part1, part2 = fake.calls
+    # Part 1: system + price-hidden prompt only
+    assert [m["role"] for m in part1] == ["system", "user"]
+    assert not re.search(r"\$7(?:\.00)?(?![\d.])", part1[1]["content"])
+    # Part 2: same conversation, with the persona's own part 1 answer, then the price
+    assert [m["role"] for m in part2] == ["system", "user", "assistant", "user"]
+    assert json.loads(part2[2]["content"])["expensive"] == 6.0
+    assert "S$7.00" in part2[3]["content"]
+
+    # Result combines part 1 limits and part 2 decision
+    assert (result.too_cheap, result.cheap, result.expensive, result.too_expensive) == (2.0, 3.5, 6.0, 8.0)
+    assert result.buy_probability_pct == 35
+    assert result.in_character_quote == "Maybe once in a while."
+
+
+@pytest.mark.parametrize("fail_on_call", [1, 2])
+def test_two_part_interview_falls_back_when_a_part_fails(fail_on_call):
+    """json_schema and json_object both fail on that call -> the persona uses the rule-based answer."""
+    persona = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=5)[0]
+    concept = decompose_query_rule_based("S$7 artisanal kopi bar in Ang Mo Kio")
+
+    class AlwaysFailFrom(_TwoPartFakeClient):
+        def __init__(self):
+            super().__init__()
+            inner = self.chat.completions.create
+
+            async def create(**kwargs):
+                if len(self.calls) + 1 >= fail_on_call:
+                    self.calls.append(kwargs["messages"])
+                    raise RuntimeError("simulated AI failure")
+                return await inner(**kwargs)
+
+            self.chat = SimpleNamespace(completions=SimpleNamespace(create=create))
+
+    result = asyncio.run(_evaluate_single_persona(
+        asyncio.Semaphore(1), AlwaysFailFrom(), persona, concept, rag_chunks=None, use_mock=False, model="m"))
+    assert result == evaluate_persona_rule_based(persona, concept)
 
 
 # Ground rules taken from respondent.py, which the persona AI must always be told

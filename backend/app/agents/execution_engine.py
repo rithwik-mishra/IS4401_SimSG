@@ -8,6 +8,9 @@ decomposed business pitch and Layer 2 ChromaDB qualitative neighborhood context.
 Core Capabilities:
   - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(25).
   - Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL) with structured JSON output enforcement.
+  - Two-part interview per persona, so price limits are not anchored on the seller's price:
+      1. price limits: concept with prices hidden -> 4 Van Westendorp thresholds
+      2. purchase: same conversation, price revealed -> buy %, sentiment, quote, objection
   - Contextual prompt conditioning across demographic attributes, typical eating-out spend,
     and local neighborhood conditions (including local prices from ChromaDB).
   - Monotonicity post-processing enforcing Van Westendorp price thresholds:
@@ -183,9 +186,24 @@ def repair_price_monotonicity(
 
 
 # ---------------------------------------------------------------------------
-# Structured JSON Schema for OpenAI
+# Structured JSON Schemas for OpenAI (one per part of the two-part interview)
 # ---------------------------------------------------------------------------
-PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
+# Part 1: the four Van Westendorp price limits, asked before the persona sees the price
+PRICE_LIMITS_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "persona_id": {"type": "string"},
+        "too_cheap": {"type": "number"},
+        "cheap": {"type": "number"},
+        "expensive": {"type": "number"},
+        "too_expensive": {"type": "number"},
+    },
+    "required": ["persona_id", "too_cheap", "cheap", "expensive", "too_expensive"],
+    "additionalProperties": False,
+}
+
+# Part 2: the purchase decision at the seller's price, asked after the price is revealed
+PURCHASE_SCHEMA: Dict[str, Any] = {
     "type": "object",
     "properties": {
         "persona_id": {"type": "string"},
@@ -194,10 +212,6 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
             "minimum": 0,
             "maximum": 100,
         },
-        "too_cheap": {"type": "number"},
-        "cheap": {"type": "number"},
-        "expensive": {"type": "number"},
-        "too_expensive": {"type": "number"},
         "sentiment_label": {
             "type": "string",
             "enum": ["Positive", "Neutral", "Negative"],
@@ -211,10 +225,6 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
     "required": [
         "persona_id",
         "buy_probability_pct",
-        "too_cheap",
-        "cheap",
-        "expensive",
-        "too_expensive",
         "sentiment_label",
         "in_character_quote",
         "primary_objection",
@@ -229,13 +239,27 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
 SYSTEM_PROMPT = """You are an advanced consumer simulation agent representing an authentic Singapore resident in an empirical market research focus group.
 You MUST strictly adopt the persona's demographic background, dwelling and household income. The eating-out figure in your profile is an average for your home type, a guide to typical spending, not a hard limit.
 You are evaluating a proposed business concept planned for your neighborhood.
-Evaluate whether you would realistically buy this offering at the proposed candidate price, how likely you are to purchase (0-100%), and provide your 4 Van Westendorp price thresholds (in SGD).
+You will be interviewed in two parts: first, before you are told the seller's price, you give your own 4 Van Westendorp price thresholds (in SGD); then you are told the price and say how likely you are to buy (0-100%).
 Your responses must be grounded in Singapore's local consumer reality (hawker vs cafe price gaps, CDC voucher habits, neighborhood foot traffic).
 Ground rules:
 - Do not invent other facts about yourself (no job, children, hobbies or health unless stated in your profile).
 - The monthly household income is for the whole household, combined, not just you.
 - If the price is too high for your household, or the product does not suit you, say you would not buy. Answer honestly; most real people say no to most new products.
 You must output a single JSON object matching the requested schema strictly. Do not include markdown code fences or extraneous text."""
+
+PRICE_HIDDEN = "[price not shown]"
+
+# Money amounts in a pitch: S$7, $6.50, SGD 12, 7 dollars, 4.5 bucks, 8sgd
+_PRICE_PATTERN = re.compile(
+    r"(?:S\$|SGD\s*|\$)\s*\d+(?:[.,]\d+)?"
+    r"|\b\d+(?:[.,]\d+)?\s*(?:sgd|dollars?|bucks)\b",
+    re.IGNORECASE,
+)
+
+
+def hide_prices(text: str) -> str:
+    """Replaces money amounts in pitch text, so part 1 of the interview never shows the seller's price."""
+    return _PRICE_PATTERN.sub(PRICE_HIDDEN, text or "")
 
 
 def format_rag_context(rag_chunks: Optional[List[Any]], planning_area: str) -> str:
@@ -257,12 +281,16 @@ def format_rag_context(rag_chunks: Optional[List[Any]], planning_area: str) -> s
     return "\n".join(lines)
 
 
-def build_persona_prompt(
+def build_price_limits_prompt(
     persona: SyntheticPersona,
     concept: DecomposedConcept,
     rag_chunks: Optional[List[Any]] = None,
 ) -> str:
-    """Builds the comprehensive evaluation prompt for a single synthetic resident."""
+    """
+    Part 1 of the interview: persona profile, the concept with every price removed, and local context.
+    Asks only for the 4 price thresholds, so they are not anchored on the seller's price.
+    Local prices in the neighbourhood context are kept: they are reference points, not the seller's price.
+    """
     description = (
         getattr(concept, "concept_description", None)
         or getattr(concept, "description", "")
@@ -278,28 +306,40 @@ Monthly Household Income: S${persona.monthly_household_income_sgd:,.0f} ({person
 Typical Eating-Out Spend: S${persona.daily_dining_budget_sgd:.2f} per person per day (HES 2023 average for your home type, not your personal limit)
 
 --- PROPOSED BUSINESS CONCEPT ---
-Concept Name: {concept.concept_name}
+Concept Name: {hide_prices(concept.concept_name)}
 Category: {concept.category_type}
-Candidate Price: S${concept.candidate_price_sgd:.2f}
-Description: {description}
+Description: {hide_prices(description)}
 Target Planning Area: {concept.target_planning_area}
 
 --- LOCAL NEIGHBORHOOD CONTEXT (RAG) ---
 {rag_text}
 
---- YOUR TASK ---
-Adopt this persona completely. Consider your household income, the typical eating-out spend of about S${persona.daily_dining_budget_sgd:.2f} per day for households like yours, and the local prices and alternatives in {concept.target_planning_area} described in the neighbourhood context above.
-Answer the following in character:
+--- YOUR TASK (PART 1 OF 2: YOUR OWN PRICES) ---
+Adopt this persona completely. The seller has not told you their price yet. Consider your household income, the typical eating-out spend of about S${persona.daily_dining_budget_sgd:.2f} per day for households like yours, and the local prices and alternatives in {concept.target_planning_area} described in the neighbourhood context above.
+Answer the following in character, from your own sense of value:
 1. `persona_id`: "{persona.persona_id}"
-2. `buy_probability_pct`: An integer from 0 to 100 representing how likely you are to buy this product at the candidate price of S${concept.candidate_price_sgd:.2f} during a typical week.
-3. `too_cheap`: Price in SGD below which you would question the product's quality or freshness.
-4. `cheap`: Price in SGD you would consider a bargain / great value for money.
-5. `expensive`: Price in SGD that feels pricey, but you might still consider buying as a treat.
-6. `too_expensive`: Price in SGD where you would completely refuse to purchase because it is unreasonably expensive.
+2. `too_cheap`: Price in SGD below which you would question the product's quality or freshness.
+3. `cheap`: Price in SGD you would consider a bargain / great value for money.
+4. `expensive`: Price in SGD that feels pricey, but you might still consider buying as a treat.
+5. `too_expensive`: Price in SGD where you would completely refuse to purchase because it is unreasonably expensive.
 (Note: your thresholds should logically satisfy: too_cheap <= cheap < expensive <= too_expensive).
-7. `sentiment_label`: "Positive", "Neutral", or "Negative" reflecting your general reaction to this business concept.
-8. `in_character_quote`: A short 1-2 sentence authentic reaction quote, written in standard Singapore English.
-9. `primary_objection`: Your main hesitation, criticism, or constraint in 120 characters or fewer (e.g. "Price too high for daily kopi", "Prefer traditional hawker stall", "No CDC vouchers accepted").
+"""
+
+
+def build_purchase_prompt(persona: SyntheticPersona, concept: DecomposedConcept) -> str:
+    """
+    Part 2 of the interview, sent in the same conversation after the persona's part 1 answer:
+    reveals the seller's price and asks for the purchase decision.
+    """
+    return f"""--- YOUR TASK (PART 2 OF 2: THE SELLER'S PRICE) ---
+The seller's price for {concept.concept_name} is S${concept.candidate_price_sgd:.2f}.
+Stay in character as persona {persona.persona_id}, and keep your own price answers from part 1 in mind.
+Answer the following:
+1. `persona_id`: "{persona.persona_id}"
+2. `buy_probability_pct`: An integer from 0 to 100 representing how likely you are to buy this product at the seller's price of S${concept.candidate_price_sgd:.2f} during a typical week.
+3. `sentiment_label`: "Positive", "Neutral", or "Negative" reflecting your general reaction to this business concept at this price.
+4. `in_character_quote`: A short 1-2 sentence authentic reaction quote, written in standard Singapore English.
+5. `primary_objection`: Your main hesitation, criticism, or constraint in 120 characters or fewer (e.g. "Price too high for daily kopi", "Prefer traditional hawker stall", "No CDC vouchers accepted").
 """
 
 
@@ -427,8 +467,41 @@ def evaluate_persona_rule_based(
 
 
 # ---------------------------------------------------------------------------
-# LLM Async Invocation Worker
+# LLM Async Invocation Worker (two-part interview per persona)
 # ---------------------------------------------------------------------------
+async def _ask_json(
+    client: Any,
+    model: Optional[str],
+    messages: List[Dict[str, str]],
+    schema_name: str,
+    schema: Dict[str, Any],
+) -> Dict[str, Any]:
+    """One AI call that must return a JSON object: strict json_schema first, json_object as a fallback."""
+    try:
+        response = await client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {"name": schema_name, "strict": True, "schema": schema},
+            },
+            temperature=0.7,
+        )
+    except Exception as schema_err:
+        logger.debug(f"json_schema mode failed ({schema_err}); trying json_object.")
+        response = await client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=0.7,
+        )
+
+    raw_text = (response.choices[0].message.content or "").strip()
+    if raw_text.startswith("```"):
+        raw_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text)
+    return json.loads(raw_text)
+
+
 async def _evaluate_single_persona(
     sem: asyncio.Semaphore,
     client: Optional[Any],
@@ -438,68 +511,55 @@ async def _evaluate_single_persona(
     use_mock: bool,
     model: Optional[str] = None,
 ) -> PersonaEvaluationOutput:
-    """Evaluates a single persona with bounded concurrency and fallback."""
+    """
+    Evaluates a single persona with bounded concurrency and fallback, in two AI calls:
+      1. price limits: the concept without its price -> too_cheap / cheap / expensive / too_expensive
+      2. purchase: same conversation, price revealed -> buy %, sentiment, quote, objection
+    If either call fails, the persona falls back to the rule-based evaluation.
+    """
     if use_mock or client is None:
         return evaluate_persona_rule_based(persona, concept, rag_chunks)
 
-    prompt = build_persona_prompt(persona, concept, rag_chunks)
-    messages = [
+    messages: List[Dict[str, str]] = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": prompt},
+        {"role": "user", "content": build_price_limits_prompt(persona, concept, rag_chunks)},
     ]
 
     async with sem:
         try:
-            # Attempt structured output via json_schema
-            try:
-                response = await client.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    response_format={
-                        "type": "json_schema",
-                        "json_schema": {
-                            "name": "persona_evaluation",
-                            "strict": True,
-                            "schema": PERSONA_EVALUATION_SCHEMA,
-                        },
-                    },
-                    temperature=0.7,
-                )
-            except Exception as schema_err:
-                logger.debug(f"json_schema mode failed ({schema_err}); trying json_object.")
-                response = await client.chat.completions.create(
-                    model=model,
-                    messages=messages,
-                    response_format={"type": "json_object"},
-                    temperature=0.7,
-                )
-
-            raw_text = response.choices[0].message.content or ""
-            # Strip potential fences
-            raw_text = raw_text.strip()
-            if raw_text.startswith("```"):
-                raw_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text)
-
-            data = json.loads(raw_text)
-
-            # Monotonicity repair on price thresholds
+            # Part 1: price limits, before the seller's price is shown
+            limits = await _ask_json(client, model, messages, "persona_price_limits", PRICE_LIMITS_SCHEMA)
             tc, c, exp, te = repair_price_monotonicity(
-                data.get("too_cheap", 1.0),
-                data.get("cheap", 2.0),
-                data.get("expensive", 4.0),
-                data.get("too_expensive", 6.0),
+                limits.get("too_cheap", 1.0),
+                limits.get("cheap", 2.0),
+                limits.get("expensive", 4.0),
+                limits.get("too_expensive", 6.0),
             )
+
+            # Part 2: reveal the price; the persona's own (repaired) part 1 answer stays in the conversation.
+            # A new list, so the part 1 request is left exactly as it was sent.
+            part2_messages = messages + [
+                {
+                    "role": "assistant",
+                    "content": json.dumps({
+                        "persona_id": persona.persona_id,
+                        "too_cheap": tc, "cheap": c, "expensive": exp, "too_expensive": te,
+                    }),
+                },
+                {"role": "user", "content": build_purchase_prompt(persona, concept)},
+            ]
+            decision = await _ask_json(client, model, part2_messages, "persona_purchase", PURCHASE_SCHEMA)
 
             return PersonaEvaluationOutput(
                 persona_id=persona.persona_id,
-                buy_probability_pct=data.get("buy_probability_pct", 50),
+                buy_probability_pct=decision.get("buy_probability_pct", 50),
                 too_cheap=tc,
                 cheap=c,
                 expensive=exp,
                 too_expensive=te,
-                sentiment_label=data.get("sentiment_label", "Neutral"),
-                in_character_quote=str(data.get("in_character_quote", "")),
-                primary_objection=str(data.get("primary_objection", "None"))[:120],
+                sentiment_label=decision.get("sentiment_label", "Neutral"),
+                in_character_quote=str(decision.get("in_character_quote", "")),
+                primary_objection=str(decision.get("primary_objection", "None"))[:120],
             )
         except Exception as exc:
             logger.warning(

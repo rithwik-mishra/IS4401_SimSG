@@ -50,7 +50,8 @@ try:
     )
     from app.agents.execution_engine import (
         SYSTEM_PROMPT,
-        build_persona_prompt,
+        build_price_limits_prompt,
+        build_purchase_prompt,
         run_persona_evaluations,
     )
     from app.agents.synthesis_agent import generate_macro_synthesis
@@ -82,7 +83,8 @@ except ImportError:
     )
     from backend.app.agents.execution_engine import (
         SYSTEM_PROMPT,
-        build_persona_prompt,
+        build_price_limits_prompt,
+        build_purchase_prompt,
         run_persona_evaluations,
     )
     from backend.app.agents.synthesis_agent import generate_macro_synthesis
@@ -290,7 +292,9 @@ async def simulate(
     summary="Preview the Persona Prompts Without Running the Simulation",
     description=(
         "Runs steps 1-3 of /api/simulate (pitch decomposition, ChromaDB context, seeded personas) and returns "
-        "the exact prompts the persona AI would receive. No persona AI calls are made. "
+        "the exact prompts the persona AI would receive. Each persona is interviewed in two parts: "
+        "price_limits_prompt (price hidden, asks the 4 price limits), then purchase_prompt (price revealed, "
+        "asks buy %, reaction and objection) in the same conversation. No persona AI calls are made. "
         "With an API key, step 1 still uses the AI to read the pitch, exactly as /api/simulate does."
     ),
 )
@@ -307,7 +311,8 @@ def simulate_preview(
     previews = [
         PersonaPromptPreview(
             persona=p,
-            user_prompt=build_persona_prompt(p, concept, rag_chunks),
+            price_limits_prompt=build_price_limits_prompt(p, concept, rag_chunks),
+            purchase_prompt=build_purchase_prompt(p, concept),
         )
         for p in personas
     ]

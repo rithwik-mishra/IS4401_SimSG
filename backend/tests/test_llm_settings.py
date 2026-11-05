@@ -139,7 +139,7 @@ def test_all_stages_use_simsg_model(client: TestClient, monkeypatch, recorder):
 
     stages = [stage for stage, _ in recorder.calls]
     assert stages.count("pitch") == 1
-    assert stages.count("persona") == 10
+    assert stages.count("persona") == 20  # 10 personas x 2 parts (price limits, then purchase)
     assert stages.count("report") == 1
     assert {model for _, model in recorder.calls} == {"test-model-123"}
     assert all(c == {"api_key": "sk-test"} for c in recorder.clients)  # no base_url for openai
@@ -155,7 +155,7 @@ def test_soclaas_routes_every_stage_to_its_server(client: TestClient, monkeypatc
     assert response.status_code == 200, response.text
 
     assert {model for _, model in recorder.calls} == {"soc-model"}
-    assert len(recorder.calls) == 12  # 1 pitch + 10 personas + 1 report
+    assert len(recorder.calls) == 22  # 1 pitch + 10 personas x 2 parts + 1 report
     assert all(c == {"api_key": "soc-key", "base_url": "https://soc.example/v1"} for c in recorder.clients)
 
 

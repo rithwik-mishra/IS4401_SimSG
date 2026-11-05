@@ -12,6 +12,7 @@ and the pitch-reading client fails so both routes use the rule-based reader.
 from __future__ import annotations
 
 import json
+import re
 from types import SimpleNamespace
 
 import openai
@@ -79,22 +80,31 @@ def test_preview_without_key(client: TestClient, no_api_key):
 
     rag_texts = [c["text"] for c in data["rag_chunks"]]
     for item in data["personas"]:
-        prompt = item["user_prompt"]
-        assert item["persona"]["persona_id"] in prompt
-        assert data["concept"]["concept_name"] in prompt
+        part1, part2 = item["price_limits_prompt"], item["purchase_prompt"]
+        assert item["persona"]["persona_id"] in part1 and item["persona"]["persona_id"] in part2
+        assert data["concept"]["concept_name"] in part2
         for text in rag_texts:
-            assert text in prompt
+            assert text in part1
+        # The seller's price appears only in part 2. Part 1 may still show local prices from ChromaDB
+        # (some are S$7.00 too), so check part 1 with those passages taken out.
+        part1_own_text = part1
+        for text in rag_texts:
+            part1_own_text = part1_own_text.replace(text, "")
+        # exactly S$7 / S$7.00 (not, say, the S$7.77 eating-out spend of a 1-2 room home)
+        assert not re.search(r"\$7(?:\.00)?(?![\d.])", part1_own_text)
+        assert "Candidate Price" not in part1
+        assert "S$7.00" in part2
 
 
 def test_persona_prompts_have_no_style_or_language(client: TestClient, no_api_key):
     """Singlish was dropped: no speaking style or home language, quotes asked for in standard English."""
     data = client.post("/api/simulate/preview", json=_payload()).json()
     for item in data["personas"]:
-        prompt = item["user_prompt"]
+        prompt = item["price_limits_prompt"] + item["purchase_prompt"]
         assert "Linguistic Style" not in prompt
         assert "Primary Home Language" not in prompt
         assert "Singlish" not in prompt
-        assert "standard Singapore English" in prompt
+        assert "standard Singapore English" in item["purchase_prompt"]  # the quote is asked for in part 2
 
 
 def test_persona_prompts_use_town_prices_not_fixed_references(client: TestClient, no_api_key):
@@ -103,7 +113,7 @@ def test_persona_prompts_use_town_prices_not_fixed_references(client: TestClient
     pricing = [c["text"] for c in data["rag_chunks"] if c["category"] == "pricing_benchmarks"]
     assert len(pricing) == 1
     for item in data["personas"]:
-        prompt = item["user_prompt"]
+        prompt = item["price_limits_prompt"]
         assert "Reference Baselines" not in prompt
         assert "reference price" not in prompt.lower()
         assert pricing[0] in prompt
@@ -119,9 +129,9 @@ def test_preview_shows_census_personas(client: TestClient, no_api_key):
         for dropped in ("home_language", "linguistic_style", "hawker_baseline_kopi_sgd", "cafe_baseline_coffee_sgd"):
             assert dropped not in persona
         assert persona["daily_dining_budget_sgd"] == hes_daily[persona["dwelling_type"]]
-        assert persona["age_bracket"] in item["user_prompt"]
-        assert "not your personal limit" in item["user_prompt"]
-        assert "Consumer Archetype" not in item["user_prompt"]
+        assert persona["age_bracket"] in item["price_limits_prompt"]
+        assert "not your personal limit" in item["price_limits_prompt"]
+        assert "Consumer Archetype" not in item["price_limits_prompt"]
 
 
 def test_preview_personas_match_simulate(client: TestClient, no_api_key):
@@ -147,10 +157,17 @@ def test_preview_prompts_match_what_simulate_sends(client: TestClient, fake_ai):
 
     # Every persona call carries exactly SYSTEM_PROMPT (incl. the ground rules checked in test_agents.py)
     persona_calls = [m for m in fake_ai if m[0]["content"] == SYSTEM_PROMPT]
-    assert len(persona_calls) == 30
-    sent_prompts = sorted(m[1]["content"] for m in persona_calls)
-    preview_prompts = sorted(i["user_prompt"] for i in preview["personas"])
-    assert sent_prompts == preview_prompts
+    assert len(persona_calls) == 60  # two parts per persona
+    part1_calls = [m for m in persona_calls if len(m) == 2]
+    part2_calls = [m for m in persona_calls if len(m) == 4]
+    assert len(part1_calls) == len(part2_calls) == 30
+
+    assert sorted(m[1]["content"] for m in part1_calls) == sorted(i["price_limits_prompt"] for i in preview["personas"])
+    assert sorted(m[3]["content"] for m in part2_calls) == sorted(i["purchase_prompt"] for i in preview["personas"])
+    # Part 2 repeats part 1 and the AI's own price-limit answer before revealing the price
+    for m in part2_calls:
+        assert m[1]["content"] in {i["price_limits_prompt"] for i in preview["personas"]}
+        assert m[2]["role"] == "assistant" and json.loads(m[2]["content"])["expensive"] == 6.0
 
 
 def test_preview_use_mock_reports_rule_based(client: TestClient, fake_ai):
