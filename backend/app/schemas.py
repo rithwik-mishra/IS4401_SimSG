@@ -2,39 +2,9 @@ from pydantic import BaseModel, Field, field_validator
 from typing import Any, Literal, Optional
 import logging
 
-class ArchetypeWeights(BaseModel):
-    retiree: float
-    student: float
-    working_class: float
-    heartland_family: float
-    affluent_pro: float
-
-
-class DemographicProfile(BaseModel):
-    planning_area: str
-    total_adult_pop_2026: int
-    total_households: int
-    archetype_weights: ArchetypeWeights
-    age_distribution: dict[str, float]
-    dwelling_distribution: dict[str, float]
-    income_distribution: dict[str, float]
-    home_language: dict[str, float]
-
-
-class ArchetypeSpendingProfile(BaseModel):
-    description: str
-    monthly_food_budget_sgd: float
-    hawker_tolerance_per_meal_sgd: float
-    cafe_willingness_to_pay_sgd: float
-    specialty_coffee_ceiling_sgd: float
-    bubble_tea_frequency: str
-    cdc_voucher_reliance: bool
-    price_sensitivity: str
-
-
-class SpendingThresholds(BaseModel):
-    archetypes: dict[str, ArchetypeSpendingProfile]
-    national_benchmarks: dict[str, Any]
+# Layer 1 / HES benchmark shapes (ArchetypeWeights, DemographicProfile, ArchetypeSpendingProfile,
+# SpendingThresholds) were removed in step 9: personas now come from the census sampler, and
+# nothing loads layer1_seed.json or hes_expenditure_benchmarks.json any more.
 
 
 class RAGChunk(BaseModel):
@@ -47,13 +17,11 @@ class RAGChunk(BaseModel):
 
 class SimulationContextPayload(BaseModel):
     """
-    Full consolidated payload returned by SimulationContextService.get_simulation_context().
-    This dict is passed directly to the LangGraph simulation graph as its initial state.
+    Payload returned by SimulationContextService.get_simulation_context() (shown by /api/test/simulation-context):
+    the town's top ChromaDB passages for a pitch.
     """
     planning_area: str
     user_pitch: str
-    demographic_profile: DemographicProfile
-    spending_thresholds: SpendingThresholds
     rag_context: list[RAGChunk]
     rag_query_used: str
 

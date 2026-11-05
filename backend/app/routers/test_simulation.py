@@ -1,8 +1,8 @@
 """
 backend/app/routers/test_simulation.py
 ---------------------------------------
-Dedicated test router for verifying Layer 1 + Layer 2 qualitative context
-pipeline before LangGraph multi-agent simulation orchestrator integration.
+Dedicated test router for checking the data the simulation relies on:
+the census sampler's planning areas and the Layer 2 ChromaDB passages.
 
 Kept strictly separate from core production routers.
 """
@@ -19,12 +19,14 @@ logger = logging.getLogger(__name__)
 # Resilient imports (works when imported as app.routers or backend.app.routers)
 try:
     from app.schemas import SimulationContextPayload
+    from app.services.sampler import list_supported_areas
     from app.services.simulation_context import (
         SimulationContextService,
         get_simulation_context_service,
     )
 except ImportError:
     from backend.app.schemas import SimulationContextPayload
+    from backend.app.services.sampler import list_supported_areas
     from backend.app.services.simulation_context import (
         SimulationContextService,
         get_simulation_context_service,
@@ -52,10 +54,10 @@ class TestContextRequest(BaseModel):
 @router.get(
     "/simulation-context",
     response_model=SimulationContextPayload,
-    summary="[Test] Retrieve Layer 1 + Layer 2 Simulation Context (GET)",
+    summary="[Test] Retrieve Layer 2 ChromaDB Context (GET)",
     description=(
-        "Diagnostic endpoint for testing Layer 1 demographic weighting and Layer 2 "
-        "ChromaDB qualitative vector retrieval for a given town and business pitch."
+        "Diagnostic endpoint for testing Layer 2 ChromaDB qualitative vector retrieval "
+        "for a given town and business pitch. Returns 404 for a town with no passages."
     ),
 )
 def get_simulation_context_get(
@@ -89,7 +91,7 @@ def get_simulation_context_get(
 @router.post(
     "/simulation-context",
     response_model=SimulationContextPayload,
-    summary="[Test] Retrieve Layer 1 + Layer 2 Simulation Context (POST)",
+    summary="[Test] Retrieve Layer 2 ChromaDB Context (POST)",
     description="POST variation supporting structured JSON payloads for frontend client testing.",
 )
 def get_simulation_context_post(
@@ -116,29 +118,26 @@ def get_simulation_context_post(
 
 @router.get(
     "/diagnostics",
-    summary="[Test] System Diagnostics (Layer 1 Seed, HES Data & ChromaDB)",
-    description="Checks the health and availability of all persistent Layer 1 & 2 assets.",
+    summary="[Test] System Diagnostics (Census Tables & ChromaDB)",
+    description="Checks the census sampler's planning areas and the Layer 2 ChromaDB collection.",
 )
 def get_diagnostics(
     svc: SimulationContextService = Depends(get_simulation_context_service),
 ) -> Dict[str, Any]:
-    available_areas: List[str] = [rec["planning_area"] for rec in svc._layer1]
+    census_areas: List[str] = list_supported_areas()
     chroma_count: int = svc._collection.count()
-    archetypes: List[str] = list(svc._hes.get("archetypes", {}).keys())
+    indexed_areas: List[str] = svc.get_indexed_planning_areas()
 
     return {
         "status": "healthy",
-        "layer1": {
-            "loaded_planning_areas": available_areas,
-            "total_areas_count": len(available_areas),
+        "census_sampler": {
+            "supported_planning_areas": census_areas,
+            "total_areas_count": len(census_areas),
         },
         "layer2_chromadb": {
             "collection_name": svc._collection.name,
             "total_documents_indexed": chroma_count,
+            "indexed_planning_areas": indexed_areas,
             "status": "connected" if chroma_count > 0 else "empty",
-        },
-        "hes_benchmarks": {
-            "archetypes_available": archetypes,
-            "total_archetypes": len(archetypes),
         },
     }

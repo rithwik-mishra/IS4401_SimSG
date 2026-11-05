@@ -3,14 +3,15 @@ backend/app/services/simulation_context.py
 --------------------------------------------
 Layer 2 – Step 4: Runtime SimulationContextService.
 
-On startup loads:
-  - data/layer1_seed.json          → quantitative demographic weights
-  - data/hes_expenditure_benchmarks.json → archetype spending thresholds
+On startup:
+  - Connects to ChromaDB (data/chroma_db, collection simsg_layer2_rag, cosine).
 
 On each request:
-  - Queries ChromaDB (simsg_layer2_rag, cosine) for the top-3 qualitative
-    RAG chunks relevant to the user's pitch, filtered by planning_area.
-  - Returns a consolidated payload used by the LangGraph simulation orchestrator.
+  - Queries ChromaDB for the top-3 qualitative RAG chunks relevant to the
+    user's pitch, filtered by planning_area.
+
+Personas come from the census sampler (app/services/sampler.py), so this service no
+longer loads layer1_seed.json or hes_expenditure_benchmarks.json.
 
 Usage (standalone test):
     python -m backend.app.services.simulation_context
@@ -20,11 +21,9 @@ Requirements: chromadb>=0.5, pydantic>=2.0
 
 from __future__ import annotations
 
-import json
 import logging
 from functools import lru_cache
 from pathlib import Path
-from typing import Any
 
 import chromadb
 from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
@@ -36,23 +35,9 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 try:
-    from app.schemas import (
-        ArchetypeSpendingProfile,
-        ArchetypeWeights,
-        DemographicProfile,
-        RAGChunk,
-        SimulationContextPayload,
-        SpendingThresholds,
-    )
+    from app.schemas import RAGChunk, SimulationContextPayload
 except ImportError:
-    from backend.app.schemas import (
-        ArchetypeSpendingProfile,
-        ArchetypeWeights,
-        DemographicProfile,
-        RAGChunk,
-        SimulationContextPayload,
-        SpendingThresholds,
-    )
+    from backend.app.schemas import RAGChunk, SimulationContextPayload
 
 _HERE = Path(__file__).resolve()
 # Walk up until we find the data/ directory (works from any depth)
@@ -62,18 +47,17 @@ for _ in range(6):
         break
     _REPO_ROOT = _REPO_ROOT.parent
 
-LAYER1_PATH  = _REPO_ROOT / "data" / "layer1_seed.json"
-HES_PATH     = _REPO_ROOT / "data" / "hes_expenditure_benchmarks.json"
 CHROMA_PATH  = str(_REPO_ROOT / "data" / "chroma_db")
 COLLECTION   = "simsg_layer2_rag"
 N_RAG_CHUNKS = 3
 
+
 class SimulationContextService:
     """
     Singleton-friendly service that:
-      1. Loads Layer 1 demographics and HES benchmarks on instantiation.
-      2. Connects to the persistent ChromaDB instance.
-      3. Exposes get_simulation_context() for the LangGraph orchestrator.
+      1. Connects to the persistent ChromaDB instance.
+      2. Exposes query_rag() for the simulation pipeline and
+         get_simulation_context() for the diagnostic route.
 
     Best practice: instantiate once at app startup (FastAPI lifespan event)
     and reuse via dependency injection.
@@ -81,26 +65,13 @@ class SimulationContextService:
 
     def __init__(self) -> None:
         logger.info("Initialising SimulationContextService …")
-        self._layer1: list[dict] = self._load_json(LAYER1_PATH, "Layer 1 seed")
-        self._hes: dict          = self._load_json(HES_PATH, "HES benchmarks")  # type: ignore[assignment]
-        self._chroma_client      = chromadb.PersistentClient(path=CHROMA_PATH)
-        self._collection         = self._get_collection()
+        self._chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
+        self._collection    = self._get_collection()
         logger.info("SimulationContextService ready ✓")
 
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
-
-    @staticmethod
-    def _load_json(path: Path, label: str) -> Any:
-        if not path.exists():
-            raise FileNotFoundError(
-                f"{label} not found at {path}. "
-                "Ensure the data pipeline scripts have been executed."
-            )
-        data = json.loads(path.read_text(encoding="utf-8"))
-        logger.info(f"Loaded {label} from {path}")
-        return data
 
     def _get_collection(self) -> chromadb.Collection:
         try:
@@ -119,15 +90,14 @@ class SimulationContextService:
                 "Run scripts/ingest_layer2_chroma.py first."
             ) from exc
 
-    def _find_layer1_area(self, planning_area: str) -> dict:
-        """Look up Layer 1 record for the given planning area (case-insensitive)."""
-        pa_lower = planning_area.strip().lower()
-        for record in self._layer1:
-            if record.get("planning_area", "").lower() == pa_lower:
-                return record
-        available = [r["planning_area"] for r in self._layer1]
+    def _find_indexed_area(self, planning_area: str) -> str:
+        """Planning area name as indexed in ChromaDB (case-insensitive), or ValueError if it has no passages."""
+        available = self.get_indexed_planning_areas()
+        for area in available:
+            if area.lower() == planning_area.strip().lower():
+                return area
         raise ValueError(
-            f"planning_area '{planning_area}' not found in Layer 1 seed. "
+            f"planning_area '{planning_area}' has no neighbourhood passages in ChromaDB. "
             f"Available areas: {available}"
         )
 
@@ -198,58 +168,26 @@ class SimulationContextService:
         user_pitch: str,
     ) -> SimulationContextPayload:
         """
-        Consolidate Layer 1 demographics, HES spending thresholds, and top-3
-        qualitative RAG chunks into a single simulation context payload.
+        Top-3 qualitative ChromaDB passages for a town and pitch (used by /api/test/simulation-context).
 
         Args:
-            planning_area: One of the 6 supported Singapore planning areas
-                           (e.g., "Ang Mo Kio", "Tampines", "Bukit Timah").
-            user_pitch:    Free-text description of the business concept being
-                           tested (used as the semantic RAG query).
+            planning_area: A planning area with passages in ChromaDB (e.g. "Ang Mo Kio"), case-insensitive.
+            user_pitch:    Free-text description of the business concept (the semantic RAG query).
 
         Returns:
             SimulationContextPayload (Pydantic model, .model_dump() for JSON).
 
         Raises:
-            ValueError: If planning_area is not in Layer 1 seed.
-            RuntimeError: If ChromaDB collection is unavailable.
+            ValueError: If planning_area has no passages in ChromaDB.
         """
-        # 1. Demographics
-        layer1_rec = self._find_layer1_area(planning_area)
-        demo_profile = DemographicProfile(
-            planning_area=layer1_rec["planning_area"],
-            total_adult_pop_2026=layer1_rec["total_adult_pop_2026"],
-            total_households=layer1_rec["total_households"],
-            archetype_weights=ArchetypeWeights(**layer1_rec["archetype_weights"]),
-            age_distribution=layer1_rec["age_distribution"],
-            dwelling_distribution=layer1_rec["dwelling_distribution"],
-            income_distribution=layer1_rec["income_distribution"],
-            home_language=layer1_rec["home_language"],
-        )
-
-        # 2. Spending thresholds
-        hes_archetypes = {
-            archetype: ArchetypeSpendingProfile(**profile)
-            for archetype, profile in self._hes["archetypes"].items()
-        }
-        spending = SpendingThresholds(
-            archetypes=hes_archetypes,
-            national_benchmarks=self._hes["national_benchmarks"],
-        )
-
-        # 3. RAG context
-        rag_chunks, query_used = self._query_rag(planning_area, user_pitch)
-
-        # 4. Assemble payload
-        payload = SimulationContextPayload(
-            planning_area=planning_area,
+        area = self._find_indexed_area(planning_area)
+        rag_chunks, query_used = self.query_rag(area, user_pitch)
+        return SimulationContextPayload(
+            planning_area=area,
             user_pitch=user_pitch,
-            demographic_profile=demo_profile,
-            spending_thresholds=spending,
             rag_context=rag_chunks,
             rag_query_used=query_used,
         )
-        return payload
 
     def get_simulation_context_dict(
         self,
@@ -291,8 +229,6 @@ def get_simulation_context_service() -> SimulationContextService:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    import pprint
-
     logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
     svc = get_simulation_context_service()
@@ -308,8 +244,6 @@ if __name__ == "__main__":
         print(f"AREA: {area}  |  PITCH: {pitch}")
         print("=" * 70)
         ctx = svc.get_simulation_context(area, pitch)
-        print(f"Dominant archetype: "
-              f"{max(ctx.demographic_profile.archetype_weights.model_dump(), key=lambda k: ctx.demographic_profile.archetype_weights.model_dump()[k])}")
         print(f"RAG chunks retrieved: {len(ctx.rag_context)}")
         for chunk in ctx.rag_context:
             print(f"  [{chunk.category}] dist={chunk.cosine_distance} — {chunk.text[:100]}…")

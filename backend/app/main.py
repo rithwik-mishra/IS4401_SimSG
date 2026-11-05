@@ -32,8 +32,7 @@ logger = logging.getLogger("simsg")
 async def lifespan(app: FastAPI):
     """
     Lifespan context manager: Pre-warms the SimulationContextService
-    on application startup to cache Layer 1 demographics, HES data,
-    and the ChromaDB persistent client connection.
+    on application startup to open the ChromaDB persistent client connection.
     """
     logger.info("Initializing SimSG services on startup...")
     try:
@@ -89,7 +88,7 @@ app.include_router(simulate.router)
 app.include_router(simulation.router, prefix="/api/v1")
 app.include_router(simulation.router, prefix="/api")
 
-# Testing & Diagnostics module (Layer 1 Seed, HES benchmarks, ChromaDB checks)
+# Testing & Diagnostics module (census sampler areas, ChromaDB checks)
 app.include_router(test_simulation.router)
 
 
