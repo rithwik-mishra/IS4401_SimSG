@@ -34,6 +34,8 @@ export interface RepresentativePersona {
   gender: 'Female' | 'Male' | string;
   dwelling_type: string;
   monthly_income_sgd: number;
+  /** Census household income-from-work band, e.g. "S$7,000 to S$7,999" (shown instead of the exact amount) */
+  income_bracket?: string | null;
   daily_dining_budget_sgd: number;
   buy_probability_pct: number;
   sentiment: 'Positive' | 'Neutral' | 'Negative' | string;

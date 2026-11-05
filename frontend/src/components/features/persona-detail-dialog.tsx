@@ -1,6 +1,6 @@
 import React from "react";
 import { RepresentativePersona } from "@/types/api";
-import { formatSGD } from "@/lib/utils";
+import { formatIncomeBand, formatSGD } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -96,12 +96,11 @@ export function PersonaDetailDialog({
 
             <div className="rounded-xl border border-[#e5e9e3] bg-[#fafbf8] p-3.5 space-y-1 shadow-xs">
               <span className="text-[#748078] flex items-center gap-1.5 font-medium">
-                <Wallet className="h-3.5 w-3.5 text-[#214f43]" /> Monthly Income
+                <Wallet className="h-3.5 w-3.5 text-[#214f43]" /> Household Income (from work)
               </span>
-              <p className="font-extrabold text-[#263c35] text-sm">
-                {persona.monthly_income_sgd > 0
-                  ? formatSGD(persona.monthly_income_sgd)
-                  : "Dependent / Student"}
+              <p className="font-extrabold text-[#263c35] text-sm">{formatIncomeBand(persona)} /mo</p>
+              <p className="text-[11px] leading-snug text-[#748078]">
+                Whole household; excludes pensions, CPF payouts, rental income and family support
               </p>
               <p className="text-[#748078] flex items-center gap-1">
                 <DollarSign className="h-3 w-3" />

@@ -91,7 +91,7 @@ def test_preview_without_key(client: TestClient, no_api_key):
         for text in rag_texts:
             part1_own_text = part1_own_text.replace(text, "")
         # exactly S$7 / S$7.00 (not, say, the S$7.77 eating-out spend of a 1-2 room home)
-        assert not re.search(r"\$7(?:\.00)?(?![\d.])", part1_own_text)
+        assert not re.search(r"\$7(?:\.00)?(?![\d.,])", part1_own_text)
         assert "Candidate Price" not in part1
         assert "S$7.00" in part2
 

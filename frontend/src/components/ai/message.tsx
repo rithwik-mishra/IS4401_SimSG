@@ -1,5 +1,5 @@
 import React from "react";
-import { formatSGD } from "@/lib/utils";
+import { formatIncomeBand, formatSGD } from "@/lib/utils";
 import { RepresentativePersona } from "@/types/api";
 import { MessageSquareQuote, DollarSign, Wallet, Building2, AlertCircle } from "lucide-react";
 
@@ -120,10 +120,8 @@ export function PersonaMessage({
         </div>
         <div className="flex items-center gap-1">
           <Wallet className="h-3 w-3 text-[#748078]/70" />
-          <span className="truncate">
-            {persona.monthly_income_sgd > 0
-              ? `${formatSGD(persona.monthly_income_sgd)}/mo`
-              : "Dependent"}
+          <span className="truncate" title={`Household income from work: ${formatIncomeBand(persona)} per month`}>
+            {formatIncomeBand(persona, true)}/mo
           </span>
         </div>
         <div className="flex items-center gap-1">

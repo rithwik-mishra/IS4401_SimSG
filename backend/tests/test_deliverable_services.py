@@ -224,19 +224,31 @@ def test_sampler_age_within_census_age_group():
 
 
 def test_sampler_income_within_census_band():
-    """Income lies inside the census band; '$35,000 or more' is treated as 35,000-39,999."""
+    """Income lies inside the census band; 'S$35,000 or more' is treated as 35,000-39,999."""
     cohort = sample_synthetic_cohort("Bukit Timah", n=400, seed=8)
+    labels = set()
     for p in cohort:
         inc = p.monthly_household_income_sgd
         label = p.income_bracket
+        labels.add(label)
         if label.endswith("or more"):
-            assert label == "$35,000 or more"
+            assert label == "S$35,000 or more"
             assert 35000 <= inc <= 39999
         elif label.startswith("below"):
-            assert 0 <= inc < int(label.replace("below $", "").replace(",", ""))
+            assert label == "below S$1,000"
+            assert 0 <= inc < 1000
         else:
-            lo, hi = (int(x.replace("$", "").replace(",", "")) for x in label.split(" to "))
+            assert re.fullmatch(r"S\$[\d,]+ to S\$[\d,]+", label), label
+            lo, hi = (int(x.replace("S$", "").replace(",", "")) for x in label.split(" to "))
             assert lo <= inc <= hi, (label, inc)
+    assert "below S$1,000" in labels and "S$35,000 or more" in labels  # both ends were drawn
+
+
+def test_app_personas_carry_income_band():
+    """The app's persona rows carry the census band (shown instead of the drawn exact amount)."""
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=50, seed=3)
+    rows = sampler_module.format_all_demographic_personas(cohort, [])
+    assert [r.income_bracket for r in rows] == [p.income_bracket for p in cohort]
 
 
 def test_sampler_deterministic_seed_reproducibility():

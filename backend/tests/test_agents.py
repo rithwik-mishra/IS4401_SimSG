@@ -185,7 +185,10 @@ def test_build_persona_prompt_contains_all_demographics():
     assert "Linguistic Style" not in prompt
     # Census budget is an HES average for the home type, labelled so the AI does not treat it as a cap
     assert p.age_bracket in prompt
-    assert p.income_bracket in prompt
+    # Income: the census band only (the exact drawn amount is not shown), labelled as income from work
+    assert f"Monthly Household Income from Work: {p.income_bracket}" in prompt
+    assert f"S${p.monthly_household_income_sgd:,.0f}" not in prompt
+    assert "excludes pensions, CPF payouts" in prompt
     assert "Typical Eating-Out Spend" in prompt
     assert "not your personal limit" in prompt
     assert "Daily Dining Budget" not in prompt
@@ -267,7 +270,7 @@ def test_two_part_interview_asks_limits_before_revealing_price():
     part1, part2 = fake.calls
     # Part 1: system + price-hidden prompt only
     assert [m["role"] for m in part1] == ["system", "user"]
-    assert not re.search(r"\$7(?:\.00)?(?![\d.])", part1[1]["content"])
+    assert not re.search(r"\$7(?:\.00)?(?![\d.,])", part1[1]["content"])
     # Part 2: same conversation, with the persona's own part 1 answer, then the price
     assert [m["role"] for m in part2] == ["system", "user", "assistant", "user"]
     assert json.loads(part2[2]["content"])["expensive"] == 6.0
@@ -318,6 +321,20 @@ SINGLISH = re.compile(r"\b(lah|lor|leh|wah|shiok|siao|okay-lah|kopitiam|steady)\
 @pytest.mark.parametrize("rule", PROMPT_GROUND_RULES)
 def test_system_prompt_contains_ground_rule(rule):
     assert rule in SYSTEM_PROMPT
+
+
+def test_system_prompt_explains_income_is_from_work():
+    assert "income from work" in SYSTEM_PROMPT
+    assert "leaves out pensions, CPF payouts" in SYSTEM_PROMPT
+
+
+def test_prompt_for_lowest_band_shows_band_not_tiny_amount():
+    """A household drawn at, say, S$9.82 shows as 'below S$1,000', never as S$10."""
+    concept = decompose_query_rule_based("S$7 kopi bar in Ang Mo Kio")
+    low = next(p for p in sample_synthetic_cohort("Ang Mo Kio", n=300, seed=2) if p.income_bracket == "below S$1,000")
+    prompt = build_price_limits_prompt(low, concept, rag_chunks=None)
+    assert "Monthly Household Income from Work: below S$1,000" in prompt
+    assert f"S${low.monthly_household_income_sgd:,.0f} " not in prompt
 
 
 def test_system_prompt_has_no_speaking_style():

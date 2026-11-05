@@ -75,9 +75,16 @@ class SyntheticPersona(BaseModel):
     gender: Literal["Male", "Female"] = Field(..., description="Census sex, drawn with age group by area")
     dwelling_type: DwellingType = Field(..., description="HDB or private dwelling category")
     monthly_household_income_sgd: float = Field(
-        ..., ge=0.0, description="Monthly household income in SGD, random within the census income band"
+        ...,
+        ge=0.0,
+        description=(
+            "Monthly household income from work in SGD, random within the census band. Internal only: "
+            "the AI prompt and the app show income_bracket, since the census gives only the band"
+        ),
     )
-    income_bracket: str = Field(..., description="Census household income band, e.g. '$7,000 to $7,999'")
+    income_bracket: str = Field(
+        ..., description="Census household income-from-work band, e.g. 'S$7,000 to S$7,999' or 'below S$1,000'"
+    )
     archetype: Literal[
         "retiree", "student", "working_class", "heartland_family", "affluent_pro"
     ] = Field(..., description="SimSG consumer archetype (age, then home type); not shown to the persona AI")
@@ -118,7 +125,11 @@ class RepresentativePersona(BaseModel):
     )
     monthly_income_sgd: float = Field(
         ...,
-        description="Estimated monthly household income in SGD",
+        description="Monthly household income from work in SGD (random within the census band; the app shows income_bracket)",
+    )
+    income_bracket: Optional[str] = Field(
+        default=None,
+        description="Census household income-from-work band shown in the app, e.g. 'S$7,000 to S$7,999'",
     )
     daily_dining_budget_sgd: float = Field(
         ...,
@@ -161,12 +172,12 @@ def _age_group_hi(label: str) -> Optional[int]:
 
 
 def _income_label(lo: float, hi: Optional[float]) -> str:
-    """Census income band as text: 'below $1,000', '$7,000 to $7,999', '$35,000 or more'."""
+    """Census income band as text: 'below S$1,000', 'S$7,000 to S$7,999', 'S$35,000 or more'."""
     if hi is None:
-        return f"${int(lo):,} or more"
+        return f"S${int(lo):,} or more"
     if lo == 0:
-        return f"below ${int(hi) + 1:,}"
-    return f"${int(lo):,} to ${int(hi):,}"
+        return f"below S${int(hi) + 1:,}"
+    return f"S${int(lo):,} to S${int(hi):,}"
 
 
 def _fill_open_ended(rows: List[Dict[str, Any]], lo_key: str, hi_key: str) -> None:
@@ -598,6 +609,7 @@ def select_representative_demographic_personas(
                 gender=best_p.gender,
                 dwelling_type=best_p.dwelling_type,
                 monthly_income_sgd=round(best_p.monthly_household_income_sgd, 2),
+                income_bracket=best_p.income_bracket,
                 daily_dining_budget_sgd=round(best_p.daily_dining_budget_sgd, 2),
                 buy_probability_pct=int(ev_data.get("buy_probability_pct", 50)),
                 sentiment=sentiment_val,
@@ -675,6 +687,7 @@ def format_all_demographic_personas(
             gender=p.gender,
             dwelling_type=p.dwelling_type,
             monthly_income_sgd=round(p.monthly_household_income_sgd, 2),
+            income_bracket=p.income_bracket,
             daily_dining_budget_sgd=round(p.daily_dining_budget_sgd, 2),
             buy_probability_pct=int(ev_data.get("buy_probability_pct", 50)),
             sentiment=sentiment_val,

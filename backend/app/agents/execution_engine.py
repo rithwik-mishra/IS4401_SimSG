@@ -246,7 +246,7 @@ You will be interviewed in two parts: first, before you are told the seller's pr
 Your responses must be grounded in Singapore's local consumer reality (hawker vs cafe price gaps, CDC voucher habits, neighborhood foot traffic).
 Ground rules:
 - Do not invent other facts about yourself (no job, children, hobbies or health unless stated in your profile).
-- The monthly household income is for the whole household, combined, not just you.
+- The monthly household income is income from work for the whole household, combined, not just you. It leaves out pensions, CPF payouts, rental income and support from family, so a low figure does not mean you have no money to live on.
 - If the price is too high for your household, or the product does not suit you, say you would not buy. Answer honestly; most real people say no to most new products.
 You must output a single JSON object matching the requested schema strictly. Do not include markdown code fences or extraneous text."""
 
@@ -305,7 +305,7 @@ def build_price_limits_prompt(
 Age: {persona.age} ({persona.age_bracket})
 Gender: {persona.gender}
 Dwelling: {persona.dwelling_type}
-Monthly Household Income: S${persona.monthly_household_income_sgd:,.0f} ({persona.income_bracket})
+Monthly Household Income from Work: {persona.income_bracket} (whole household combined; excludes pensions, CPF payouts, rental income and support from family)
 Typical Eating-Out Spend: S${persona.daily_dining_budget_sgd:.2f} per person per day (HES 2023 average for your home type, not your personal limit)
 
 --- PROPOSED BUSINESS CONCEPT ---
