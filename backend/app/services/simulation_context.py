@@ -1,33 +1,37 @@
 """
 backend/app/services/simulation_context.py
 --------------------------------------------
-Layer 2 – Step 4: Runtime SimulationContextService.
+Layer 2 – Step 4: Runtime SimulationContextService (Strict ChromaDB Mode).
 
 On startup loads:
   - data/layer1_seed.json          → quantitative demographic weights
   - data/hes_expenditure_benchmarks.json → archetype spending thresholds
+  - data/chroma_db                 → persistent ChromaDB collection (simsg_layer2_rag)
 
 On each request:
   - Queries ChromaDB (simsg_layer2_rag, cosine) for the top-3 qualitative
     RAG chunks relevant to the user's pitch, filtered by planning_area.
+  - In serverless environments (e.g. Vercel, AWS Lambda), ChromaDB is automatically
+    prepared in /tmp/chroma_db with full read-write locks for native execution.
   - Returns a consolidated payload used by the LangGraph simulation orchestrator.
-
-Usage (standalone test):
-    python -m backend.app.services.simulation_context
-
-Requirements: chromadb>=0.5, pydantic>=2.0
 """
 
 from __future__ import annotations
 
 import json
 import logging
+import os
+import shutil
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
-import chromadb
-from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
+try:
+    import chromadb
+    from chromadb.utils.embedding_functions import DefaultEmbeddingFunction
+except ImportError:
+    chromadb = None
+    DefaultEmbeddingFunction = None
 
 logger = logging.getLogger(__name__)
 
@@ -62,30 +66,70 @@ for _ in range(6):
         break
     _REPO_ROOT = _REPO_ROOT.parent
 
-LAYER1_PATH  = _REPO_ROOT / "data" / "layer1_seed.json"
-HES_PATH     = _REPO_ROOT / "data" / "hes_expenditure_benchmarks.json"
-CHROMA_PATH  = str(_REPO_ROOT / "data" / "chroma_db")
-COLLECTION   = "simsg_layer2_rag"
+LAYER1_PATH = _REPO_ROOT / "data" / "layer1_seed.json"
+HES_PATH = _REPO_ROOT / "data" / "hes_expenditure_benchmarks.json"
+CHROMA_SOURCE_PATH = _REPO_ROOT / "data" / "chroma_db"
+COLLECTION = "simsg_layer2_rag"
 N_RAG_CHUNKS = 3
+
+
+def _resolve_chroma_path() -> str:
+    """
+    In serverless environments (e.g. Vercel, AWS Lambda), the deployment directory is read-only.
+    Copies ChromaDB directory to /tmp/chroma_db so SQLite has write/lock permissions.
+    """
+    is_serverless = bool(
+        os.environ.get("VERCEL")
+        or os.environ.get("AWS_LAMBDA_FUNCTION_NAME")
+        or not os.access(str(CHROMA_SOURCE_PATH), os.W_OK)
+    )
+    if is_serverless and CHROMA_SOURCE_PATH.exists():
+        tmp_dir = Path("/tmp/chroma_db")
+        try:
+            if not tmp_dir.exists():
+                shutil.copytree(str(CHROMA_SOURCE_PATH), str(tmp_dir), dirs_exist_ok=True)
+                logger.info(f"Copied ChromaDB from {CHROMA_SOURCE_PATH} to writable {tmp_dir}")
+            if tmp_dir.exists():
+                return str(tmp_dir)
+        except Exception as err:
+            logger.error(f"Failed to copy ChromaDB to /tmp: {err}")
+            raise RuntimeError(f"Could not prepare writable ChromaDB in /tmp: {err}") from err
+
+    return str(CHROMA_SOURCE_PATH)
+
 
 class SimulationContextService:
     """
-    Singleton-friendly service that:
+    Singleton service that:
       1. Loads Layer 1 demographics and HES benchmarks on instantiation.
-      2. Connects to the persistent ChromaDB instance.
-      3. Exposes get_simulation_context() for the LangGraph orchestrator.
-
-    Best practice: instantiate once at app startup (FastAPI lifespan event)
-    and reuse via dependency injection.
+      2. Strictly connects to ChromaDB (with automatic /tmp copying in serverless).
+      3. Strictly executes vector similarity queries against simsg_layer2_rag.
+      4. Exposes get_simulation_context() for simulation orchestrators.
     """
 
     def __init__(self) -> None:
-        logger.info("Initialising SimulationContextService …")
+        logger.info("Initialising SimulationContextService (Strict ChromaDB) …")
         self._layer1: list[dict] = self._load_json(LAYER1_PATH, "Layer 1 seed")
-        self._hes: dict          = self._load_json(HES_PATH, "HES benchmarks")  # type: ignore[assignment]
-        self._chroma_client      = chromadb.PersistentClient(path=CHROMA_PATH)
-        self._collection         = self._get_collection()
-        logger.info("SimulationContextService ready ✓")
+        self._hes: dict = self._load_json(HES_PATH, "HES benchmarks")
+
+        if chromadb is None or DefaultEmbeddingFunction is None:
+            raise RuntimeError("chromadb package is required but could not be imported.")
+
+        chroma_path = _resolve_chroma_path()
+        try:
+            self._chroma_client = chromadb.PersistentClient(path=chroma_path)
+            self._collection = self._get_collection()
+            logger.info(
+                f"Strict ChromaDB connected: collection='{COLLECTION}' "
+                f"({self._collection.count()} documents indexed) ✓"
+            )
+        except Exception as exc:
+            raise RuntimeError(
+                f"Strict ChromaDB initialization failed on path '{chroma_path}': {exc}. "
+                "Ensure data/chroma_db exists and has valid index files."
+            ) from exc
+
+        logger.info("SimulationContextService ready with strict ChromaDB ✓")
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -102,20 +146,17 @@ class SimulationContextService:
         logger.info(f"Loaded {label} from {path}")
         return data
 
-    def _get_collection(self) -> chromadb.Collection:
+    def _get_collection(self) -> Any:
+        if self._chroma_client is None or DefaultEmbeddingFunction is None:
+            raise RuntimeError("ChromaDB client is not initialized.")
         try:
-            col = self._chroma_client.get_collection(
+            return self._chroma_client.get_collection(
                 name=COLLECTION,
                 embedding_function=DefaultEmbeddingFunction(),
             )
-            logger.info(
-                f"Connected to ChromaDB collection '{COLLECTION}' "
-                f"({col.count()} documents)"
-            )
-            return col
         except Exception as exc:
             raise RuntimeError(
-                f"ChromaDB collection '{COLLECTION}' not found at {CHROMA_PATH}. "
+                f"ChromaDB collection '{COLLECTION}' not found. "
                 "Run scripts/ingest_layer2_chroma.py first."
             ) from exc
 
@@ -139,51 +180,51 @@ class SimulationContextService:
     ) -> tuple[list[RAGChunk], str]:
         """
         Query ChromaDB with metadata filter on planning_area.
+        Strictly executes vector similarity search against the ChromaDB collection.
         Returns (chunks, query_string_used).
         """
+        if self._collection is None:
+            raise RuntimeError(f"ChromaDB collection '{COLLECTION}' is not initialized.")
+
         query_text = user_pitch.strip() or planning_area
-        try:
-            results = self._collection.query(
-                query_texts=[query_text],
-                n_results=n_results,
-                where={"planning_area": planning_area},
-                include=["documents", "metadatas", "distances"],
-            )
-        except Exception as exc:
-            logger.error(f"ChromaDB query failed: {exc}")
-            return [], query_text
+        results = self._collection.query(
+            query_texts=[query_text],
+            n_results=n_results,
+            where={"planning_area": planning_area},
+            include=["documents", "metadatas", "distances"],
+        )
 
         chunks: list[RAGChunk] = []
-        ids        = results.get("ids", [[]])[0]
-        docs       = results.get("documents", [[]])[0]
-        metas      = results.get("metadatas", [[]])[0]
-        distances  = results.get("distances", [[]])[0]
+        ids = results.get("ids", [[]])[0]
+        docs = results.get("documents", [[]])[0]
+        metas = results.get("metadatas", [[]])[0]
+        distances = results.get("distances", [[]])[0]
 
         for chunk_id, doc, meta, dist in zip(ids, docs, metas, distances):
-            chunks.append(RAGChunk(
-                id=chunk_id,
-                planning_area=meta.get("planning_area", planning_area),
-                category=meta.get("category", "unknown"),
-                text=doc,
-                cosine_distance=round(float(dist), 6),
-            ))
+            chunks.append(
+                RAGChunk(
+                    id=chunk_id,
+                    planning_area=meta.get("planning_area", planning_area),
+                    category=meta.get("category", "unknown"),
+                    text=doc,
+                    cosine_distance=round(float(dist), 6),
+                )
+            )
 
         logger.info(
-            f"RAG query '{query_text[:60]}' → {len(chunks)} chunks "
-            f"for planning_area='{planning_area}'"
+            f"Strict ChromaDB query '{query_text[:60]}' → {len(chunks)} chunks "
+            f"for planning_area='{planning_area}' (cosine distances: {[c.cosine_distance for c in chunks]})"
         )
         return chunks, query_text
 
     def get_indexed_planning_areas(self) -> list[str]:
-        """Return sorted list of planning areas indexed in ChromaDB."""
-        try:
-            data = self._collection.get(include=["metadatas"])
-            metas = data.get("metadatas", []) or []
-            areas = {m.get("planning_area") for m in metas if isinstance(m, dict) and m.get("planning_area")}
-            return sorted(areas)
-        except Exception as exc:
-            logger.error(f"Failed to fetch indexed planning areas: {exc}")
-            return []
+        """Return sorted list of planning areas strictly indexed in ChromaDB."""
+        if self._collection is None:
+            raise RuntimeError("ChromaDB is not initialized.")
+        data = self._collection.get(include=["metadatas"])
+        metas = data.get("metadatas", []) or []
+        areas = {m.get("planning_area") for m in metas if isinstance(m, dict) and m.get("planning_area")}
+        return sorted(areas)
 
     # Backwards compatibility alias
     _query_rag = query_rag
@@ -200,19 +241,6 @@ class SimulationContextService:
         """
         Consolidate Layer 1 demographics, HES spending thresholds, and top-3
         qualitative RAG chunks into a single simulation context payload.
-
-        Args:
-            planning_area: One of the 6 supported Singapore planning areas
-                           (e.g., "Ang Mo Kio", "Tampines", "Bukit Timah").
-            user_pitch:    Free-text description of the business concept being
-                           tested (used as the semantic RAG query).
-
-        Returns:
-            SimulationContextPayload (Pydantic model, .model_dump() for JSON).
-
-        Raises:
-            ValueError: If planning_area is not in Layer 1 seed.
-            RuntimeError: If ChromaDB collection is unavailable.
         """
         # 1. Demographics
         layer1_rec = self._find_layer1_area(planning_area)
@@ -237,7 +265,7 @@ class SimulationContextService:
             national_benchmarks=self._hes["national_benchmarks"],
         )
 
-        # 3. RAG context
+        # 3. Strict RAG context from ChromaDB
         rag_chunks, query_used = self._query_rag(planning_area, user_pitch)
 
         # 4. Assemble payload
@@ -270,46 +298,5 @@ def get_simulation_context_service() -> SimulationContextService:
     """
     Returns a singleton SimulationContextService instance.
     Thread-safe due to CPython's GIL; safe for FastAPI startup.
-
-    Usage in FastAPI:
-        from backend.app.services.simulation_context import get_simulation_context_service
-        from fastapi import Depends
-
-        @router.get("/simulation-context")
-        async def simulation_context(
-            planning_area: str,
-            user_pitch: str,
-            svc: SimulationContextService = Depends(get_simulation_context_service),
-        ):
-            return svc.get_simulation_context_dict(planning_area, user_pitch)
     """
     return SimulationContextService()
-
-
-# ---------------------------------------------------------------------------
-# Standalone smoke test
-# ---------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    import pprint
-
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
-
-    svc = get_simulation_context_service()
-
-    test_cases = [
-        ("Ang Mo Kio",  "S$7 specialty coffee for retiree residents"),
-        ("Bukit Timah", "premium artisan bakery with single-origin pour-over coffee"),
-        ("Tampines",    "affordable bubble tea shop targeting young families"),
-    ]
-
-    for area, pitch in test_cases:
-        print(f"\n{'='*70}")
-        print(f"AREA: {area}  |  PITCH: {pitch}")
-        print("=" * 70)
-        ctx = svc.get_simulation_context(area, pitch)
-        print(f"Dominant archetype: "
-              f"{max(ctx.demographic_profile.archetype_weights.model_dump(), key=lambda k: ctx.demographic_profile.archetype_weights.model_dump()[k])}")
-        print(f"RAG chunks retrieved: {len(ctx.rag_context)}")
-        for chunk in ctx.rag_context:
-            print(f"  [{chunk.category}] dist={chunk.cosine_distance} — {chunk.text[:100]}…")

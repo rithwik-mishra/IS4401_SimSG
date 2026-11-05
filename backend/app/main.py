@@ -39,7 +39,7 @@ async def lifespan(app: FastAPI):
     try:
         svc = get_simulation_context_service()
         logger.info(
-            f"Pre-warm complete: ChromaDB collection has {svc._collection.count()} docs."
+            f"Pre-warm complete: ChromaDB collection '{svc._collection.name}' has {svc._collection.count()} docs."
         )
     except Exception as exc:
         logger.error(f"Startup warning - could not pre-warm simulation service: {exc}")
