@@ -60,6 +60,7 @@ default_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
+    "https://simsg.vercel.app",
 ]
 
 env_cors = os.getenv("CORS_ORIGINS")
@@ -82,8 +83,23 @@ app.add_middleware(
 # ROUTERS
 # ---------------------------------------------------------------------------
 
-# Full End-to-End Simulation Pipeline (POST /api/simulate)
+# Full End-to-End Simulation Pipeline (POST /api/simulate and /simulate)
 app.include_router(simulate.router)
+
+# Aliases for reverse proxies that might strip /api prefix
+app.add_api_route(
+    "/simulate",
+    simulate.simulate,
+    methods=["POST"],
+    response_model=simulate.SimulateResponse,
+    include_in_schema=False,
+)
+app.add_api_route(
+    "/simulate",
+    simulate.simulate_info,
+    methods=["GET"],
+    include_in_schema=False,
+)
 
 # Granular Simulation Engine Endpoints (/api/v1/simulation/*)
 app.include_router(simulation.router, prefix="/api/v1")
