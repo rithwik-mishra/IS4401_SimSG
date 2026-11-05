@@ -78,8 +78,20 @@ class CorpusChunk(BaseModel):
 
 # ---------------------------------------------------------------------------
 # Static qualitative knowledge templates
-# (These encode real Singapore F&B market dynamics grounded in public data:
-#  URA commercial rent reports, NEA hawker pricing surveys, SingStat HES 2023)
+# (These encode Singapore F&B market dynamics described as drawn from public data:
+#  URA commercial rent reports, NEA hawker pricing surveys, SingStat HES 2023.)
+#
+# Step 12 clean-up (previous text: app/legacy/build_layer2_corpus_v1.py):
+#  - Removed persona-type shares (e.g. "heartland ~46%", "affluent ~63%") and
+#    per-type price ceilings / willingness to pay copied from the retired
+#    layer1_seed.json and hes_expenditure_benchmarks.json, incl. Ang Mo Kio's
+#    "price ceiling ... S$6–S$7" line and the shared "above S$7–S$8" sentence.
+#  - Removed ethnic / language percentages (they were also wrong vs the census).
+#  - Census-style figures checked against data/sheets/processed: "aged 65+" (not
+#    "retirees"), 1-2 room shares as % of households, Bukit Timah 91% condo/landed.
+#  - Fixed the "S$51+" typo.
+# UNVERIFIED: individual shop / hawker prices, MRT ridership and rent psf figures
+# carry no per-figure source; treat them as indicative.
 # ---------------------------------------------------------------------------
 
 PRICING_TEMPLATES: dict[str, str] = {
@@ -92,9 +104,7 @@ PRICING_TEMPLATES: dict[str, str] = {
         "S$2.50–S$3.50 per cup with regular promos; LiHo and KOI sit at "
         "S$3.80–S$5.50. Third-wave specialty cafes in AMK Hub or Jubilee Square "
         "charge S$5.80–S$7.50 for a flat white and S$7.00–S$9.00 for signature "
-        "lattes. The dominant customer price ceiling for a non-hawker beverage "
-        "is approximately S$6–S$7 for the retiree-heavy demographic; younger "
-        "working-class residents stretch to S$8 for premium offerings. CDC "
+        "lattes. CDC "
         "SingVouchers are widely redeemed at heartland coffeeshops and "
         "neighbourhood food courts (Koufu, Kopitiam brands)."
     ),
@@ -107,10 +117,9 @@ PRICING_TEMPLATES: dict[str, str] = {
         "Luckin Coffee targets S$3.00–S$4.50 per cup with frequent app coupons. "
         "Mall-based cafes in Century Square, Tampines Mall, and Tampines 1 "
         "price specialty coffee at S$6.00–S$8.00, with Starbucks commanding "
-        "S$7.50–S$9.50. The heartland family archetype (dominant ~46%) is "
-        "willing to pay S$8–S$10 for family-friendly cafe experiences. "
+        "S$7.50–S$9.50. "
         "E-payment adoption (PayLah!, GrabPay) is very high, lowering friction "
-        "for S$7–S$10 ticket items. Kopitiam and Food Republic food courts offer "
+        "for higher-priced items. Kopitiam and Food Republic food courts offer "
         "value sets at S$5.50–S$6.50 for a beverage + snack combo."
     ),
     "Bukit Timah": (
@@ -121,10 +130,10 @@ PRICING_TEMPLATES: dict[str, str] = {
         "tasting flights. Kaya toast at Beauty World Food Centre remains a "
         "S$3.50–S$4.00 anchor for heritage seekers. Artisanal bakeries (Tiong "
         "Bahru Bakery Rail Mall, The Bakery Chef) price croissants at S$4.50–"
-        "S$6.00 and specialty loaves at S$12–S$18. The affluent_pro archetype "
-        "(~63%) has a specialty coffee ceiling of S$15 and is largely "
-        "price-insensitive when quality signals are present (single-origin beans, "
-        "latte art, aesthetic Instagram-friendly interiors). Budget bubble tea "
+        "S$6.00 and specialty loaves at S$12–S$18. About 91% of households live "
+        "in condominiums or landed homes (census), and quality signals "
+        "(single-origin beans, latte art, aesthetic Instagram-friendly "
+        "interiors) carry weight. Budget bubble tea "
         "chains (Mixue) have negligible penetration here. Premium tea brands "
         "(TWG, Lupicia) are preferred over traditional Kopi. Commercial rents "
         "along Upper Bukit Timah Road and Greenwood Avenue are S$8–S$12 psf/month."
@@ -136,8 +145,7 @@ PRICING_TEMPLATES: dict[str, str] = {
         "S$1.20–S$1.50, kaya toast sets S$3.00–S$4.00. Luckin Coffee runs "
         "strong app-coupon campaigns targeting S$2.80–S$4.00 per cup. Mixue "
         "positions at S$2.00–S$3.00. Mall-based Starbucks (JEM, Westgate) price "
-        "at S$7.50–S$9.50. The heartland family archetype (~38%) is the largest "
-        "segment and pays up to S$9.00 for sit-down family cafes. Specialty "
+        "at S$7.50–S$9.50. Specialty "
         "coffee at independent cafes inside or near JEM costs S$6.00–S$8.00. "
         "CDC vouchers are actively redeemed. Commercial F&B rental in JEM/IMM "
         "ground floor is S$15–S$22 psf/month (high competition for anchor spots)."
@@ -152,8 +160,7 @@ PRICING_TEMPLATES: dict[str, str] = {
         "Gong Cha) at S$4.00–S$5.50. IKEA food court offers S$1 soft-serve and "
         "S$5 meals, creating a low-price anchor effect on surrounding F&B. CDC "
         "voucher redemption is among the highest in this planning area due to "
-        "1-2-room HDB concentration (16%). Working-class archetype tolerance for "
-        "cafe spend caps at ~S$8 per visit."
+        "1-2-room HDB concentration (about 16% of households)."
     ),
     "Outram": (
         "Outram / Chinatown is Singapore's most heritage-dense planning area and "
@@ -164,25 +171,24 @@ PRICING_TEMPLATES: dict[str, str] = {
         "charge S$7.00–S$12.00 and attract specialty coffee pilgrims island-wide. "
         "Bubble tea chains are present on Chinatown Point and Smith Street. "
         "Artisanal bakers (Tiong Bahru Bakery flagship on Craig Road) price "
-        "croissants S$4.50–S$6.00 and loaves S$12–S$18. The working-class "
-        "archetype (~42% of residents) has low disposable income; the S$51+ "
-        "specialty experience is largely driven by tourists and CBD workers. "
+        "croissants S$4.50–S$6.00 and loaves S$12–S$18. Specialty coffee "
+        "demand here is largely driven by tourists and CBD workers. "
         "Commercial ground floor rent in Chinatown Point / Tanjong Pagar area: "
         "S$12–S$20 psf/month. CDC vouchers are heavily relied upon by 1-2 room "
-        "HDB residents (~37% of dwellings)."
+        "HDB residents (about 37% of households)."
     ),
 }
 
 FOOT_TRAFFIC_TEMPLATES: dict[str, str] = {
     "Ang Mo Kio": (
         "Ang Mo Kio has Singapore's oldest age profile among major towns, with "
-        "31% retirees. Foot traffic peaks at MRT interchange (NS16/Circle Line "
+        "about 31% of adults aged 65 or over. Foot traffic peaks at MRT interchange (NS16/Circle Line "
         "under construction) between 07:30–09:00 and 17:30–19:30. The hawker "
         "and coffeeshop morning rush (07:00–09:30) is driven by retirees and "
         "early-career workers from HDB blocks; lunch (11:30–13:30) sees a mixed "
         "crowd at Ang Mo Kio Hub food court and AMK Central market. Weekend "
-        "foot traffic is family-oriented (AMK Hub cinema, libraries). Student "
-        "density is modest (~6%) vs national average due to limited tertiary "
+        "foot traffic is family-oriented (AMK Hub cinema, libraries). Young "
+        "adults aged 20–24 are about 6% of adults, with limited tertiary "
         "institutions nearby. Nanyang Polytechnic is ~1.5 km from town centre, "
         "generating student F&B demand during term time. CDC voucher redemption "
         "activity is high at Kopitiam/Koufu outlets and provision shops. "
@@ -193,13 +199,12 @@ FOOT_TRAFFIC_TEMPLATES: dict[str, str] = {
         "Tampines is a high-density family town with Tampines MRT (EWL/DT "
         "interchange) generating consistent 60,000+ daily ridership. Morning "
         "commuter peak 07:00–09:00 drives grab-and-go demand; evening peak "
-        "17:30–20:00 sustains mall-based F&B. The young-family archetype (~46% "
-        "heartland family) generates strong weekend demand for sit-down cafes and "
+        "17:30–20:00 sustains mall-based F&B. Young families generate strong "
+        "weekend demand for sit-down cafes and "
         "bakeries. SUTD (Singapore University of Technology and Design) is in "
         "Tampines, adding ~4,000 tertiary students with moderate F&B spend. "
         "Tampines Regional Library and community centres generate consistent "
-        "family + student footfall on weekday afternoons. Malay-speaking "
-        "households (~10%) create halal F&B demand. E-payment penetration is "
+        "family + student footfall on weekday afternoons. E-payment penetration is "
         "very high (>90%); GrabFood and FoodPanda delivery usage is also among "
         "the highest in heartland towns, implying delivery F&B is a strong "
         "channel alongside dine-in."
@@ -225,20 +230,19 @@ FOOT_TRAFFIC_TEMPLATES: dict[str, str] = {
         "sustains all-day family foot traffic, especially weekends. Weekday "
         "morning commuter rush (07:00–09:00) drives high-volume, quick-service "
         "F&B (Luckin Coffee, McDonald's, Ya Kun). Lunch crowd peaks at IMM food "
-        "republic and Jurong East FC (11:30–13:30). The heartland family "
-        "archetype (~38%) drives weekend family dining and cafe visits in malls. "
+        "republic and Jurong East FC (11:30–13:30). Families drive weekend "
+        "family dining and cafe visits in malls. "
         "Jurong Lake District (JLD) masterplan is actively transforming the area; "
         "new office supply will increase PME worker density from 2027 onward, "
-        "lifting cafe/artisan bakery demand. Malay (~8%) and Indian (~4%) "
-        "communities add halal and vegetarian demand signals. CDC voucher "
+        "lifting cafe/artisan bakery demand. CDC voucher "
         "redemption is moderate-high, typical of mixed HDB estates."
     ),
     "Bukit Merah": (
         "Bukit Merah straddles the southern HDB belt and Alexandra tech corridor. "
         "MRT access via Redhill (EWL), Queenstown (EWL), and Haw Par Villa (CCL). "
         "Morning commuter peak funnels CBD-bound workers through F&B nodes at "
-        "Redhill and Alexandra Road. The 1-2 room HDB cluster (~16%) is the "
-        "highest proportion in this dataset, creating a pocket of very price-"
+        "Redhill and Alexandra Road. The 1-2 room HDB cluster (about 16% of "
+        "households) creates a pocket of very price-"
         "sensitive elderly residents who rely heavily on CDC vouchers and hawker "
         "meal subsidies. Proximity to one-north tech park (~2.5 km) creates "
         "weekday lunch demand from knowledge workers preferring specialty coffee "
@@ -249,13 +253,13 @@ FOOT_TRAFFIC_TEMPLATES: dict[str, str] = {
     ),
     "Outram": (
         "Outram / Chinatown is a dual-audience market: a small, older residential "
-        "base (14,450 adults, ~33% retirees) and a massive daytime tourist + CBD "
+        "base (about 14,800 adults, ~33% aged 65+) and a massive daytime tourist + CBD "
         "worker influx via Chinatown MRT (NEL) and Outram Park MRT (EWL/NEL/TE "
         "interchange). Tourist foot traffic peaks 10:00–21:00 daily, weekends "
         "especially heavy on Pagoda Street and Chinatown Complex. CBD worker "
         "overflow from Tanjong Pagar (lunch: 12:00–14:00) drives specialty cafe "
-        "and artisan bakery demand. Working-class resident archetype (~42%) "
-        "relies on Maxwell FC and Chinatown Complex for daily meals at S$4–S$6. "
+        "and artisan bakery demand. Many residents rely on Maxwell FC and "
+        "Chinatown Complex for daily meals at S$4–S$6. "
         "Specialty roasters (Papa Palheta, Nylon) attract enthusiast pilgrims "
         "from across Singapore on weekends. Night market activity on Smith Street "
         "sustains late-night (until 23:00) F&B demand unique among the 6 target "
@@ -339,8 +343,7 @@ def build_competitors_text(area: str, names: list[str]) -> str:
         f"New entrants in the specialty coffee / artisan bakery space face established "
         f"chain dominance in high-traffic mall nodes and must differentiate on "
         f"quality, community storytelling, or niche positioning (e.g., single-origin "
-        f"beans, sourdough, vegan options) to justify a price premium above "
-        f"S$7–S$8 for the dominant heartland demographic."
+        f"beans, sourdough, vegan options) to justify a price premium."
     )
 
 

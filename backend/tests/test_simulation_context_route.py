@@ -119,6 +119,45 @@ def test_live_code_does_not_use_backend_agents_folder():
     assert offenders == []
 
 
+def test_chroma_passages_have_no_persona_type_figures_or_ceilings():
+    """
+    Step 12: the corpus no longer carries the layer1 / HES persona-type shares, per-type price
+    ceilings, ethnic or language percentages, or the S$51+ typo. Every town still has 3 passages.
+    """
+    import re
+    from app.services.simulation_context import get_simulation_context_service
+
+    svc = get_simulation_context_service()
+    data = svc._collection.get(include=["documents", "metadatas"])
+    docs = list(zip(data["metadatas"], data["documents"]))
+    assert len(docs) == 18
+
+    forbidden = [
+        r"archetype", r"heartland family", r"affluent_pro", r"ceiling", r"willing to pay", r"pays up to",
+        r"tolerance for", r"dominant heartland", r"retiree-heavy", r"S\$51", r"(Malay|Indian)[^.]{0,25}\d+%",
+        r"Malay-speaking", r"~(46|63|38|42)%",
+    ]
+    for meta, text in docs:
+        for pattern in forbidden:
+            assert not re.search(pattern, text, re.IGNORECASE), f"{meta['planning_area']} {meta['category']}: '{pattern}'"
+
+    per_area = {}
+    for meta, _ in docs:
+        per_area.setdefault(meta["planning_area"], set()).add(meta["category"])
+    assert len(per_area) == 6
+    assert all(cats == {"pricing_benchmarks", "competitors_and_supply", "foot_traffic_and_lifestyle"} for cats in per_area.values())
+
+
+def test_corpus_json_matches_chroma():
+    """The ingested passages are exactly data/rag_corpus/layer2_corpus.json (rebuild + reload stayed in sync)."""
+    import json
+    from app.services.simulation_context import get_simulation_context_service
+
+    corpus = json.loads((Path(__file__).resolve().parents[1] / "data" / "rag_corpus" / "layer2_corpus.json").read_text(encoding="utf-8"))
+    data = get_simulation_context_service()._collection.get(include=["documents"])
+    assert dict(zip(data["ids"], data["documents"])) == {c["id"]: c["text"] for c in corpus}
+
+
 def test_simulation_context_area_is_case_insensitive(client: TestClient):
     response = client.get("/api/test/simulation-context", params={"planning_area": "ang mo kio", "user_pitch": "kopi"})
     assert response.status_code == 200, response.text
