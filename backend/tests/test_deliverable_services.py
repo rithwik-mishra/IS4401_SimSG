@@ -407,6 +407,17 @@ def test_sampler_does_not_read_layer1_or_hes_benchmark_files(monkeypatch):
         sampler_module._load_census_tables.cache_clear()
 
 
+def test_layer1_and_hes_files_moved_to_legacy():
+    """Step 11: the unused layer1 / HES files live in app/legacy/data, not in the live data folder."""
+    backend_dir = Path(sampler_module.__file__).resolve().parents[2]
+    legacy_data = backend_dir / "app" / "legacy" / "data"
+    for name in ("layer1_seed.json", "hes_expenditure_benchmarks.json", "layer1_master.csv"):
+        assert not (backend_dir / "data" / name).exists(), f"{name} is back in backend/data"
+        assert (legacy_data / name).exists(), f"{name} missing from app/legacy/data"
+    assert not (backend_dir / "scripts" / "extract_layer1_seed.py").exists()
+    assert (backend_dir / "app" / "legacy" / "extract_layer1_seed.py").exists()
+
+
 def test_live_code_does_not_import_legacy():
     """backend/app/legacy holds backups only; no live module imports from it."""
     app_dir = Path(sampler_module.__file__).resolve().parents[1]

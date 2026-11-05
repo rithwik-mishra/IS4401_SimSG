@@ -97,6 +97,18 @@ def check_preview_panel_without_rag():
         assert "Local neighborhood context" not in prompt
 
 
+def check_layer1_sampler_reads_legacy_data():
+    """The pre-step-7 sampler still loads layer1_seed.json / HES benchmarks from app/legacy/data."""
+    from app.legacy import sampler_layer1
+    from app.legacy import extract_layer1_seed
+
+    assert sampler_layer1.LAYER1_PATH.exists() and sampler_layer1.HES_PATH.exists()
+    cohort = sampler_layer1.sample_synthetic_cohort("Ang Mo Kio", n=5, seed=1)
+    assert len(cohort) == 5
+    assert extract_layer1_seed.CSV_PATH.exists()
+    assert extract_layer1_seed.CSV_PATH.parent == sampler_layer1.LAYER1_PATH.parent
+
+
 def check_legacy_preview_route(client: TestClient):
     payload = {
         "planning_area": "Ang Mo Kio",
@@ -131,6 +143,8 @@ def run_all():
     print("  [PASS] Legacy preview panel with ChromaDB RAG OK")
     check_preview_panel_without_rag()
     print("  [PASS] Legacy preview panel without RAG OK")
+    check_layer1_sampler_reads_legacy_data()
+    print("  [PASS] Layer 1 sampler and extract script find app/legacy/data OK")
     with TestClient(legacy_app()) as client:
         check_legacy_preview_route(client)
         print("  [PASS] Legacy POST /api/v1/simulation/preview (and 404) OK")

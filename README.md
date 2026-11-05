@@ -70,6 +70,7 @@ backend/
       execution_engine.py     - Persona answers (AI, with rule-based backup)
       synthesis_agent.py      - Report writer (AI, with rule-based backup)
     legacy/                   - Replaced code kept for reference (not used by the app)
+      data/                   - Old layer1_seed.json, HES benchmarks and layer1_master.csv
   pipeline/
     clean_data.py             - Raw spreadsheets -> tidy processed CSVs
     fit.py                    - Iterative proportional fitting (dwelling x income)

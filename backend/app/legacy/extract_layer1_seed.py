@@ -1,6 +1,10 @@
 """
-extract_layer1_seed.py
-──────────────────────
+backend/app/legacy/extract_layer1_seed.py
+──────────────────────────────────────────
+LEGACY BACKUP - moved from backend/scripts/ in step 11; the live app no longer uses
+layer1_seed.json (personas come from the census tables in data/sheets/processed/).
+Reads and writes in backend/app/legacy/data/.
+
 ETL script for SimSG Layer-1 Seed Data.
 
 Pipeline:
@@ -12,8 +16,8 @@ Pipeline:
   5. Validate every row through Pydantic v2 schemas
   6. Write the result to  data/layer1_seed.json
 
-Usage:
-  python scripts/extract_layer1_seed.py
+Usage (from backend/):
+  python app/legacy/extract_layer1_seed.py
 """
 
 from __future__ import annotations
@@ -30,7 +34,7 @@ from pydantic import BaseModel, Field, model_validator
 # 1.  PATHS
 # ─────────────────────────────────────────────────────────────
 
-ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT_DIR = Path(__file__).resolve().parent  # backend/app/legacy (was backend/ when in scripts/)
 CSV_PATH = ROOT_DIR / "data" / "layer1_master.csv"
 OUTPUT_PATH = ROOT_DIR / "data" / "layer1_seed.json"
 

@@ -3,9 +3,10 @@ backend/app/legacy/sampler_layer1.py
 --------------------------------------
 LEGACY BACKUP - not imported by the live app.
 This is the sampler as it was before step 7 (census sampler). It reads
-layer1_seed.json and hes_expenditure_benchmarks.json. Kept only so the
-change can be compared or reversed: copy it back over
-backend/app/services/sampler.py to restore the old behaviour.
+layer1_seed.json and hes_expenditure_benchmarks.json, which moved to
+backend/app/legacy/data/ in step 11. Kept only so the change can be compared
+or reversed: copy it back over backend/app/services/sampler.py (and move the
+two JSON files back to backend/data/, or keep _DATA_DIR pointing here).
 
 SimSG Synthetic Cohort Sampler:
 Generates statistically representative synthetic cohorts of Singapore residents
@@ -39,9 +40,8 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Path resolution for seed data
 # ---------------------------------------------------------------------------
-_CURRENT_DIR = Path(__file__).resolve().parent
-_BACKEND_DIR = _CURRENT_DIR.parent.parent  # backend/
-_DATA_DIR = _BACKEND_DIR / "data"
+_CURRENT_DIR = Path(__file__).resolve().parent  # backend/app/legacy/
+_DATA_DIR = _CURRENT_DIR / "data"  # backend/app/legacy/data/ (moved from backend/data/ in step 11)
 
 LAYER1_PATH = _DATA_DIR / "layer1_seed.json"
 HES_PATH = _DATA_DIR / "hes_expenditure_benchmarks.json"
