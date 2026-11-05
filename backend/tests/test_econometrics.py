@@ -43,7 +43,7 @@ from app.services.econometrics import (
     compute_sentiment,
     get_econometrics_service,
 )
-from agents.sampler import sample_personas
+from app.services.sampler import sample_synthetic_cohort
 
 
 # ---------------------------------------------------------------------------
@@ -167,11 +167,12 @@ def test_psm_intersections_order(synthetic_psm_records):
 
 def test_cohort_segmentation_with_singstat_sampler():
     """
-    Test cohort segmentation on real personas drawn from SingStat tables via sampler.py.
+    Test cohort segmentation on real personas drawn from SingStat tables via the census sampler
+    (app/services/sampler.py, the one /api/simulate uses).
     """
-    panel_df, seed = sample_personas("Ang Mo Kio", 50, seed=42)
+    cohort = sample_synthetic_cohort("Ang Mo Kio", 50, seed=42)
     # Add dummy evaluation responses
-    records = panel_df.to_dict("records")
+    records = [p.model_dump() for p in cohort]
     for r in records:
         r["likelihood_1_to_5"] = 4
         r["expensive"] = 6.50

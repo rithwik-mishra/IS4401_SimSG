@@ -1,33 +1,47 @@
 """
-backend/tests/test_integrated_simulation.py
----------------------------------------------
-Automated end-to-end tests for the integrated SimSG focus group engine:
-  - Persona sampling from official SingStat tables (agents.sampler)
+backend/app/legacy/integrated_simulation_checks.py
+----------------------------------------------------
+LEGACY CHECKS - moved from backend/tests/test_integrated_simulation.py in step 10.
+Not collected by pytest (the file name does not start with test_); run by hand to confirm
+the legacy backups still work:
+
+    cd backend
+    python -m app.legacy.integrated_simulation_checks
+
+Covers the legacy respondent pipeline:
+  - Persona sampling from official SingStat tables (app.legacy.agents_sampler)
   - Layer 2 Qualitative RAG retrieval from ChromaDB (app.services.simulation_context)
-  - Grounded prompt generation (agents.respondent)
-  - FastAPI endpoints (/api/v1/simulation/*)
+  - Grounded prompt generation (app.legacy.respondent)
+  - The old /simulation/preview route (app.legacy.simulation_routes), mounted on a
+    throwaway app here since main.py no longer registers it
 """
 
 from __future__ import annotations
 
 import sys
 from pathlib import Path
+
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-# Ensure backend root is on sys.path
-_BACKEND_DIR = Path(__file__).resolve().parent.parent
-if str(_BACKEND_DIR) not in sys.path:
-    sys.path.insert(0, str(_BACKEND_DIR))
-_PROJECT_ROOT = _BACKEND_DIR.parent
-if str(_PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(_PROJECT_ROOT))
+# Ensure backend root and project root are on sys.path
+_BACKEND_DIR = Path(__file__).resolve().parents[2]
+for _p in (_BACKEND_DIR, _BACKEND_DIR.parent):
+    if str(_p) not in sys.path:
+        sys.path.insert(0, str(_p))
 
-from app.main import app
-from agents.sampler import sample_personas, list_areas
-from agents.respondent import preview_panel, fetch_rag_context, build_user_prompt
+from app.legacy.agents_sampler import sample_personas, list_areas
+from app.legacy.respondent import preview_panel, fetch_rag_context
+from app.legacy.simulation_routes import router as legacy_router
 
 
-def test_sampler_and_areas():
+def legacy_app() -> FastAPI:
+    app = FastAPI()
+    app.include_router(legacy_router, prefix="/api/v1")
+    return app
+
+
+def check_sampler_and_areas():
     areas = list_areas()
     assert len(areas) >= 28, f"Expected at least 28 areas, got {len(areas)}"
     assert "Ang Mo Kio" in areas
@@ -40,7 +54,7 @@ def test_sampler_and_areas():
     assert "dwelling_text" in panel.columns
 
 
-def test_chroma_rag_retrieval():
+def check_chroma_rag_retrieval():
     chunks = fetch_rag_context("Ang Mo Kio", "S$7 specialty coffee")
     assert len(chunks) == 3, f"Expected 3 chunks for Ang Mo Kio, got {len(chunks)}"
     categories = [c.category for c in chunks]
@@ -49,7 +63,7 @@ def test_chroma_rag_retrieval():
     assert "foot_traffic_and_lifestyle" in categories
 
 
-def test_preview_panel_with_rag():
+def check_preview_panel_with_rag():
     panel, rag_chunks, prompts, seed = preview_panel(
         area="Ang Mo Kio",
         n=3,
@@ -60,8 +74,6 @@ def test_preview_panel_with_rag():
     assert len(panel) == 3
     assert len(rag_chunks) == 3
     assert len(prompts) == 3
-
-    # Check that ChromaDB context was injected into the prompt
     for prompt in prompts:
         assert "Local neighborhood context for Ang Mo Kio:" in prompt
         assert "Pricing Norms & Benchmarks" in prompt
@@ -70,7 +82,7 @@ def test_preview_panel_with_rag():
         assert "Question: A new cafe near your home sells a kopi" in prompt
 
 
-def test_preview_panel_without_rag():
+def check_preview_panel_without_rag():
     panel, rag_chunks, prompts, seed = preview_panel(
         area="Ang Mo Kio",
         n=3,
@@ -81,21 +93,11 @@ def test_preview_panel_without_rag():
     assert len(panel) == 3
     assert len(rag_chunks) == 0
     assert len(prompts) == 3
-
     for prompt in prompts:
         assert "Local neighborhood context" not in prompt
 
 
-def test_simulation_api_areas(client: TestClient):
-    resp = client.get("/api/v1/simulation/areas")
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["total_areas"] >= 28
-    assert "Ang Mo Kio" in data["areas"]
-    assert "Ang Mo Kio" in data["rag_coverage"]["covered_areas"]
-
-
-def test_simulation_api_preview(client: TestClient):
+def check_legacy_preview_route(client: TestClient):
     payload = {
         "planning_area": "Ang Mo Kio",
         "question": "A new bubble tea shop sells brown sugar milk tea for S$6.50. Would you buy it?",
@@ -112,44 +114,30 @@ def test_simulation_api_preview(client: TestClient):
     assert len(data["personas"]) == 3
     assert "Local neighborhood context" in data["personas"][0]["user_prompt"]
 
-
-def test_simulation_api_preview_invalid_area(client: TestClient):
-    payload = {
-        "planning_area": "Atlantis",
-        "question": "Seafood restaurant",
-        "n_personas": 3,
-    }
-    resp = client.post("/api/v1/simulation/preview", json=payload)
-    assert resp.status_code == 404
-    assert "No household data" in resp.json()["detail"]
+    bad = client.post("/api/v1/simulation/preview", json={"planning_area": "Atlantis", "question": "x", "n_personas": 3})
+    assert bad.status_code == 404
+    assert "No household data" in bad.json()["detail"]
 
 
 def run_all():
     print("=" * 70)
-    print("RUNNING INTEGRATED SIMULATION TESTS")
+    print("RUNNING LEGACY INTEGRATED SIMULATION CHECKS")
     print("=" * 70)
-    test_sampler_and_areas()
-    print("  [PASS] Sampler and areas OK")
-    test_chroma_rag_retrieval()
+    check_sampler_and_areas()
+    print("  [PASS] Legacy sampler and areas OK")
+    check_chroma_rag_retrieval()
     print("  [PASS] ChromaDB RAG retrieval OK")
-    test_preview_panel_with_rag()
-    print("  [PASS] Preview panel with ChromaDB RAG OK")
-    test_preview_panel_without_rag()
-    print("  [PASS] Preview panel without RAG (ablation) OK")
-
-    with TestClient(app) as client:
-        test_simulation_api_areas(client)
-        print("  [PASS] GET /api/v1/simulation/areas OK")
-        test_simulation_api_preview(client)
-        print("  [PASS] POST /api/v1/simulation/preview OK")
-        test_simulation_api_preview_invalid_area(client)
-        print("  [PASS] POST /api/v1/simulation/preview 404 handling OK")
-
+    check_preview_panel_with_rag()
+    print("  [PASS] Legacy preview panel with ChromaDB RAG OK")
+    check_preview_panel_without_rag()
+    print("  [PASS] Legacy preview panel without RAG OK")
+    with TestClient(legacy_app()) as client:
+        check_legacy_preview_route(client)
+        print("  [PASS] Legacy POST /api/v1/simulation/preview (and 404) OK")
     print("=" * 70)
-    print("ALL INTEGRATED TESTS PASSED SUCCESSFULLY! [OK]")
+    print("ALL LEGACY CHECKS PASSED [OK]")
     print("=" * 70)
 
 
 if __name__ == "__main__":
     run_all()
-

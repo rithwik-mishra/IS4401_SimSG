@@ -1,13 +1,17 @@
 """
+LEGACY BACKUP - moved from backend/agents/respondent.py in step 10; not imported by the live app.
+The live persona engine is backend/app/agents/execution_engine.py (its ground rules came from here).
+Restore by moving it and agents_sampler.py back to backend/agents/ and changing parents[2] back to parents[1].
+
 SimSG - respondent agent: each persona answers one market-research question through the OpenAI API.
 Integrated with Layer 2 ChromaDB qualitative RAG for local neighborhood context (pricing, competitors, lifestyle).
 
-Try it:
-    python -m agents.respondent "Ang Mo Kio" 5 --dry-run                     # print prompts with ChromaDB context, zero API cost
-    python -m agents.respondent "Ang Mo Kio" 5 --dry-run --no-rag           # print prompts without ChromaDB context
-    python -m agents.respondent "Ang Mo Kio" 5 --seed 42                    # 5 real answers
-    python -m agents.respondent "Ang Mo Kio" 5 --seed 42 --provider soclaas # same 5 personas, SoC endpoint
-    python -m agents.respondent "Tampines" 30 --question "A new bubble tea shop near your home sells a large milk tea for S$6.50. Would you buy one?"
+Try it (from backend/):
+    python -m app.legacy.respondent "Ang Mo Kio" 5 --dry-run                     # print prompts with ChromaDB context, zero API cost
+    python -m app.legacy.respondent "Ang Mo Kio" 5 --dry-run --no-rag           # print prompts without ChromaDB context
+    python -m app.legacy.respondent "Ang Mo Kio" 5 --seed 42                    # 5 real answers
+    python -m app.legacy.respondent "Ang Mo Kio" 5 --seed 42 --provider soclaas # same 5 personas, SoC endpoint
+    python -m app.legacy.respondent "Tampines" 30 --question "A new bubble tea shop near your home sells a large milk tea for S$6.50. Would you buy one?"
 
 Results are saved to data/runs/<time>_<area>_<seed>.csv: one row per persona, with its
 profile, the exact prompt it saw, its answer, and the tokens used.
@@ -25,17 +29,14 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import pandas as pd
 
-BACKEND = Path(__file__).resolve().parents[1]      # .../backend
+BACKEND = Path(__file__).resolve().parents[2]      # backend/app/legacy -> backend
 if str(BACKEND) not in sys.path:
     sys.path.insert(0, str(BACKEND))
 
 try:
-    from agents.sampler import sample_personas
+    from app.legacy.agents_sampler import sample_personas
 except ImportError:
-    try:
-        from sampler import sample_personas
-    except ImportError:
-        from backend.agents.sampler import sample_personas
+    from backend.app.legacy.agents_sampler import sample_personas
 
 try:                                   # optional: read OPENAI_API_KEY from backend/.env
     from dotenv import load_dotenv

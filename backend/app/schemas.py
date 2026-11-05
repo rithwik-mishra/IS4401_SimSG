@@ -36,6 +36,7 @@ class SimulationContextPayload(BaseModel):
 
 # ---------------------------------------------------------------------------
 # Integrated Simulation Engine Schemas (Sampler + ChromaDB + Respondent)
+# Used only by the legacy /simulation/preview and /run routes (app/legacy/simulation_routes.py).
 # ---------------------------------------------------------------------------
 
 class SimulationRunRequest(BaseModel):

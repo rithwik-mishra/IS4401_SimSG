@@ -84,8 +84,8 @@ app.add_middleware(
 # Full End-to-End Simulation Pipeline (POST /api/simulate)
 app.include_router(simulate.router)
 
-# Granular Simulation Engine Endpoints (/api/v1/simulation/*)
-app.include_router(simulation.router, prefix="/api/v1")
+# Planning-area lookup (GET /api/simulation/areas). The older /simulation/preview and /run
+# routes (respondent.py pipeline) are kept unregistered in app/legacy/simulation_routes.py.
 app.include_router(simulation.router, prefix="/api")
 
 # Testing & Diagnostics module (census sampler areas, ChromaDB checks)
@@ -101,9 +101,9 @@ def root():
         "docs_url": "/docs",
         "routes": {
             "simulate": "/api/simulate",
-            "simulation_preview": "/api/v1/simulation/preview",
-            "simulation_run": "/api/v1/simulation/run",
-            "simulation_areas": "/api/v1/simulation/areas",
+            "simulate_preview": "/api/simulate/preview",
+            "ai_status": "/api/ai-status",
+            "simulation_areas": "/api/simulation/areas",
             "diagnostics": "/api/test/diagnostics",
             "simulation_context_get": "/api/test/simulation-context?planning_area=Ang Mo Kio&user_pitch=S$7 specialty coffee",
             "simulation_context_post": "/api/test/simulation-context",

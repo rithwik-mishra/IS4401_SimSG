@@ -30,7 +30,7 @@ Remember to activate the virtual environment again in each new terminal before r
 
 ```
 Layer 1: Census Data & Personas (clean_data.py + fit.py -> sampler.py)
-   ├── 29 Singapore Planning Areas (dwelling, income, age, sex, ethnic group, HES 2023 spend)
+   ├── 29 Singapore Planning Areas (dwelling, income, age, sex, HES 2023 eating-out spend)
    └── Statistically representative individual persona panels
           ↓
 Layer 2: Local Market Knowledge (ChromaDB collection: simsg_layer2_rag)
@@ -38,10 +38,16 @@ Layer 2: Local Market Knowledge (ChromaDB collection: simsg_layer2_rag)
    ├── Competitors & Supply (OSM operating F&B, anchor malls, food courts)
    └── Foot Traffic & Lifestyle (peak hours, retiree density, MRT interchanges)
           ↓
-Focus Group Simulation Engine (respondent.py & FastAPI /api/v1/simulation)
-   ├── Grounded Prompts combining Persona Profile + Local Neighborhood Context
-   └── Structured Answers (would_buy, max_price, likelihood, driver, objection)
+Focus Group Simulation Engine (POST /api/simulate)
+   ├── Pitch reader -> concept, price, town
+   ├── Persona answers (execution_engine.py): two-part interview per persona
+   │     1. own 4 price limits, with the seller's price hidden
+   │     2. buy %, reaction and objection once the price is shown
+   ├── Price analysis (Van Westendorp PSM) and cohort breakdown
+   └── Report writer -> verdict, objections, pivot
 ```
+
+Each AI step falls back to a rule-based backup when no API key is set or a call fails.
 
 ## Project layout
 
@@ -51,13 +57,19 @@ backend/
     main.py                   - FastAPI application entry point
     schemas.py                - Pydantic models for demographics, RAG, and simulation
     routers/
-      simulation.py           - Production routes (/preview, /run, /areas)
+      simulate.py             - Main pipeline (/api/simulate, /api/simulate/preview, /api/ai-status)
+      simulation.py           - Planning-area lookup (/api/simulation/areas)
       test_simulation.py      - Diagnostics & context inspection routes
     services/
+      sampler.py              - Persona sampling from SingStat census tables
       simulation_context.py   - ChromaDB RAG vector query & context singleton
-  agents/
-    sampler.py                - Persona sampling from SingStat tables
-    respondent.py             - Focus group respondent agent with ChromaDB RAG grounding
+      query_decomposer.py     - Pitch reader
+      econometrics.py         - Van Westendorp PSM and cohort statistics
+      llm_settings.py         - AI provider and model from .env
+    agents/
+      execution_engine.py     - Persona answers (AI, with rule-based backup)
+      synthesis_agent.py      - Report writer (AI, with rule-based backup)
+    legacy/                   - Replaced code kept for reference (not used by the app)
   pipeline/
     clean_data.py             - Raw spreadsheets -> tidy processed CSVs
     fit.py                    - Iterative proportional fitting (dwelling x income)
@@ -84,28 +96,25 @@ python pipeline/fit.py            # iterative proportional fitting of dwelling x
 Then draw personas:
 
 ```
-python agents/sampler.py "Ang Mo Kio" 10            # 10 personas, random seed
-python agents/sampler.py "Ang Mo Kio" 10 --seed 42  # reproducible
-python agents/sampler.py --check "Ang Mo Kio"       # draw 20,000 and compare against source tables
+python -m app.services.sampler "Ang Mo Kio" 10            # 10 personas, random seed
+python -m app.services.sampler "Ang Mo Kio" 10 --seed 42  # reproducible
 ```
 
-Sampling order: dwelling + income band, then sex + age group, then ethnic group,
-then spending per household member (looked up from HES 2023).
+Sampling order: dwelling + income band, then sex + age group (drawn separately),
+then an exact age and income within the drawn group and band, then the HES 2023
+eating-out spend per household member for the dwelling type. Income is shown to
+the AI and in the app only as its census band (household income from work).
 
-## Respondent agents (with ChromaDB RAG)
+## Legacy respondent agent
 
-Each persona evaluates a concept grounded in both their household profile and the local neighborhood context (pricing norms, competitors, lifestyle):
+The earlier respondent pipeline (`respondent.py`, its sampler and the
+`/simulation/preview` and `/simulation/run` routes) was replaced by `/api/simulate`
+and kept in `app/legacy/`. It still runs by hand:
 
 ```
-python -m agents.respondent "Ang Mo Kio" 5 --dry-run                     # print prompts with ChromaDB context, no API call
-python -m agents.respondent "Ang Mo Kio" 5 --dry-run --no-rag           # ablation: print prompts without ChromaDB context
-python -m agents.respondent "Ang Mo Kio" 5 --seed 42                    # 5 real answers with ChromaDB context
-python -m agents.respondent "Ang Mo Kio" 5 --seed 42 --provider soclaas # use the SoC endpoint
-python -m agents.respondent "Tampines" 30 --question "A new bubble tea shop near your home sells a large milk tea for S$6.50. Would you buy one?"
+python -m app.legacy.respondent "Ang Mo Kio" 5 --dry-run    # print prompts with ChromaDB context, no API call
+python -m app.legacy.integrated_simulation_checks           # confirm the legacy code still works
 ```
-
-Results are saved to `data/runs/<time>_<area>_<seed>.csv` (one row per persona:
-profile, exact prompt, answer, tokens used, RAG metadata).
 
 ## Layer 2 Knowledge & Vector Store
 
@@ -123,11 +132,15 @@ Start the server and open the Swagger docs at http://127.0.0.1:8000/docs:
 python -m uvicorn app.main:app --reload
 ```
 
+The frontend's Testing panel (beaker icon, top right) shows the AI model in use, which
+steps of the last run used the AI or the backup, and a seed box for repeatable runs.
+
 Key endpoints:
-- `GET /api/v1/simulation/areas`: Supported planning areas & ChromaDB coverage.
-- `POST /api/v1/simulation/preview`: Zero-cost preview of personas and grounded prompts.
-- `POST /api/v1/simulation/run`: Execute full LLM focus group simulation.
-- `GET /api/test/diagnostics`: System diagnostics (ChromaDB health, doc count).
+- `POST /api/simulate`: Run the full focus group (pitch -> personas -> answers -> price analysis -> report).
+- `POST /api/simulate/preview`: Zero-cost preview of the personas and the exact prompts they would be sent.
+- `GET /api/ai-status`: Which AI provider and model runs would use (or the rule-based backup).
+- `GET /api/simulation/areas`: Supported planning areas & ChromaDB coverage.
+- `GET /api/test/diagnostics`: System diagnostics (census areas, ChromaDB health, doc count).
 
 ## Tests
 

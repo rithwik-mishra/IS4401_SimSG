@@ -1,13 +1,18 @@
 """
+LEGACY BACKUP - moved from backend/agents/sampler.py in step 10; not imported by the live app.
+Its census logic now lives in backend/app/services/sampler.py (sample_synthetic_cohort).
+Kept for respondent.py (also legacy) and for reference. Restore by moving it back to
+backend/agents/sampler.py and changing parents[2] below back to parents[1].
+
 SimSG - draw N synthetic residents (personas) for one planning area.
 
-Run after clean_data.py and fit.py. Try it:
-    python sampler.py "Ang Mo Kio" 10            # 10 personas, random seed
-    python sampler.py "Ang Mo Kio" 10 --seed 42  # same 10 personas every time
-    python sampler.py --check "Ang Mo Kio"       # draw 20,000 and compare with the source tables
+Run after clean_data.py and fit.py. Try it (from backend/):
+    python -m app.legacy.agents_sampler "Ang Mo Kio" 10            # 10 personas, random seed
+    python -m app.legacy.agents_sampler "Ang Mo Kio" 10 --seed 42  # same 10 personas every time
+    python -m app.legacy.agents_sampler --check "Ang Mo Kio"       # draw 20,000 and compare with the source tables
 
 Or from other code:
-    from sampler import sample_personas, list_areas
+    from app.legacy.agents_sampler import sample_personas, list_areas
     panel, seed = sample_personas("Tampines", 30)
 
 Order of draws (each step uses only the tables named):
@@ -24,7 +29,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-BACKEND = Path(__file__).resolve().parents[1]
+BACKEND = Path(__file__).resolve().parents[2]  # backend/app/legacy -> backend
 DATA = BACKEND / "data" / "sheets"
 PROC = DATA / "processed"
 

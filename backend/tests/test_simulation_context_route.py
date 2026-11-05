@@ -87,6 +87,38 @@ def test_simulation_context_post(client: TestClient):
     print(f"  [PASS] POST context OK: {len(data['rag_context'])} Bukit Timah passages")
 
 
+def test_simulation_areas_route(client: TestClient):
+    """GET /api/simulation/areas lists the census sampler's towns and which have ChromaDB passages."""
+    resp = client.get("/api/simulation/areas")
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+    assert data["total_areas"] == 29
+    assert "Ang Mo Kio" in data["areas"]
+    assert data["rag_coverage"]["coverage_count"] == 6
+    assert "Ang Mo Kio" in data["rag_coverage"]["covered_areas"]
+
+
+def test_old_respondent_routes_are_not_registered(client: TestClient):
+    """The respondent.py routes moved to app/legacy in step 10; /api/simulate replaces them."""
+    assert client.get("/api/v1/simulation/areas").status_code == 404
+    for path in ("/api/v1/simulation/preview", "/api/simulation/preview", "/api/simulation/run"):
+        assert client.post(path, json={"planning_area": "Ang Mo Kio", "question": "x"}).status_code == 404
+
+
+def test_live_code_does_not_use_backend_agents_folder():
+    """backend/agents/ was removed in step 10; nothing outside app/legacy may import agents.*."""
+    import re
+    backend_dir = Path(__file__).resolve().parents[1]
+    assert not (backend_dir / "agents").exists()
+    offenders = []
+    for path in list((backend_dir / "app").rglob("*.py")) + list((backend_dir / "tests").rglob("*.py")):
+        if "legacy" in path.parts:
+            continue
+        if re.search(r"^\s*(from|import)\s+(backend\.)?agents\b", path.read_text(encoding="utf-8"), re.MULTILINE):
+            offenders.append(str(path))
+    assert offenders == []
+
+
 def test_simulation_context_area_is_case_insensitive(client: TestClient):
     response = client.get("/api/test/simulation-context", params={"planning_area": "ang mo kio", "user_pitch": "kopi"})
     assert response.status_code == 200, response.text
