@@ -2,8 +2,18 @@
 backend/app/services/sampler.py
 ---------------------------------
 SimSG Synthetic Cohort Sampler:
-Generates statistically representative synthetic cohorts of Singapore residents
-conditioned on official SingStat census data (Layer 1) and HES expenditure benchmarks.
+Draws synthetic cohorts of Singapore adult residents from the census tables in
+backend/data/sheets/processed/ (same logic as backend/agents/sampler.py).
+
+Order of draws for each persona (each step uses only the tables named):
+    1. dwelling + household income band   fitted_area_dwelling_income.csv (area)
+    2. sex + 5-year age group (20+)       resident_area_age_sex.csv (area), independent of step 1
+    3. exact age / income                 random within the drawn age group / income band
+    4. daily eating-out spend             spend_per_member_dwelling.csv (HES 2023, by dwelling),
+                                          looked up, not drawn: monthly spend per member / 30
+
+The previous sampler (layer1_seed.json + hes_expenditure_benchmarks.json) is kept
+in backend/app/legacy/sampler_layer1.py.
 
 Usage (CLI):
     python backend/app/services/sampler.py "Ang Mo Kio" 30
@@ -17,13 +27,12 @@ Usage (Python API):
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import logging
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Sequence, Set, Tuple
-
-
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -31,14 +40,23 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Path resolution for seed data
+# Census table paths
 # ---------------------------------------------------------------------------
 _CURRENT_DIR = Path(__file__).resolve().parent
 _BACKEND_DIR = _CURRENT_DIR.parent.parent  # backend/
 _DATA_DIR = _BACKEND_DIR / "data"
+CENSUS_DIR = _DATA_DIR / "sheets" / "processed"
 
-LAYER1_PATH = _DATA_DIR / "layer1_seed.json"
-HES_PATH = _DATA_DIR / "hes_expenditure_benchmarks.json"
+FITTED_PATH = CENSUS_DIR / "fitted_area_dwelling_income.csv"
+AGE_SEX_PATH = CENSUS_DIR / "resident_area_age_sex.csv"
+SPEND_PATH = CENSUS_DIR / "spend_per_member_dwelling.csv"
+
+MIN_AGE = 20  # personas are adults aged 20 and over
+DAYS_PER_MONTH = 30
+EATING_OUT_CATEGORY = "Food and Beverage Serving Services"  # HES: hawkers, food courts, cafes, restaurants
+
+DwellingType = Literal["1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed"]
+DWELLING_TYPES: Tuple[str, ...] = ("1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed")
 
 
 # ---------------------------------------------------------------------------
@@ -46,38 +64,30 @@ HES_PATH = _DATA_DIR / "hes_expenditure_benchmarks.json"
 # ---------------------------------------------------------------------------
 class SyntheticPersona(BaseModel):
     """
-    Full demographic and financial profile for an individual synthetic resident in SimSG.
-    All attributes are mathematically grounded in SingStat census distributions
-    and HES 2023 expenditure benchmarks.
+    Demographic and financial profile of one synthetic adult resident, drawn from
+    the census tables (dwelling + income, sex + age) and HES 2023 eating-out spend.
     """
 
     persona_id: str = Field(..., description="Unique persona identifier (e.g. 'AMK-001')")
     planning_area: str = Field(..., description="Target Singapore planning area")
-    age: int = Field(..., ge=20, description="Adult age (>= 20 years)")
-    age_bracket: str = Field(..., description="Life-stage bracket: 20-24, 25-34, 35-49, 50-64, or 65+")
-    gender: Literal["Male", "Female"] = Field(..., description="Gender (50/50 draw)")
-    dwelling_type: Literal[
-        "1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed"
-    ] = Field(..., description="HDB or private dwelling category")
+    age: int = Field(..., ge=20, description="Adult age (>= 20 years), random within the census age group")
+    age_bracket: str = Field(..., description="Census 5-year age group, e.g. '35-39' or '90+'")
+    gender: Literal["Male", "Female"] = Field(..., description="Census sex, drawn with age group by area")
+    dwelling_type: DwellingType = Field(..., description="HDB or private dwelling category")
     monthly_household_income_sgd: float = Field(
-        ..., ge=0.0, description="Estimated monthly household income in SGD"
+        ..., ge=0.0, description="Monthly household income in SGD, random within the census income band"
     )
-    income_bracket: str = Field(..., description="Standard SingStat household income bracket")
-    home_language: str = Field(..., description="Primary language spoken at home")
-    linguistic_style: Literal[
-        "Colloquial Singlish", "Mixed Code-Switch", "Standard Singapore English"
-    ] = Field(..., description="Persona conversational linguistic register")
+    income_bracket: str = Field(..., description="Census household income band, e.g. '$7,000 to $7,999'")
     archetype: Literal[
         "retiree", "student", "working_class", "heartland_family", "affluent_pro"
-    ] = Field(..., description="SimSG consumer archetype")
+    ] = Field(..., description="SimSG consumer archetype (age, then home type); not shown to the persona AI")
     daily_dining_budget_sgd: float = Field(
-        ..., ge=0.0, description="Daily food/dining out allowance in SGD (monthly_budget * 0.73 / 30)"
-    )
-    hawker_baseline_kopi_sgd: float = Field(
-        default=1.30, description="Reference baseline price for traditional kopi (S$1.30)"
-    )
-    cafe_baseline_coffee_sgd: float = Field(
-        default=6.50, description="Reference baseline price for specialty cafe coffee (S$6.50)"
+        ...,
+        ge=0.0,
+        description=(
+            "Average daily eating-out spend per household member for this dwelling type "
+            "(HES 2023 monthly 'Food and Beverage Serving Services' / 30). An average, not a personal limit."
+        ),
     )
 
 
@@ -141,29 +151,107 @@ class RepresentativePersona(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Data Caching & Benchmarks Loading
+# Census table loading (cached)
 # ---------------------------------------------------------------------------
+def _age_group_hi(label: str) -> Optional[int]:
+    """'35-39' -> 39; open-ended '90+' -> None."""
+    if label.endswith("+"):
+        return None
+    return int(label.split("-")[1])
+
+
+def _income_label(lo: float, hi: Optional[float]) -> str:
+    """Census income band as text: 'below $1,000', '$7,000 to $7,999', '$35,000 or more'."""
+    if hi is None:
+        return f"${int(lo):,} or more"
+    if lo == 0:
+        return f"below ${int(hi) + 1:,}"
+    return f"${int(lo):,} to ${int(hi):,}"
+
+
+def _fill_open_ended(rows: List[Dict[str, Any]], lo_key: str, hi_key: str) -> None:
+    """
+    Gives open-ended top bands ('90+', '$35,000+') the same width as the band below,
+    e.g. 85-89 -> 90+ becomes 90-94; $30,000-34,999 -> $35,000+ becomes $35,000-39,999.
+    """
+    closed = [r for r in rows if r[hi_key] is not None]
+    top = max(closed, key=lambda r: r[lo_key])
+    width = top[hi_key] - top[lo_key]
+    for r in rows:
+        if r[hi_key] is None:
+            r[hi_key] = r[lo_key] + width
+
+
 @lru_cache(maxsize=1)
-def _load_seed_data() -> Tuple[Dict[str, Dict[str, Any]], Dict[str, Any]]:
-    """Loads and caches layer1_seed.json and hes_expenditure_benchmarks.json."""
-    if not LAYER1_PATH.exists():
-        raise FileNotFoundError(f"Layer 1 seed data not found at {LAYER1_PATH}")
-    if not HES_PATH.exists():
-        raise FileNotFoundError(f"HES benchmarks not found at {HES_PATH}")
+def _load_census_tables() -> Tuple[
+    Dict[str, List[Dict[str, Any]]], Dict[str, List[Dict[str, Any]]], Dict[str, float]
+]:
+    """
+    Loads and caches the three census tables:
+      households[area] -> rows of dwelling + income band, weighted by prob_in_area
+      people[area]     -> rows of sex + age group (20+), weighted by residents
+      eating_out_daily -> dwelling -> S$ eating-out spend per household member per day
+    """
+    for path in (FITTED_PATH, AGE_SEX_PATH, SPEND_PATH):
+        if not path.exists():
+            raise FileNotFoundError(f"Census table not found at {path}")
 
-    l1_raw = json.loads(LAYER1_PATH.read_text(encoding="utf-8"))
-    hes_raw = json.loads(HES_PATH.read_text(encoding="utf-8"))
+    households: Dict[str, List[Dict[str, Any]]] = {}
+    with FITTED_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            income_hi = float(row["income_hi"]) if row["income_hi"] else None
+            lo = float(row["income_lo"])
+            households.setdefault(row["area"], []).append({
+                "dwelling": row["dwelling"],
+                "income_lo": lo,
+                "income_hi": income_hi,
+                "income_label": _income_label(lo, income_hi),
+                "weight": float(row["prob_in_area"]),
+            })
 
-    # Index Layer 1 data by case-insensitive planning area name
-    areas_by_name: Dict[str, Dict[str, Any]] = {}
-    for entry in l1_raw:
-        areas_by_name[entry["planning_area"].lower()] = entry
+    people: Dict[str, List[Dict[str, Any]]] = {}
+    with AGE_SEX_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            age_lo = int(row["age_lo"])
+            if age_lo < MIN_AGE:
+                continue
+            people.setdefault(row["area"], []).append({
+                "age_group": row["age_group"],
+                "age_lo": age_lo,
+                "age_hi": _age_group_hi(row["age_group"]),
+                "sex": row["sex"],
+                "weight": float(row["residents"]),
+            })
 
-    return areas_by_name, hes_raw
+    eating_out_daily: Dict[str, float] = {}
+    with SPEND_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row["category"] == EATING_OUT_CATEGORY:
+                eating_out_daily[row["dwelling"]] = float(row["spend_per_member"]) / DAYS_PER_MONTH
+
+    _fill_open_ended([r for rows in households.values() for r in rows], "income_lo", "income_hi")
+    _fill_open_ended([r for rows in people.values() for r in rows], "age_lo", "age_hi")
+
+    return households, people, eating_out_daily
+
+
+def list_supported_areas() -> List[str]:
+    """Planning areas that have both household and resident census tables."""
+    households, people, _ = _load_census_tables()
+    return sorted(set(households) & set(people))
+
+
+def average_daily_eating_out_sgd() -> float:
+    """
+    Plain average of the six dwelling types' HES daily eating-out spend (about S$10.99).
+    Used by the rule-based backup as its reference budget.
+    """
+    _, _, eating_out_daily = _load_census_tables()
+    return sum(eating_out_daily[d] for d in DWELLING_TYPES) / len(DWELLING_TYPES)
 
 
 # ---------------------------------------------------------------------------
-# Sampling Configuration and Priors
+# Persona IDs and archetypes
 # ---------------------------------------------------------------------------
 AREA_CODE_MAP: Dict[str, str] = {
     "ang mo kio": "AMK",
@@ -172,92 +260,6 @@ AREA_CODE_MAP: Dict[str, str] = {
     "jurong east": "JRE",
     "outram": "OUT",
     "tampines": "TAM",
-}
-
-DWELLING_KEYS: List[Tuple[str, Literal["1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed"]]] = [
-    ("hdb_1_2_room_pct", "1-2 room"),
-    ("hdb_3_room_pct", "3 room"),
-    ("hdb_4_room_pct", "4 room"),
-    ("hdb_5_room_exec_pct", "5 room/exec"),
-    ("condo_apt_pct", "condo"),
-    ("landed_pct", "landed"),
-]
-
-AGE_BRACKET_CONFIG: List[Tuple[str, str, Tuple[int, int]]] = [
-    ("student_pct", "20-24", (20, 24)),
-    ("early_career_pct", "25-34", (25, 34)),
-    ("family_career_pct", "35-49", (35, 49)),
-    ("mature_working_pct", "50-64", (50, 64)),
-    ("retiree_pct", "65+", (65, 82)),
-]
-
-LANGUAGE_KEYS: List[Tuple[str, str]] = [
-    ("english_pct", "English"),
-    ("mandarin_pct", "Mandarin"),
-    ("chinese_dialect_pct", "Chinese Dialect"),
-    ("malay_pct", "Malay"),
-    ("indian_pct", "Tamil / Indian Languages"),
-]
-
-INCOME_BRACKET_INFO: Dict[str, Tuple[str, Tuple[float, float]]] = {
-    "unemployed_pct": ("Below $1,000 / No Income", (0.0, 0.0)),
-    "below3k_pct": ("$1,000 - $2,999", (1000.0, 2999.0)),
-    "income_3k_to_5999_pct": ("$3,000 - $5,999", (3000.0, 5999.0)),
-    "income_6k_to_9999_pct": ("$6,000 - $9,999", (6000.0, 9999.0)),
-    "income_10k_to_17499_pct": ("$10,000 - $17,499", (10000.0, 17499.0)),
-    "income_17500_plus_pct": ("$17,500+", (17500.0, 28000.0)),
-}
-
-# Empirical national affinity matrix P(income_band | dwelling_type)
-DWELLING_INCOME_AFFINITY: Dict[str, Dict[str, float]] = {
-    "1-2 room": {
-        "unemployed_pct": 0.35,
-        "below3k_pct": 0.35,
-        "income_3k_to_5999_pct": 0.20,
-        "income_6k_to_9999_pct": 0.08,
-        "income_10k_to_17499_pct": 0.02,
-        "income_17500_plus_pct": 0.00,
-    },
-    "3 room": {
-        "unemployed_pct": 0.15,
-        "below3k_pct": 0.22,
-        "income_3k_to_5999_pct": 0.30,
-        "income_6k_to_9999_pct": 0.20,
-        "income_10k_to_17499_pct": 0.10,
-        "income_17500_plus_pct": 0.03,
-    },
-    "4 room": {
-        "unemployed_pct": 0.05,
-        "below3k_pct": 0.10,
-        "income_3k_to_5999_pct": 0.25,
-        "income_6k_to_9999_pct": 0.32,
-        "income_10k_to_17499_pct": 0.20,
-        "income_17500_plus_pct": 0.08,
-    },
-    "5 room/exec": {
-        "unemployed_pct": 0.03,
-        "below3k_pct": 0.06,
-        "income_3k_to_5999_pct": 0.15,
-        "income_6k_to_9999_pct": 0.32,
-        "income_10k_to_17499_pct": 0.30,
-        "income_17500_plus_pct": 0.14,
-    },
-    "condo": {
-        "unemployed_pct": 0.02,
-        "below3k_pct": 0.03,
-        "income_3k_to_5999_pct": 0.07,
-        "income_6k_to_9999_pct": 0.18,
-        "income_10k_to_17499_pct": 0.35,
-        "income_17500_plus_pct": 0.35,
-    },
-    "landed": {
-        "unemployed_pct": 0.01,
-        "below3k_pct": 0.02,
-        "income_3k_to_5999_pct": 0.04,
-        "income_6k_to_9999_pct": 0.10,
-        "income_10k_to_17499_pct": 0.28,
-        "income_17500_plus_pct": 0.55,
-    },
 }
 
 
@@ -272,12 +274,41 @@ def _get_area_code(planning_area: str) -> str:
     return planning_area[:3].upper()
 
 
-def _normalize_probs(probs: np.ndarray) -> np.ndarray:
-    """Safely normalizes an array of probabilities so they sum to 1.0."""
-    total = probs.sum()
-    if total <= 0:
-        return np.ones_like(probs) / len(probs)
-    return probs / total
+# Each archetype maps to one demographic group shown in the app
+ARCHETYPE_COHORT: Dict[str, str] = {
+    "retiree": "Senior / Retiree",
+    "student": "Young Adult / Student",
+    "affluent_pro": "Affluent Private Property",
+    "heartland_family": "Suburban Family",
+    "working_class": "Working-Class",
+}
+
+
+def _assign_archetype(
+    age: int, dwelling_type: str
+) -> Literal["retiree", "student", "working_class", "heartland_family", "affluent_pro"]:
+    """
+    SimSG archetype from age, then home type (the same groups econometrics.py uses).
+    Household income is not used: census incomes are for the whole household, so a young
+    adult living with parents would otherwise look affluent.
+      65+ -> retiree; 20-24 -> student (young adult); condo/landed -> affluent_pro;
+      4 room, 5 room/exec -> heartland_family; 1-2 room, 3 room -> working_class
+    """
+    if age >= 65:
+        return "retiree"
+    if age <= 24:
+        return "student"
+    if dwelling_type in ("condo", "landed"):
+        return "affluent_pro"
+    if dwelling_type in ("4 room", "5 room/exec"):
+        return "heartland_family"
+    return "working_class"
+
+
+def _draw_rows(rows: List[Dict[str, Any]], n: int, rng: np.random.Generator) -> List[Dict[str, Any]]:
+    weights = np.array([r["weight"] for r in rows], dtype=float)
+    idx = rng.choice(len(rows), size=n, p=weights / weights.sum())
+    return [rows[int(i)] for i in idx]
 
 
 # ---------------------------------------------------------------------------
@@ -289,165 +320,61 @@ def sample_synthetic_cohort(
     seed: Optional[int] = None,
 ) -> List[SyntheticPersona]:
     """
-    Draws a synthetic cohort of N Singapore adult personas representative of
-    the specified planning area, based on Layer 1 census tables and HES 2023 benchmarks.
+    Draws a synthetic cohort of N adult residents of the planning area from the census tables.
 
     Parameters:
-      planning_area: Target planning area (e.g. 'Ang Mo Kio', 'Tampines', 'Bukit Timah', etc.)
+      planning_area: Target planning area (e.g. 'Ang Mo Kio'); case-insensitive
       n: Cohort sample size (default 30)
-      seed: Optional integer seed for 100% reproducible sampling
+      seed: Optional integer seed; the same area, n and seed always give the same cohort
 
     Returns:
       List of SyntheticPersona Pydantic models.
     """
-    areas_by_name, hes_data = _load_seed_data()
+    households, people, eating_out_daily = _load_census_tables()
+
+    areas = {a.lower(): a for a in list_supported_areas()}
     area_key = planning_area.lower().strip()
-
-    if area_key not in areas_by_name:
-        supported = [entry["planning_area"] for entry in areas_by_name.values()]
+    if area_key not in areas:
         raise ValueError(
-            f"Unsupported planning area '{planning_area}'. Supported areas: {', '.join(supported)}"
+            f"Unsupported planning area '{planning_area}'. Supported areas: {', '.join(sorted(areas.values()))}"
         )
-
-    area_data = areas_by_name[area_key]
-    formal_name = area_data["planning_area"]
+    formal_name = areas[area_key]
     area_code = _get_area_code(formal_name)
 
-    # Deterministic or independent RNG stream
-    rng = np.random.default_rng(seed)
+    # One independent random stream per step, so personas 1..k stay the same when n grows
+    rng_household, rng_person, rng_detail = (
+        np.random.default_rng(s) for s in np.random.SeedSequence(seed).spawn(3)
+    )
 
-    # 1. Dwelling type distribution
-    dwell_keys, dwell_names = zip(*DWELLING_KEYS)
-    dwell_probs = np.array([float(area_data["dwelling_distribution"].get(k, 0.0)) for k in dwell_keys])
-    dwell_probs = _normalize_probs(dwell_probs)
-
-    # 2. Age distribution
-    age_keys, age_brackets, age_ranges = zip(*AGE_BRACKET_CONFIG)
-    age_probs = np.array([float(area_data["age_distribution"].get(k, 0.0)) for k in age_keys])
-    age_probs = _normalize_probs(age_probs)
-
-    # 3. Home language distribution
-    lang_keys, lang_names = zip(*LANGUAGE_KEYS)
-    lang_probs = np.array([float(area_data["home_language"].get(k, 0.0)) for k in lang_keys])
-    lang_probs = _normalize_probs(lang_probs)
-
-    # 4. Area marginal income distribution
-    area_income_weights = {
-        k: float(area_data["income_distribution"].get(k, 0.0))
-        for k in INCOME_BRACKET_INFO.keys()
-    }
-
-    # 5. National expenditure constants
-    national_bench = hes_data.get("national_benchmarks", {})
-    eating_out_pct = float(national_bench.get("eating_out_share_of_food_pct", 0.73))
-    hawker_kopi = float(national_bench.get("coffeeshop_kopi_sgd", 1.30))
-    cafe_coffee = float(national_bench.get("third_wave_cafe_black_coffee_sgd", 6.50))
-    archetypes_bench = hes_data.get("archetypes", {})
+    # 1. dwelling + income band (weighted by residents in the area)
+    household_draws = _draw_rows(households[formal_name], n, rng_household)
+    # 2. sex + age group, adults only
+    person_draws = _draw_rows(people[formal_name], n, rng_person)
 
     cohort: List[SyntheticPersona] = []
+    for i, (hh, person) in enumerate(zip(household_draws, person_draws)):
+        # 3. exact age and income, uniform within the drawn group / band
+        age = int(rng_detail.integers(person["age_lo"], person["age_hi"] + 1))
+        monthly_income = round(float(rng_detail.uniform(hh["income_lo"], hh["income_hi"])), 2)
+        dwelling_type = hh["dwelling"]
 
-    for i in range(n):
-        persona_id = f"{area_code}-{i + 1:03d}"
-
-        # 50/50 gender draw
-        gender: Literal["Male", "Female"] = "Male" if rng.random() < 0.5 else "Female"
-
-        # Draw age bracket and sample specific adult age >= 20
-        age_idx = int(rng.choice(len(age_keys), p=age_probs))
-        age_bracket = age_brackets[age_idx]
-        min_age, max_age = age_ranges[age_idx]
-        age = int(rng.integers(min_age, max_age + 1))
-
-        # Draw dwelling type
-        dwell_idx = int(rng.choice(len(dwell_names), p=dwell_probs))
-        dwelling_type = dwell_names[dwell_idx]
-
-        # Condition income on dwelling type and area marginals
-        affinities = DWELLING_INCOME_AFFINITY[dwelling_type]
-        income_keys = list(INCOME_BRACKET_INFO.keys())
-        raw_income_weights = np.array(
-            [affinities.get(k, 0.01) * area_income_weights.get(k, 0.01) for k in income_keys]
+        cohort.append(
+            SyntheticPersona(
+                persona_id=f"{area_code}-{i + 1:03d}",
+                planning_area=formal_name,
+                age=age,
+                age_bracket=person["age_group"],
+                gender=person["sex"],
+                dwelling_type=dwelling_type,
+                monthly_household_income_sgd=monthly_income,
+                income_bracket=hh["income_label"],
+                archetype=_assign_archetype(age, dwelling_type),
+                # 4. HES eating-out spend for the dwelling type
+                daily_dining_budget_sgd=round(eating_out_daily[dwelling_type], 2),
+            )
         )
-        conditioned_income_probs = _normalize_probs(raw_income_weights)
-
-        inc_idx = int(rng.choice(len(income_keys), p=conditioned_income_probs))
-        chosen_inc_key = income_keys[inc_idx]
-        bracket_label, (inc_min, inc_max) = INCOME_BRACKET_INFO[chosen_inc_key]
-
-        if inc_min == 0.0 and inc_max == 0.0:
-            monthly_income = 0.0
-        else:
-            monthly_income = round(float(rng.uniform(inc_min, inc_max)), 2)
-
-        # Draw home language
-        lang_idx = int(rng.choice(len(lang_names), p=lang_probs))
-        home_language = lang_names[lang_idx]
-
-        # Determine Archetype based on census and HES benchmark definitions
-        archetype: Literal["retiree", "student", "working_class", "heartland_family", "affluent_pro"]
-        if age >= 65:
-            archetype = "retiree"
-        elif age <= 24 and monthly_income < 6000:
-            archetype = "student"
-        elif dwelling_type in ["condo", "landed"] or monthly_income >= 10000:
-            archetype = "affluent_pro"
-        elif dwelling_type in ["4 room", "5 room/exec"] and monthly_income >= 6000:
-            archetype = "heartland_family"
-        else:
-            archetype = "working_class"
-
-        # Determine Linguistic Style based on archetype, age, and language
-        linguistic_style: Literal["Colloquial Singlish", "Mixed Code-Switch", "Standard Singapore English"]
-        if archetype == "retiree":
-            if home_language in ["Chinese Dialect", "Mandarin", "Malay"]:
-                p_style = [0.70, 0.25, 0.05]
-            else:
-                p_style = [0.45, 0.35, 0.20]
-        elif archetype == "student":
-            p_style = [0.25, 0.50, 0.25]
-        elif archetype == "working_class":
-            p_style = [0.50, 0.40, 0.10]
-        elif archetype == "heartland_family":
-            p_style = [0.25, 0.50, 0.25]
-        elif archetype == "affluent_pro":
-            if dwelling_type in ["condo", "landed"]:
-                p_style = [0.05, 0.30, 0.65]
-            else:
-                p_style = [0.10, 0.35, 0.55]
-        else:
-            p_style = [0.34, 0.33, 0.33]
-
-        styles: List[Literal["Colloquial Singlish", "Mixed Code-Switch", "Standard Singapore English"]] = [
-            "Colloquial Singlish",
-            "Mixed Code-Switch",
-            "Standard Singapore English",
-        ]
-        linguistic_style = rng.choice(styles, p=p_style)
-
-        # Deterministic Daily Dining Budget from HES expenditure benchmarks
-        monthly_food_budget = float(archetypes_bench.get(archetype, {}).get("monthly_food_budget_sgd", 500.0))
-        daily_dining_budget = round(monthly_food_budget * eating_out_pct / 30.0, 2)
-
-        persona = SyntheticPersona(
-            persona_id=persona_id,
-            planning_area=formal_name,
-            age=age,
-            age_bracket=age_bracket,
-            gender=gender,
-            dwelling_type=dwelling_type,
-            monthly_household_income_sgd=monthly_income,
-            income_bracket=bracket_label,
-            home_language=home_language,
-            linguistic_style=linguistic_style,
-            archetype=archetype,
-            daily_dining_budget_sgd=daily_dining_budget,
-            hawker_baseline_kopi_sgd=hawker_kopi,
-            cafe_baseline_coffee_sgd=cafe_coffee,
-        )
-        cohort.append(persona)
 
     return cohort
-
 
 
 
@@ -607,7 +534,7 @@ def select_representative_demographic_personas(
         elif cohort == "Affluent Private Property":
             if d in ["condo", "landed"]:
                 return 100.0 + min(50.0, inc / 500.0)
-            if arch == "affluent_pro" or inc >= 10000:
+            if arch == "affluent_pro":
                 return 50.0 + min(50.0, inc / 500.0)
             return -1.0
         elif cohort == "Suburban Family":
@@ -617,7 +544,7 @@ def select_representative_demographic_personas(
                 return 70.0
             return -1.0
         elif cohort == "Working-Class":
-            if d in ["1-2 room", "3 room"] and 25 <= age < 65 and inc < 7000:
+            if d in ["1-2 room", "3 room"] and 25 <= age < 65:
                 return 100.0 + max(0.0, (7000.0 - inc) / 100.0)
             if arch == "working_class":
                 return 70.0
@@ -708,20 +635,11 @@ def format_all_demographic_personas(
             eval_map[pid] = ev_dict
 
     def classify_cohort(p: SyntheticPersona) -> str:
-        age = p.age
-        d = p.dwelling_type.lower()
-        inc = p.monthly_household_income_sgd
-        arch = getattr(p, "archetype", "").lower()
-
-        if age >= 65 or arch == "retiree":
-            return "Senior / Retiree"
-        if 20 <= age <= 24 or arch == "student":
-            return "Young Adult / Student"
-        if d in ["condo", "landed"] or arch == "affluent_pro" or inc >= 10000:
-            return "Affluent Private Property"
-        if d in ["1-2 room", "3 room"] or arch == "working_class" or (age < 65 and inc < 5000):
-            return "Working-Class"
-        return "Suburban Family"
+        # The group follows the archetype (age, then home type); no income cutoffs
+        arch = getattr(p, "archetype", "")
+        if arch in ARCHETYPE_COHORT:
+            return ARCHETYPE_COHORT[arch]
+        return ARCHETYPE_COHORT[_assign_archetype(p.age, p.dwelling_type)]
 
     all_personas: List[RepresentativePersona] = []
 
@@ -825,7 +743,7 @@ def main() -> None:
     print(f"==========================================================================================")
     header = (
         f"{'ID':<9} {'Age':<4} {'Gen':<6} {'Dwelling':<12} {'Monthly Inc':<13} "
-        f"{'Archetype':<17} {'Dining/Day':<11} {'Linguistic Style':<25}"
+        f"{'Archetype':<17} {'Eat-out/Day':<11} {'Age group':<9}"
     )
     print(header)
     print("-" * len(header))
@@ -833,7 +751,7 @@ def main() -> None:
         print(
             f"{p.persona_id:<9} {p.age:<4} {p.gender:<6} {p.dwelling_type:<12} "
             f"S${p.monthly_household_income_sgd:<11,.0f} {p.archetype:<17} "
-            f"S${p.daily_dining_budget_sgd:<9.2f} {p.linguistic_style:<25}"
+            f"S${p.daily_dining_budget_sgd:<9.2f} {p.age_bracket:<9}"
         )
     if len(cohort) > 15:
         print(f"... and {len(cohort) - 15} more personas (use --json for full output).")
@@ -841,9 +759,9 @@ def main() -> None:
     print("\n--- Cohort Distribution Summary ---")
     archetypes = [p.archetype for p in cohort]
     dwellings = [p.dwelling_type for p in cohort]
-    styles = [p.linguistic_style for p in cohort]
+    genders = [p.gender for p in cohort]
 
-    for label, items in [("Archetypes", archetypes), ("Dwellings", dwellings), ("Linguistic Styles", styles)]:
+    for label, items in [("Archetypes", archetypes), ("Dwellings", dwellings), ("Genders", genders)]:
         counts = {x: items.count(x) for x in set(items)}
         dist_str = ", ".join(f"{k}: {v} ({v / len(items):.0%})" for k, v in sorted(counts.items()))
         print(f"  {label:<18}: {dist_str}")

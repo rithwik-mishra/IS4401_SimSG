@@ -110,6 +110,20 @@ def test_persona_prompts_use_town_prices_not_fixed_references(client: TestClient
         assert "described in the neighbourhood context" in prompt
 
 
+def test_preview_shows_census_personas(client: TestClient, no_api_key):
+    """Preview personas carry census fields (5-year age group, income band, HES eating-out spend) only."""
+    data = client.post("/api/simulate/preview", json=_payload()).json()
+    hes_daily = {"1-2 room": 7.77, "3 room": 9.77, "4 room": 10.43, "5 room/exec": 11.03, "condo": 15.10, "landed": 11.83}
+    for item in data["personas"]:
+        persona = item["persona"]
+        for dropped in ("home_language", "linguistic_style", "hawker_baseline_kopi_sgd", "cafe_baseline_coffee_sgd"):
+            assert dropped not in persona
+        assert persona["daily_dining_budget_sgd"] == hes_daily[persona["dwelling_type"]]
+        assert persona["age_bracket"] in item["user_prompt"]
+        assert "not your personal limit" in item["user_prompt"]
+        assert "Consumer Archetype" not in item["user_prompt"]
+
+
 def test_preview_personas_match_simulate(client: TestClient, no_api_key):
     preview = client.post("/api/simulate/preview", json=_payload()).json()
     run = client.post("/api/simulate", json=_payload()).json()

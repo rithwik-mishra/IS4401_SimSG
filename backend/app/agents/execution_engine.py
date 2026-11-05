@@ -8,7 +8,7 @@ decomposed business pitch and Layer 2 ChromaDB qualitative neighborhood context.
 Core Capabilities:
   - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(25).
   - Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL) with structured JSON output enforcement.
-  - Contextual prompt conditioning across demographic attributes, daily dining budget,
+  - Contextual prompt conditioning across demographic attributes, typical eating-out spend,
     and local neighborhood conditions (including local prices from ChromaDB).
   - Monotonicity post-processing enforcing Van Westendorp price thresholds:
       too_cheap <= cheap < expensive <= too_expensive
@@ -47,15 +47,11 @@ else:
 # Schema Imports (Robust across package relative and absolute paths)
 # ---------------------------------------------------------------------------
 try:
-    from app.services.sampler import SyntheticPersona
+    from app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd
     from app.services.query_decomposer import DecomposedConcept
 except ImportError:
-    try:
-        from backend.app.services.sampler import SyntheticPersona
-        from backend.app.services.query_decomposer import DecomposedConcept
-    except ImportError:
-        SyntheticPersona = Any  # type: ignore
-        DecomposedConcept = Any  # type: ignore
+    from backend.app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd
+    from backend.app.services.query_decomposer import DecomposedConcept
 
 # Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
 try:
@@ -231,7 +227,7 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
 # Prompt Construction
 # ---------------------------------------------------------------------------
 SYSTEM_PROMPT = """You are an advanced consumer simulation agent representing an authentic Singapore resident in an empirical market research focus group.
-You MUST strictly adopt the persona's demographic background, dwelling, household income, and daily dining budget.
+You MUST strictly adopt the persona's demographic background, dwelling and household income. The eating-out figure in your profile is an average for your home type, a guide to typical spending, not a hard limit.
 You are evaluating a proposed business concept planned for your neighborhood.
 Evaluate whether you would realistically buy this offering at the proposed candidate price, how likely you are to purchase (0-100%), and provide your 4 Van Westendorp price thresholds (in SGD).
 Your responses must be grounded in Singapore's local consumer reality (hawker vs cafe price gaps, CDC voucher habits, neighborhood foot traffic).
@@ -279,8 +275,7 @@ Age: {persona.age} ({persona.age_bracket})
 Gender: {persona.gender}
 Dwelling: {persona.dwelling_type}
 Monthly Household Income: S${persona.monthly_household_income_sgd:,.0f} ({persona.income_bracket})
-Consumer Archetype: {persona.archetype}
-Daily Dining Budget: S${persona.daily_dining_budget_sgd:.2f}
+Typical Eating-Out Spend: S${persona.daily_dining_budget_sgd:.2f} per person per day (HES 2023 average for your home type, not your personal limit)
 
 --- PROPOSED BUSINESS CONCEPT ---
 Concept Name: {concept.concept_name}
@@ -293,7 +288,7 @@ Target Planning Area: {concept.target_planning_area}
 {rag_text}
 
 --- YOUR TASK ---
-Adopt this persona completely. Consider your daily dining budget of S${persona.daily_dining_budget_sgd:.2f} and the local prices and alternatives in {concept.target_planning_area} described in the neighbourhood context above.
+Adopt this persona completely. Consider your household income, the typical eating-out spend of about S${persona.daily_dining_budget_sgd:.2f} per day for households like yours, and the local prices and alternatives in {concept.target_planning_area} described in the neighbourhood context above.
 Answer the following in character:
 1. `persona_id`: "{persona.persona_id}"
 2. `buy_probability_pct`: An integer from 0 to 100 representing how likely you are to buy this product at the candidate price of S${concept.candidate_price_sgd:.2f} during a typical week.
@@ -367,11 +362,14 @@ def evaluate_persona_rule_based(
     arch = getattr(persona, "archetype", "heartland_family")
     base_anchor = cat_anchors.get(arch, 3.50)
 
-    # Adjust anchor by dwelling and daily budget
+    # Adjust anchor by dwelling and daily eating-out spend.
+    # Budget is compared with the average of the six HES dwelling figures (~S$10.99/day),
+    # so an average household scores 1.0 (census range ~0.71 for 1-2 room to ~1.37 for condo).
     dwelling = getattr(persona, "dwelling_type", "4 room")
     dwell_mult = _DWELLING_MULTIPLIERS.get(dwelling, 1.0)
-    budget = getattr(persona, "daily_dining_budget_sgd", 25.0)
-    budget_mult = min(1.6, max(0.6, budget / 25.0))
+    reference_budget = average_daily_eating_out_sgd()
+    budget = getattr(persona, "daily_dining_budget_sgd", reference_budget)
+    budget_mult = min(1.6, max(0.6, budget / reference_budget))
 
     anchor_price = base_anchor * (dwell_mult * 0.65 + budget_mult * 0.35)
 

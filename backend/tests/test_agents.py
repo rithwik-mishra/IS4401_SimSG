@@ -30,7 +30,7 @@ try:
         generate_macro_synthesis_rule_based,
         build_synthesis_prompt,
     )
-    from app.services.sampler import sample_synthetic_cohort, SyntheticPersona
+    from app.services.sampler import sample_synthetic_cohort, SyntheticPersona, average_daily_eating_out_sgd
     from app.services.query_decomposer import decompose_query_rule_based, DecomposedConcept
     from app.services.econometrics import run_econometric_analysis, EconometricAnalysisResult
 except ImportError:
@@ -52,7 +52,7 @@ except ImportError:
         generate_macro_synthesis_rule_based,
         build_synthesis_prompt,
     )
-    from backend.app.services.sampler import sample_synthetic_cohort, SyntheticPersona
+    from backend.app.services.sampler import sample_synthetic_cohort, SyntheticPersona, average_daily_eating_out_sgd
     from backend.app.services.query_decomposer import decompose_query_rule_based, DecomposedConcept
     from backend.app.services.econometrics import run_econometric_analysis, EconometricAnalysisResult
 
@@ -162,7 +162,9 @@ def test_build_persona_prompt_contains_all_demographics():
     # Demographic checks
     assert str(p.age) in prompt
     assert p.dwelling_type in prompt
-    assert p.archetype in prompt
+    # The archetype is an internal label (it would imply a job or children); the AI gets the census facts only
+    assert "Consumer Archetype" not in prompt
+    assert p.archetype not in prompt
     assert f"S${p.daily_dining_budget_sgd:.2f}" in prompt
     # Fixed kopi/cafe reference prices were dropped (unsourced); local prices come from the RAG context
     # (checked by wording, not numbers: this pitch's own price S$6.50 equals the old cafe reference)
@@ -171,6 +173,12 @@ def test_build_persona_prompt_contains_all_demographics():
     assert "Specialty Cafe Coffee" not in prompt
     # Speaking style was dropped (no research basis); the prompt must not carry it
     assert "Linguistic Style" not in prompt
+    # Census budget is an HES average for the home type, labelled so the AI does not treat it as a cap
+    assert p.age_bracket in prompt
+    assert p.income_bracket in prompt
+    assert "Typical Eating-Out Spend" in prompt
+    assert "not your personal limit" in prompt
+    assert "Daily Dining Budget" not in prompt
 
     # Concept checks
     assert concept.concept_name in prompt
@@ -207,12 +215,48 @@ def test_system_prompt_has_no_reference_price_anchors():
     assert "reference price" not in SYSTEM_PROMPT.lower()
 
 
+def test_system_prompt_treats_eating_out_spend_as_guide_not_cap():
+    assert "daily dining budget" not in SYSTEM_PROMPT.lower()
+    assert "not a hard limit" in SYSTEM_PROMPT
+
+
+def _persona_with(dwelling: str, budget: float, archetype: str = "heartland_family") -> SyntheticPersona:
+    return SyntheticPersona(
+        persona_id="AMK-001", planning_area="Ang Mo Kio", age=40, age_bracket="40-44", gender="Female",
+        dwelling_type=dwelling, monthly_household_income_sgd=8000.0, income_bracket="$8,000 to $8,999",
+        archetype=archetype, daily_dining_budget_sgd=budget,
+    )
+
+
+def test_backup_budget_factor_uses_hes_average():
+    """
+    Backup fair price = base x (home factor x 0.65 + budget factor x 0.35), budget factor = budget / ~S$10.99.
+    4-room (home factor 1.00) heartland family (drinks base S$3.20):
+      budget at the average -> fair price S$3.20, so 'cheap' = 0.75 x 3.20 = S$2.40.
+    """
+    concept =decompose_query_rule_based("Kopi stall in Ang Mo Kio", override_price=3.0)
+    avg = average_daily_eating_out_sgd()
+
+    at_average = evaluate_persona_rule_based(_persona_with("4 room", avg), concept)
+    assert at_average.cheap == pytest.approx(2.40, abs=0.01)
+    assert at_average.too_expensive == pytest.approx(3.20 * 1.80, abs=0.01)
+
+
+def test_backup_budget_changes_fair_price_across_census_range():
+    """With census budgets (S$7.77-15.10) the budget still moves the price, instead of all hitting the 0.6 floor."""
+    concept = decompose_query_rule_based("Kopi stall in Ang Mo Kio", override_price=3.0)
+    low = evaluate_persona_rule_based(_persona_with("4 room", 7.77), concept)
+    high = evaluate_persona_rule_based(_persona_with("4 room", 15.10), concept)
+    assert low.cheap < high.cheap
+    # 7.77 / 10.99 = 0.707 -> 3.20 x (0.65 + 0.707 x 0.35) x 0.75 = S$2.15
+    assert low.cheap == pytest.approx(2.15, abs=0.01)
+
+
 @pytest.mark.parametrize("price", [1.0, 4.5, 7.0, 25.0])  # covers Positive, Neutral and Negative answers
 def test_backup_quotes_are_standard_english(price):
-    """The no-key backup writes standard English, even for personas the old sampler labels Singlish."""
+    """The no-key backup writes standard English quotes and objections for every persona."""
     concept = decompose_query_rule_based("Artisanal kopi bar in Ang Mo Kio", override_price=price)
     personas = sample_synthetic_cohort("Ang Mo Kio", n=60, seed=1)
-    assert "Colloquial Singlish" in {p.linguistic_style for p in personas}
 
     for persona in personas:
         result = evaluate_persona_rule_based(persona, concept)

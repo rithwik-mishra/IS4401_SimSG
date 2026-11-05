@@ -6,9 +6,13 @@ Comprehensive tests for:
   2. backend/app/services/sampler.py
 """
 
+import csv
 import json
-import pytest
+import re
+from collections import Counter
 from pathlib import Path
+
+import pytest
 
 from backend.app.services.query_decomposer import (
     ALLOWED_PLANNING_AREAS,
@@ -18,8 +22,12 @@ from backend.app.services.query_decomposer import (
     decompose_query,
     decompose_query_rule_based,
 )
+from backend.app.services import sampler as sampler_module
 from backend.app.services.sampler import (
+    CENSUS_DIR,
     SyntheticPersona,
+    average_daily_eating_out_sgd,
+    list_supported_areas,
     sample_synthetic_cohort,
 )
 
@@ -131,13 +139,40 @@ def test_query_decomposer_empty_input():
     assert res.category_type == "beverage"
 
 
+
 # ===========================================================================
-# 2. Synthetic Cohort Sampler Tests
+# 2. Synthetic Cohort Sampler Tests (census tables in data/sheets/processed)
 # ===========================================================================
+
+DWELLINGS = ["1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed"]
+PERSONA_FIELDS = {
+    "persona_id", "planning_area", "age", "age_bracket", "gender", "dwelling_type",
+    "monthly_household_income_sgd", "income_bracket", "archetype", "daily_dining_budget_sgd",
+}
+REMOVED_FIELDS = {"home_language", "linguistic_style", "hawker_baseline_kopi_sgd", "cafe_baseline_coffee_sgd"}
+
+
+def _read_csv(name):
+    with (CENSUS_DIR / name).open(newline="", encoding="utf-8") as f:
+        return list(csv.DictReader(f))
+
+
+def _shares(counter: Counter) -> dict:
+    total = sum(counter.values())
+    return {k: v / total for k, v in counter.items()}
+
+
+def _hes_daily_eating_out() -> dict:
+    return {
+        r["dwelling"]: float(r["spend_per_member"]) / 30
+        for r in _read_csv("spend_per_member_dwelling.csv")
+        if r["category"] == "Food and Beverage Serving Services"
+    }
+
 
 @pytest.mark.parametrize("area", ALLOWED_PLANNING_AREAS)
 def test_sampler_all_target_areas(area: str):
-    """Verify sampling runs cleanly across all 6 target planning areas."""
+    """Sampling runs cleanly across all 6 target planning areas, with valid census values."""
     cohort = sample_synthetic_cohort(planning_area=area, n=15, seed=123)
     assert len(cohort) == 15
     for p in cohort:
@@ -145,106 +180,232 @@ def test_sampler_all_target_areas(area: str):
         assert p.planning_area == area
         assert p.age >= 20
         assert p.gender in ["Male", "Female"]
-        assert p.dwelling_type in ["1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed"]
+        assert p.dwelling_type in DWELLINGS
         assert p.monthly_household_income_sgd >= 0.0
-        assert p.linguistic_style in [
-            "Colloquial Singlish",
-            "Mixed Code-Switch",
-            "Standard Singapore English",
-        ]
-        assert p.archetype in [
-            "retiree",
-            "student",
-            "working_class",
-            "heartland_family",
-            "affluent_pro",
-        ]
+        assert p.archetype in ["retiree", "student", "working_class", "heartland_family", "affluent_pro"]
         assert p.daily_dining_budget_sgd > 0.0
-        assert p.hawker_baseline_kopi_sgd == 1.30
-        assert p.cafe_baseline_coffee_sgd == 6.50
+
+
+def test_sampler_covers_all_census_areas():
+    """Every area with both household and resident tables can be sampled (29 areas)."""
+    areas = list_supported_areas()
+    assert len(areas) == 29
+    for area in areas:
+        assert len(sample_synthetic_cohort(area, n=3, seed=1)) == 3
+
+
+def test_sampler_area_name_is_case_insensitive():
+    a = sample_synthetic_cohort("ang mo kio", n=5, seed=3)
+    b = sample_synthetic_cohort("Ang Mo Kio", n=5, seed=3)
+    assert [p.model_dump() for p in a] == [p.model_dump() for p in b]
+    assert a[0].planning_area == "Ang Mo Kio"
 
 
 def test_sampler_persona_id_format():
     """Verify persona_id follows area prefix and zero-padded integer format."""
     cohort_amk = sample_synthetic_cohort("Ang Mo Kio", n=3, seed=1)
-    assert cohort_amk[0].persona_id == "AMK-001"
-    assert cohort_amk[1].persona_id == "AMK-002"
-    assert cohort_amk[2].persona_id == "AMK-003"
+    assert [p.persona_id for p in cohort_amk] == ["AMK-001", "AMK-002", "AMK-003"]
 
     cohort_tam = sample_synthetic_cohort("Tampines", n=2, seed=1)
-    assert cohort_tam[0].persona_id == "TAM-001"
-    assert cohort_tam[1].persona_id == "TAM-002"
+    assert [p.persona_id for p in cohort_tam] == ["TAM-001", "TAM-002"]
 
 
-def test_sampler_age_and_bracket_consistency():
-    """Verify age integer falls within age_bracket range."""
-    cohort = sample_synthetic_cohort("Ang Mo Kio", n=50, seed=42)
+def test_sampler_age_within_census_age_group():
+    """Age is a whole year inside the census 5-year group; '90+' is treated as 90-94."""
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=400, seed=42)
     for p in cohort:
-        if p.age_bracket == "20-24":
-            assert 20 <= p.age <= 24
-        elif p.age_bracket == "25-34":
-            assert 25 <= p.age <= 34
-        elif p.age_bracket == "35-49":
-            assert 35 <= p.age <= 49
-        elif p.age_bracket == "50-64":
-            assert 50 <= p.age <= 64
-        elif p.age_bracket == "65+":
-            assert p.age >= 65
+        assert re.fullmatch(r"\d+-\d+|90\+", p.age_bracket), p.age_bracket
+        if p.age_bracket == "90+":
+            assert 90 <= p.age <= 94
+        else:
+            lo, hi = map(int, p.age_bracket.split("-"))
+            assert lo >= 20
+            assert lo <= p.age <= hi
+
+
+def test_sampler_income_within_census_band():
+    """Income lies inside the census band; '$35,000 or more' is treated as 35,000-39,999."""
+    cohort = sample_synthetic_cohort("Bukit Timah", n=400, seed=8)
+    for p in cohort:
+        inc = p.monthly_household_income_sgd
+        label = p.income_bracket
+        if label.endswith("or more"):
+            assert label == "$35,000 or more"
+            assert 35000 <= inc <= 39999
+        elif label.startswith("below"):
+            assert 0 <= inc < int(label.replace("below $", "").replace(",", ""))
+        else:
+            lo, hi = (int(x.replace("$", "").replace(",", "")) for x in label.split(" to "))
+            assert lo <= inc <= hi, (label, inc)
 
 
 def test_sampler_deterministic_seed_reproducibility():
-    """Verify that providing the same seed yields 100% identical cohorts."""
+    """The same area, n and seed give identical cohorts; a different seed gives a different one."""
     cohort_a = sample_synthetic_cohort("Bukit Merah", n=20, seed=999)
     cohort_b = sample_synthetic_cohort("Bukit Merah", n=20, seed=999)
+    cohort_c = sample_synthetic_cohort("Bukit Merah", n=20, seed=1000)
 
     assert [p.model_dump() for p in cohort_a] == [p.model_dump() for p in cohort_b]
+    assert [p.model_dump() for p in cohort_a] != [p.model_dump() for p in cohort_c]
 
 
-def test_sampler_dining_budget_deterministic_calculation():
-    """Verify daily_dining_budget_sgd = round(monthly_food_budget * 0.73 / 30, 2)."""
-    cohort = sample_synthetic_cohort("Jurong East", n=30, seed=55)
+def test_sampler_first_personas_stable_when_n_grows():
+    """Persona 1..k are the same whether 10 or 30 are drawn with the same seed."""
+    small = sample_synthetic_cohort("Tampines", n=10, seed=5)
+    large = sample_synthetic_cohort("Tampines", n=30, seed=5)
+    assert [p.model_dump() for p in small] == [p.model_dump() for p in large[:10]]
+
+
+def test_sampler_dining_budget_is_hes_eating_out_per_day():
+    """daily_dining_budget_sgd = HES 2023 eating-out spend per member for the dwelling / 30."""
+    expected = _hes_daily_eating_out()
+    assert round(expected["1-2 room"], 2) == 7.77
+    assert round(expected["condo"], 2) == 15.10
+    cohort = sample_synthetic_cohort("Jurong East", n=60, seed=55)
     for p in cohort:
-        if p.archetype == "retiree":
-            assert p.daily_dining_budget_sgd == round(350 * 0.73 / 30, 2)  # 8.52
-        elif p.archetype == "student":
-            assert p.daily_dining_budget_sgd == round(280 * 0.73 / 30, 2)  # 6.81
-        elif p.archetype == "working_class":
-            assert p.daily_dining_budget_sgd == round(520 * 0.73 / 30, 2)  # 12.65
-        elif p.archetype == "heartland_family":
-            assert p.daily_dining_budget_sgd == round(820 * 0.73 / 30, 2)  # 19.95
-        elif p.archetype == "affluent_pro":
-            assert p.daily_dining_budget_sgd == round(1400 * 0.73 / 30, 2)  # 34.07
+        assert p.daily_dining_budget_sgd == round(expected[p.dwelling_type], 2)
 
 
-def test_sampler_serialization_and_json():
-    """Verify that SyntheticPersona can be serialized with model_dump and json.dumps."""
+def test_average_daily_eating_out_is_mean_of_six_dwellings():
+    expected = _hes_daily_eating_out()
+    assert average_daily_eating_out_sgd() == pytest.approx(sum(expected[d] for d in DWELLINGS) / 6)
+    assert average_daily_eating_out_sgd() == pytest.approx(10.99, abs=0.01)
+
+
+ARCHETYPE_BY_DWELLING = {
+    "1-2 room": "working_class", "3 room": "working_class",
+    "4 room": "heartland_family", "5 room/exec": "heartland_family",
+    "condo": "affluent_pro", "landed": "affluent_pro",
+}
+
+
+def test_sampler_archetype_rules():
+    """Archetype = age first (65+ retiree, 20-24 student), then home type; household income is not used."""
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=300, seed=11)
+    for p in cohort:
+        if p.age >= 65:
+            expected = "retiree"
+        elif p.age <= 24:
+            expected = "student"
+        else:
+            expected = ARCHETYPE_BY_DWELLING[p.dwelling_type]
+        assert p.archetype == expected
+
+
+def test_archetype_ignores_household_income():
+    """A 22-year-old in a S$13,000 household is a young adult; a S$15,000 3-room household is working class."""
+    assert sampler_module._assign_archetype(22, "4 room") == "student"
+    assert sampler_module._assign_archetype(40, "3 room") == "working_class"
+    assert sampler_module._assign_archetype(40, "4 room") == "heartland_family"
+    assert sampler_module._assign_archetype(40, "condo") == "affluent_pro"
+    assert sampler_module._assign_archetype(70, "landed") == "retiree"
+
+
+@pytest.mark.parametrize("area", ["Ang Mo Kio", "Tampines", "Bukit Timah"])
+def test_archetype_shares_follow_census(area):
+    """Archetype shares = P(age group) x P(home type), since age and home type are drawn independently."""
+    cohort = sample_synthetic_cohort(area, n=20000, seed=77)
+    people = [r for r in _read_csv("resident_area_age_sex.csv") if r["area"] == area and int(r["age_lo"]) >= 20]
+    total = sum(float(r["residents"]) for r in people)
+    p_retiree = sum(float(r["residents"]) for r in people if int(r["age_lo"]) >= 65) / total
+    p_young = sum(float(r["residents"]) for r in people if int(r["age_lo"]) == 20) / total
+    p_middle = 1 - p_retiree - p_young
+
+    dwell = Counter()
+    for r in _read_csv("fitted_area_dwelling_income.csv"):
+        if r["area"] == area:
+            dwell[ARCHETYPE_BY_DWELLING[r["dwelling"]]] += float(r["prob_in_area"])
+    dwell = _shares(dwell)
+
+    expected = {"retiree": p_retiree, "student": p_young}
+    for arch in ("working_class", "heartland_family", "affluent_pro"):
+        expected[arch] = p_middle * dwell.get(arch, 0.0)
+    drawn = _shares(Counter(p.archetype for p in cohort))
+    for arch, share in expected.items():
+        assert abs(drawn.get(arch, 0.0) - share) < 0.015, f"{area} {arch}: {drawn.get(arch, 0):.3f} vs {share:.3f}"
+
+
+def test_app_groups_follow_archetype():
+    """Each persona's group in the app is fixed by its archetype (no income cutoffs)."""
+    cohort = sample_synthetic_cohort("Tampines", n=200, seed=3)
+    rows = sampler_module.format_all_demographic_personas(cohort, [])
+    for p, row in zip(cohort, rows):
+        assert row.demographic_cohort == sampler_module.ARCHETYPE_COHORT[p.archetype]
+
+
+@pytest.mark.parametrize("area", ["Ang Mo Kio", "Bukit Timah"])
+def test_sampler_matches_census_shares(area):
+    """A large draw reproduces the census shares of dwelling, income band, sex and age group."""
+    n = 20000
+    cohort = sample_synthetic_cohort(area, n=n, seed=2024)
+    tol = 0.015  # ~3 standard errors for a 20,000 draw
+
+    fitted = [r for r in _read_csv("fitted_area_dwelling_income.csv") if r["area"] == area]
+    dwell_expected, band_expected = Counter(), Counter()
+    for r in fitted:
+        label = sampler_module._income_label(float(r["income_lo"]), float(r["income_hi"]) if r["income_hi"] else None)
+        dwell_expected[r["dwelling"]] += float(r["prob_in_area"])
+        band_expected[label] += float(r["prob_in_area"])
+    dwell_expected, band_expected = _shares(dwell_expected), _shares(band_expected)
+
+    people = [r for r in _read_csv("resident_area_age_sex.csv") if r["area"] == area and int(r["age_lo"]) >= 20]
+    sex_expected, age_expected = Counter(), Counter()
+    for r in people:
+        sex_expected[r["sex"]] += float(r["residents"])
+        age_expected[r["age_group"]] += float(r["residents"])
+    sex_expected, age_expected = _shares(sex_expected), _shares(age_expected)
+
+    drawn = {
+        "dwelling": _shares(Counter(p.dwelling_type for p in cohort)),
+        "income band": _shares(Counter(p.income_bracket for p in cohort)),
+        "sex": _shares(Counter(p.gender for p in cohort)),
+        "age group": _shares(Counter(p.age_bracket for p in cohort)),
+    }
+    expected = {"dwelling": dwell_expected, "income band": band_expected, "sex": sex_expected, "age group": age_expected}
+    for name, exp in expected.items():
+        for key in set(exp) | set(drawn[name]):
+            gap = abs(drawn[name].get(key, 0.0) - exp.get(key, 0.0))
+            assert gap < tol, f"{area} {name} {key}: drawn {drawn[name].get(key, 0):.3f} vs census {exp.get(key, 0):.3f}"
+
+
+def test_sampler_serialization_and_fields():
+    """model_dump has the census fields only; the dropped style/language/reference-price fields are gone."""
     cohort = sample_synthetic_cohort("Bukit Timah", n=5, seed=10)
     for p in cohort:
         dumped = p.model_dump()
-        assert isinstance(dumped, dict)
-        # Check all 14 required fields
-        expected_fields = [
-            "persona_id",
-            "planning_area",
-            "age",
-            "age_bracket",
-            "gender",
-            "dwelling_type",
-            "monthly_household_income_sgd",
-            "income_bracket",
-            "home_language",
-            "linguistic_style",
-            "archetype",
-            "daily_dining_budget_sgd",
-            "hawker_baseline_kopi_sgd",
-            "cafe_baseline_coffee_sgd",
-        ]
-        for field in expected_fields:
-            assert field in dumped, f"Missing field {field} in model_dump()"
+        assert set(dumped) == PERSONA_FIELDS
+        assert not REMOVED_FIELDS & set(dumped)
+        assert len(json.dumps(dumped)) > 0
 
-        # Verify JSON dump
-        json_str = json.dumps(dumped)
-        assert len(json_str) > 0
+
+def test_sampler_does_not_read_layer1_or_hes_benchmark_files(monkeypatch):
+    """The census sampler works without layer1_seed.json / hes_expenditure_benchmarks.json."""
+    forbidden = ("layer1_seed.json", "hes_expenditure_benchmarks.json", "layer1_master.csv")
+    real_open = Path.open
+
+    def guarded_open(self, *args, **kwargs):
+        assert self.name not in forbidden, f"sampler read {self.name}"
+        return real_open(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", guarded_open)
+    sampler_module._load_census_tables.cache_clear()
+    try:
+        assert len(sample_synthetic_cohort("Ang Mo Kio", n=10, seed=1)) == 10
+    finally:
+        sampler_module._load_census_tables.cache_clear()
+
+
+def test_live_code_does_not_import_legacy():
+    """backend/app/legacy holds backups only; no live module imports from it."""
+    app_dir = Path(sampler_module.__file__).resolve().parents[1]
+    offenders = []
+    for path in app_dir.rglob("*.py"):
+        if "legacy" in path.parts:
+            continue
+        text = path.read_text(encoding="utf-8")
+        if re.search(r"^\s*(from|import)\s+[\w.]*legacy", text, re.MULTILINE):
+            offenders.append(str(path))
+    assert offenders == []
 
 
 def test_sampler_invalid_area_raises():
