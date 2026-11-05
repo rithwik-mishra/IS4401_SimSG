@@ -9,7 +9,8 @@ Order of draws for each persona (each step uses only the tables named):
     1. dwelling + household income band   fitted_area_dwelling_income.csv (area)
     2. sex + 5-year age group (20+)       resident_area_age_sex.csv (area), independent of step 1
     3. exact age / income                 random within the drawn age group / income band
-    4. daily eating-out spend             spend_per_member_dwelling.csv (HES 2023, by dwelling),
+    4. daily eating-out spend             spend_per_member_dwelling.csv (HES 2023, by dwelling,
+                                          x HES_PRICE_FACTOR_TO_2025 for 2025 prices),
                                           looked up, not drawn: monthly spend per member / 30
 
 The previous sampler (layer1_seed.json + hes_expenditure_benchmarks.json) is kept
@@ -55,6 +56,15 @@ MIN_AGE = 20  # personas are adults aged 20 and over
 DAYS_PER_MONTH = 30
 EATING_OUT_CATEGORY = "Food and Beverage Serving Services"  # HES: hawkers, food courts, cafes, restaurants
 
+# HES 2023 (fieldwork Dec 2022 - Dec 2023) spend, moved to 2025 prices with the CPI for
+# "Food (& Beverage) Serving Services": 2024 vs 2023 about +3% (estimated from monthly
+# year-on-year rates, 4.1% Feb 2024 to 2.9% Dec 2024; full-year figure not confirmed) and
+# 2025 vs 2024 +1.2% (SingStat CPI, December 2025 release). 1.03 x 1.012 = about 1.04.
+# Adjusts prices only, not how often people eat out. Replace with
+# (2025 annual average index / 2023 annual average index) from SingStat Table Builder
+# once both years are taken from the same CPI series.
+HES_PRICE_FACTOR_TO_2025 = 1.04
+
 DwellingType = Literal["1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed"]
 DWELLING_TYPES: Tuple[str, ...] = ("1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed")
 
@@ -93,7 +103,8 @@ class SyntheticPersona(BaseModel):
         ge=0.0,
         description=(
             "Average daily eating-out spend per household member for this dwelling type "
-            "(HES 2023 monthly 'Food and Beverage Serving Services' / 30). An average, not a personal limit."
+            "(HES 2023 monthly 'Food and Beverage Serving Services' / 30, x HES_PRICE_FACTOR_TO_2025 "
+            "for 2025 prices). An average, not a personal limit."
         ),
     )
 
@@ -238,7 +249,9 @@ def _load_census_tables() -> Tuple[
     with SPEND_PATH.open(newline="", encoding="utf-8") as f:
         for row in csv.DictReader(f):
             if row["category"] == EATING_OUT_CATEGORY:
-                eating_out_daily[row["dwelling"]] = float(row["spend_per_member"]) / DAYS_PER_MONTH
+                eating_out_daily[row["dwelling"]] = (
+                    float(row["spend_per_member"]) / DAYS_PER_MONTH * HES_PRICE_FACTOR_TO_2025
+                )
 
     _fill_open_ended([r for rows in households.values() for r in rows], "income_lo", "income_hi")
     _fill_open_ended([r for rows in people.values() for r in rows], "age_lo", "age_hi")
@@ -254,8 +267,9 @@ def list_supported_areas() -> List[str]:
 
 def average_daily_eating_out_sgd() -> float:
     """
-    Plain average of the six dwelling types' HES daily eating-out spend (about S$10.99).
-    Used by the rule-based backup as its reference budget.
+    Plain average of the six dwelling types' daily eating-out spend, at 2025 prices
+    (S$10.99 at HES 2023 prices x 1.04 = about S$11.43). Used by the rule-based backup as its
+    reference budget; the price factor cancels out there, since every budget is divided by it.
     """
     _, _, eating_out_daily = _load_census_tables()
     return sum(eating_out_daily[d] for d in DWELLING_TYPES) / len(DWELLING_TYPES)

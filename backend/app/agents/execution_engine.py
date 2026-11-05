@@ -306,7 +306,7 @@ Age: {persona.age} ({persona.age_bracket})
 Gender: {persona.gender}
 Dwelling: {persona.dwelling_type}
 Monthly Household Income from Work: {persona.income_bracket} (whole household combined; excludes pensions, CPF payouts, rental income and support from family)
-Typical Eating-Out Spend: S${persona.daily_dining_budget_sgd:.2f} per person per day (HES 2023 average for your home type, not your personal limit)
+Typical Eating-Out Spend: S${persona.daily_dining_budget_sgd:.2f} per person per day (HES 2023 average for your home type, adjusted to 2025 prices; not your personal limit)
 
 --- PROPOSED BUSINESS CONCEPT ---
 Concept Name: {hide_prices(concept.concept_name)}

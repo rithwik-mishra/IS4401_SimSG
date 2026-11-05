@@ -269,19 +269,29 @@ def test_sampler_first_personas_stable_when_n_grows():
 
 
 def test_sampler_dining_budget_is_hes_eating_out_per_day():
-    """daily_dining_budget_sgd = HES 2023 eating-out spend per member for the dwelling / 30."""
-    expected = _hes_daily_eating_out()
+    """daily_dining_budget_sgd = HES 2023 eating-out spend per member for the dwelling / 30, x 1.04 (2025 prices)."""
+    expected = _hes_daily_eating_out()  # HES 2023 prices, straight from the table
     assert round(expected["1-2 room"], 2) == 7.77
     assert round(expected["condo"], 2) == 15.10
     cohort = sample_synthetic_cohort("Jurong East", n=60, seed=55)
     for p in cohort:
-        assert p.daily_dining_budget_sgd == round(expected[p.dwelling_type], 2)
+        assert p.daily_dining_budget_sgd == round(expected[p.dwelling_type] * sampler_module.HES_PRICE_FACTOR_TO_2025, 2)
+
+
+def test_hes_price_factor_is_applied_once():
+    """The 2023 -> 2025 price factor is 1.04 in total (about +3% in 2024, +1.2% in 2025), applied once."""
+    assert sampler_module.HES_PRICE_FACTOR_TO_2025 == 1.04
+    raw = _hes_daily_eating_out()
+    by_dwelling = {p.dwelling_type: p.daily_dining_budget_sgd for p in sample_synthetic_cohort("Tampines", n=400, seed=9)}
+    assert by_dwelling["1-2 room"] == 8.08 and by_dwelling["condo"] == 15.70  # 7.77 and 15.10 x 1.04
+    for dwelling, budget in by_dwelling.items():
+        assert budget / raw[dwelling] == pytest.approx(1.04, abs=0.001)  # not 1.04 x 1.04
 
 
 def test_average_daily_eating_out_is_mean_of_six_dwellings():
     expected = _hes_daily_eating_out()
-    assert average_daily_eating_out_sgd() == pytest.approx(sum(expected[d] for d in DWELLINGS) / 6)
-    assert average_daily_eating_out_sgd() == pytest.approx(10.99, abs=0.01)
+    assert average_daily_eating_out_sgd() == pytest.approx(sum(expected[d] for d in DWELLINGS) / 6 * 1.04)
+    assert average_daily_eating_out_sgd() == pytest.approx(10.99 * 1.04, abs=0.01)  # about S$11.43
 
 
 ARCHETYPE_BY_DWELLING = {

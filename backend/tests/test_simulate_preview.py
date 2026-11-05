@@ -123,7 +123,8 @@ def test_persona_prompts_use_town_prices_not_fixed_references(client: TestClient
 def test_preview_shows_census_personas(client: TestClient, no_api_key):
     """Preview personas carry census fields (5-year age group, income band, HES eating-out spend) only."""
     data = client.post("/api/simulate/preview", json=_payload()).json()
-    hes_daily = {"1-2 room": 7.77, "3 room": 9.77, "4 room": 10.43, "5 room/exec": 11.03, "condo": 15.10, "landed": 11.83}
+    # HES 2023 daily eating-out spend (7.77, 9.77, 10.43, 11.03, 15.10, 11.83) x 1.04 for 2025 prices
+    hes_daily = {"1-2 room": 8.08, "3 room": 10.16, "4 room": 10.85, "5 room/exec": 11.47, "condo": 15.70, "landed": 12.30}
     for item in data["personas"]:
         persona = item["persona"]
         for dropped in ("home_language", "linguistic_style", "hawker_baseline_kopi_sgd", "cafe_baseline_coffee_sgd"):
@@ -131,6 +132,7 @@ def test_preview_shows_census_personas(client: TestClient, no_api_key):
         assert persona["daily_dining_budget_sgd"] == hes_daily[persona["dwelling_type"]]
         assert persona["age_bracket"] in item["price_limits_prompt"]
         assert "not your personal limit" in item["price_limits_prompt"]
+        assert "adjusted to 2025 prices" in item["price_limits_prompt"]
         assert "Consumer Archetype" not in item["price_limits_prompt"]
 
 

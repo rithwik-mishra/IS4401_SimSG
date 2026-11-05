@@ -360,11 +360,12 @@ def _persona_with(dwelling: str, budget: float, archetype: str = "heartland_fami
 
 def test_backup_budget_factor_uses_hes_average():
     """
-    Backup fair price = base x (home factor x 0.65 + budget factor x 0.35), budget factor = budget / ~S$10.99.
+    Backup fair price = base x (home factor x 0.65 + budget factor x 0.35), budget factor = budget / ~S$11.43
+    (the HES average at 2025 prices).
     4-room (home factor 1.00) heartland family (drinks base S$3.20):
       budget at the average -> fair price S$3.20, so 'cheap' = 0.75 x 3.20 = S$2.40.
     """
-    concept =decompose_query_rule_based("Kopi stall in Ang Mo Kio", override_price=3.0)
+    concept = decompose_query_rule_based("Kopi stall in Ang Mo Kio", override_price=3.0)
     avg = average_daily_eating_out_sgd()
 
     at_average = evaluate_persona_rule_based(_persona_with("4 room", avg), concept)
@@ -373,12 +374,15 @@ def test_backup_budget_factor_uses_hes_average():
 
 
 def test_backup_budget_changes_fair_price_across_census_range():
-    """With census budgets (S$7.77-15.10) the budget still moves the price, instead of all hitting the 0.6 floor."""
+    """
+    With census budgets (S$8.08-15.70 at 2025 prices) the budget still moves the price, instead of all
+    hitting the 0.6 floor. The 2025 price factor cancels out: 8.08 / 11.43 = 7.77 / 10.99 = 0.707.
+    """
     concept = decompose_query_rule_based("Kopi stall in Ang Mo Kio", override_price=3.0)
-    low = evaluate_persona_rule_based(_persona_with("4 room", 7.77), concept)
-    high = evaluate_persona_rule_based(_persona_with("4 room", 15.10), concept)
+    low = evaluate_persona_rule_based(_persona_with("4 room", 7.77 * 1.04), concept)
+    high = evaluate_persona_rule_based(_persona_with("4 room", 15.10 * 1.04), concept)
     assert low.cheap < high.cheap
-    # 7.77 / 10.99 = 0.707 -> 3.20 x (0.65 + 0.707 x 0.35) x 0.75 = S$2.15
+    # 0.707 -> 3.20 x (0.65 + 0.707 x 0.35) x 0.75 = S$2.15, the same as before the price adjustment
     assert low.cheap == pytest.approx(2.15, abs=0.01)
 
 
