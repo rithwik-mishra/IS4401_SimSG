@@ -1,7 +1,11 @@
 import { SimulateRequest, SimulateResponse } from '../types/api';
 import { SAMPLE_SIMULATION_RESULT } from '../data/sampleOutput';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname.includes('simsg.vercel.app')
+    ? 'https://simsg-backend.vercel.app'
+    : '');
 
 export interface AIStatus {
   persona_engine: 'llm' | 'rule_based';

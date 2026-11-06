@@ -99,6 +99,25 @@ router = APIRouter(
     tags=["SimSG End-to-End Simulation Engine"],
 )
 
+@router.get(
+    "/simulate",
+    summary="Simulate Endpoint Status & Usage",
+    description="Health check and documentation for the simulate route. Send a POST request to execute simulations.",
+)
+def simulate_info():
+    return {
+        "status": "ready",
+        "method": "POST",
+        "endpoint": "/api/simulate",
+        "message": "Send a POST request with SimulateRequest JSON body to execute a focus group simulation.",
+        "sample_payload": {
+            "raw_query": "Artisan sourdough bakery in Tampines at S$8",
+            "sample_size": 30,
+            "seed": 42,
+            "use_mock": False,
+        },
+    }
+
 
 @router.get(
     "/ai-status",

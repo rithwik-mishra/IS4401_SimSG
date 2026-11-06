@@ -38,7 +38,7 @@ async def lifespan(app: FastAPI):
     try:
         svc = get_simulation_context_service()
         logger.info(
-            f"Pre-warm complete: ChromaDB collection has {svc._collection.count()} docs."
+            f"Pre-warm complete: ChromaDB collection '{svc._collection.name}' has {svc._collection.count()} docs."
         )
     except Exception as exc:
         logger.error(f"Startup warning - could not pre-warm simulation service: {exc}")
@@ -59,6 +59,7 @@ default_origins = [
     "http://localhost:3000",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:3000",
+    "https://simsg.vercel.app",
 ]
 
 env_cors = os.getenv("CORS_ORIGINS")
@@ -81,11 +82,27 @@ app.add_middleware(
 # ROUTERS
 # ---------------------------------------------------------------------------
 
-# Full End-to-End Simulation Pipeline (POST /api/simulate)
+# Full End-to-End Simulation Pipeline (POST /api/simulate and /simulate)
 app.include_router(simulate.router)
 
 # Planning-area lookup (GET /api/simulation/areas). The older /simulation/preview and /run
 # routes (respondent.py pipeline) are kept unregistered in app/legacy/simulation_routes.py.
+# Aliases for reverse proxies that might strip /api prefix
+
+app.add_api_route(
+    "/simulate",
+    simulate.simulate,
+    methods=["POST"],
+    response_model=simulate.SimulateResponse,
+    include_in_schema=False,
+)
+app.add_api_route(
+    "/simulate",
+    simulate.simulate_info,
+    methods=["GET"],
+    include_in_schema=False,
+)
+
 app.include_router(simulation.router, prefix="/api")
 
 # Testing & Diagnostics module (census sampler areas, ChromaDB checks)
