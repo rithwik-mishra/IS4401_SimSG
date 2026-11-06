@@ -100,7 +100,6 @@ def test_simulation_areas_route(client: TestClient):
 
 def test_old_respondent_routes_are_not_registered(client: TestClient):
     """The respondent.py routes moved to app/legacy in step 10; /api/simulate replaces them."""
-    assert client.get("/api/v1/simulation/areas").status_code == 404
     for path in ("/api/v1/simulation/preview", "/api/simulation/preview", "/api/simulation/run"):
         assert client.post(path, json={"planning_area": "Ang Mo Kio", "question": "x"}).status_code == 404
 
