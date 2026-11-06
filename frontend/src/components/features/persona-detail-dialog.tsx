@@ -16,6 +16,8 @@ import {
   MessageSquareQuote,
   AlertCircle,
   TrendingUp,
+  Briefcase,
+  Home,
 } from "lucide-react";
 
 export interface PersonaDetailDialogProps {
@@ -92,6 +94,19 @@ export function PersonaDetailDialog({
                 <Building2 className="h-3 w-3" />
                 {persona.dwelling_type} Flat
               </p>
+              {/* Ages 60+ (labour force) and 65+ (living arrangement) only; 2025 national data */}
+              {persona.in_labour_force != null && (
+                <p className="text-[#748078] flex items-center gap-1" data-testid="persona-labour-force">
+                  <Briefcase className="h-3 w-3" />
+                  {persona.in_labour_force ? "In the labour force" : "Not in the labour force"}
+                </p>
+              )}
+              {persona.living_arrangement && (
+                <p className="text-[#748078] flex items-start gap-1" data-testid="persona-living-arrangement">
+                  <Home className="h-3 w-3 mt-0.5 shrink-0" />
+                  <span>{persona.living_arrangement.charAt(0).toUpperCase() + persona.living_arrangement.slice(1)}</span>
+                </p>
+              )}
             </div>
 
             <div className="rounded-xl border border-[#e5e9e3] bg-[#fafbf8] p-3.5 space-y-1 shadow-xs">

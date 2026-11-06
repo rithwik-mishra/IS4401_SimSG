@@ -148,6 +148,7 @@ DWELLINGS = ["1-2 room", "3 room", "4 room", "5 room/exec", "condo", "landed"]
 PERSONA_FIELDS = {
     "persona_id", "planning_area", "age", "age_bracket", "gender", "dwelling_type",
     "monthly_household_income_sgd", "income_bracket", "archetype", "daily_dining_budget_sgd",
+    "in_labour_force", "living_arrangement",
 }
 REMOVED_FIELDS = {"home_language", "linguistic_style", "hawker_baseline_kopi_sgd", "cafe_baseline_coffee_sgd"}
 
@@ -302,10 +303,14 @@ ARCHETYPE_BY_DWELLING = {
 
 
 def test_sampler_archetype_rules():
-    """Archetype = age first (65+ retiree, 20-24 student), then home type; household income is not used."""
+    """
+    Archetype = 65+ and not in the labour force -> retiree; 20-24 -> student; otherwise home type
+    (so a 65+ still in the labour force is grouped by home type). Household income is not used.
+    """
     cohort = sample_synthetic_cohort("Ang Mo Kio", n=300, seed=11)
+    assert any(p.age >= 65 and p.in_labour_force for p in cohort)  # the new case is exercised
     for p in cohort:
-        if p.age >= 65:
+        if p.age >= 65 and not p.in_labour_force:
             expected = "retiree"
         elif p.age <= 24:
             expected = "student"
@@ -320,18 +325,38 @@ def test_archetype_ignores_household_income():
     assert sampler_module._assign_archetype(40, "3 room") == "working_class"
     assert sampler_module._assign_archetype(40, "4 room") == "heartland_family"
     assert sampler_module._assign_archetype(40, "condo") == "affluent_pro"
-    assert sampler_module._assign_archetype(70, "landed") == "retiree"
+    assert sampler_module._assign_archetype(70, "landed", in_labour_force=False) == "retiree"
+
+
+def test_working_senior_is_grouped_by_home_type():
+    assert sampler_module._assign_archetype(67, "4 room", in_labour_force=True) == "heartland_family"
+    assert sampler_module._assign_archetype(72, "3 room", in_labour_force=True) == "working_class"
+    assert sampler_module._assign_archetype(66, "condo", in_labour_force=True) == "affluent_pro"
+    assert sampler_module._assign_archetype(62, "4 room", in_labour_force=False) == "heartland_family"  # under 65
+    assert sampler_module._assign_archetype(70, "landed") == "retiree"  # status unknown: old rule
+
+
+def _labour_force_rates() -> dict:
+    return {(r["age_group"], r["sex"]): float(r["rate"]) for r in _read_csv("labour_force_rate_age_sex.csv")}
 
 
 @pytest.mark.parametrize("area", ["Ang Mo Kio", "Tampines", "Bukit Timah"])
 def test_archetype_shares_follow_census(area):
-    """Archetype shares = P(age group) x P(home type), since age and home type are drawn independently."""
+    """
+    Archetype shares follow the census: age and home type are drawn independently, and each 65+
+    is a retiree with probability 1 - labour force rate (age group, sex); working seniors join the
+    home-type groups.
+    """
     cohort = sample_synthetic_cohort(area, n=20000, seed=77)
     people = [r for r in _read_csv("resident_area_age_sex.csv") if r["area"] == area and int(r["age_lo"]) >= 20]
     total = sum(float(r["residents"]) for r in people)
-    p_retiree = sum(float(r["residents"]) for r in people if int(r["age_lo"]) >= 65) / total
+    rates = _labour_force_rates()
+    p_retiree = sum(
+        float(r["residents"]) * (1 - rates[("70+" if int(r["age_lo"]) >= 70 else r["age_group"], r["sex"])])
+        for r in people if int(r["age_lo"]) >= 65
+    ) / total
     p_young = sum(float(r["residents"]) for r in people if int(r["age_lo"]) == 20) / total
-    p_middle = 1 - p_retiree - p_young
+    p_middle = 1 - p_retiree - p_young  # 25-64, plus 65+ still in the labour force
 
     dwell = Counter()
     for r in _read_csv("fitted_area_dwelling_income.csv"):
@@ -355,12 +380,102 @@ def test_app_groups_follow_archetype():
         assert row.demographic_cohort == sampler_module.ARCHETYPE_COHORT[p.archetype]
 
 
+# ---------------------------------------------------------------------------
+# Labour force status (60+) and living arrangement (65+), from the pipeline's senior tables
+# ---------------------------------------------------------------------------
+
+def test_senior_fields_only_for_their_ages():
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=500, seed=21)
+    for p in cohort:
+        assert (p.in_labour_force is not None) == (p.age >= 60)
+        assert (p.living_arrangement is not None) == (p.age >= 65)
+
+
+def test_app_personas_carry_senior_details():
+    """The app's persona rows show labour force status (60+) and living arrangement wording (65+), else null."""
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=200, seed=13)
+    rows = sampler_module.format_all_demographic_personas(cohort, [])
+    for p, row in zip(cohort, rows):
+        assert row.in_labour_force == p.in_labour_force
+        assert row.living_arrangement == sampler_module.living_arrangement_text(p.living_arrangement)
+        if p.age < 60:
+            assert row.in_labour_force is None and row.living_arrangement is None
+    assert any(r.living_arrangement == "lives alone" for r in rows)
+
+
+def test_existing_draws_unchanged_by_senior_streams():
+    """Steps 1-4 (age, sex, home type, income) are the same as before step 13 for the same seed."""
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=4, seed=12345)
+    assert [(p.persona_id, p.age, p.gender, p.dwelling_type, p.monthly_household_income_sgd) for p in cohort] == [
+        ("AMK-001", 71, "Male", "condo", 31055.63),
+        ("AMK-002", 45, "Female", "4 room", 13086.38),
+        ("AMK-003", 55, "Female", "3 room", 5097.17),
+        ("AMK-004", 30, "Male", "3 room", 9012.42),
+    ]
+
+
+def test_labour_force_draws_match_rates():
+    """On a large draw, the share in the labour force matches the 2025 rate for each age group and sex."""
+    rates = _labour_force_rates()
+    cohort = sample_synthetic_cohort("Tampines", n=40000, seed=31)
+    groups = {}
+    for p in cohort:
+        if p.in_labour_force is None:
+            continue
+        key = ("70+" if p.age >= 70 else p.age_bracket, p.gender)
+        groups.setdefault(key, []).append(p.in_labour_force)
+    assert set(groups) == {(g, s) for g in ("60-64", "65-69", "70+") for s in ("Male", "Female")}
+    for key, flags in groups.items():
+        assert abs(sum(flags) / len(flags) - rates[key]) < 0.03, f"{key}: {sum(flags) / len(flags):.3f} vs {rates[key]:.3f}"
+
+
+def test_living_arrangement_draws_match_shares():
+    """On a large draw, living arrangements match the 2025 shares for each age group (65-69 ... 85+)."""
+    expected = {}
+    for r in _read_csv("senior_living_arrangement_age.csv"):
+        expected.setdefault(r["age_group"], {})[r["arrangement"]] = float(r["share"])
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=40000, seed=41)
+    groups = {}
+    for p in cohort:
+        if p.living_arrangement is not None:
+            groups.setdefault("85+" if p.age >= 85 else p.age_bracket, Counter())[p.living_arrangement] += 1
+    assert set(groups) == set(expected)
+    for group, counts in groups.items():
+        drawn = _shares(counts)
+        for key, share in expected[group].items():
+            assert abs(drawn.get(key, 0.0) - share) < 0.04, f"{group} {key}: {drawn.get(key, 0):.3f} vs {share:.3f}"
+
+
+def test_senior_tables_match_pipeline_output():
+    """pipeline/clean_data.py rebuilds the two senior tables exactly from the raw downloads."""
+    import importlib.util
+    import pandas as pd
+
+    path = Path(sampler_module.__file__).resolve().parents[2] / "pipeline" / "clean_data.py"
+    spec = importlib.util.spec_from_file_location("clean_data", path)
+    clean_data = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(clean_data)
+
+    lf = clean_data.clean_labour_force()
+    living, published = clean_data.clean_living_arrangement()
+    pd.testing.assert_frame_equal(lf, pd.read_csv(CENSUS_DIR / "labour_force_rate_age_sex.csv"), check_dtype=False)
+    pd.testing.assert_frame_equal(living, pd.read_csv(CENSUS_DIR / "senior_living_arrangement_age.csv"), check_dtype=False)
+    assert clean_data.run_senior_checks(lf, living, published)
+    # Rates the sampler uses (60+) stay within 0-100%; known >100% cells are prime-age only
+    assert lf.query("age_lo >= 60")["rate"].between(0, 1).all()
+
+
 @pytest.mark.parametrize("area", ["Ang Mo Kio", "Bukit Timah"])
 def test_sampler_matches_census_shares(area):
-    """A large draw reproduces the census shares of dwelling, income band, sex and age group."""
+    """
+    A large draw reproduces the census shares of sex and age group (drawn first, never filtered), and
+    of dwelling and income band within the household-rule tolerances (see test_town_mix_matches_census).
+    """
     n = 20000
     cohort = sample_synthetic_cohort(area, n=n, seed=2024)
-    tol = 0.015  # ~3 standard errors for a 20,000 draw
+    tol = 0.015  # ~3 standard errors for a 20,000 draw (sex, age group)
+    tol_household = {"dwelling": 0.02, "income band": 0.01}
+    known_gap = {("Bukit Timah", "below S$1,000"): 0.025}  # see BUKIT_TIMAH_LOW_BAND_GAP
 
     fitted = [r for r in _read_csv("fitted_area_dwelling_income.csv") if r["area"] == area]
     dwell_expected, band_expected = Counter(), Counter()
@@ -387,7 +502,112 @@ def test_sampler_matches_census_shares(area):
     for name, exp in expected.items():
         for key in set(exp) | set(drawn[name]):
             gap = abs(drawn[name].get(key, 0.0) - exp.get(key, 0.0))
-            assert gap < tol, f"{area} {name} {key}: drawn {drawn[name].get(key, 0):.3f} vs census {exp.get(key, 0):.3f}"
+            limit = known_gap.get((area, key), tol_household.get(name, tol))
+            assert gap < limit, f"{area} {name} {key}: drawn {drawn[name].get(key, 0):.3f} vs census {exp.get(key, 0):.3f}"
+
+
+# ---------------------------------------------------------------------------
+# Step 14: household drawn after the person, with 3 rules for people aged 65+
+# ---------------------------------------------------------------------------
+
+RAG_TOWNS = ["Ang Mo Kio", "Tampines", "Bukit Timah", "Jurong East", "Bukit Merah", "Outram"]
+SMALL_FLATS = ("1-2 room", "3 room")
+BIG_HOMES = ("4 room", "5 room/exec", "condo", "landed")
+# Bukit Timah: national rates predict ~2.7% of adults are retired and living alone (who must be
+# below S$1,000 from work), but the town's census puts only 1.1% below S$1,000. Even after moving
+# every other low draw out, its lowest band runs ~1.6 points above the census.
+BUKIT_TIMAH_LOW_BAND_GAP = 0.025
+
+
+def _census_mix(area):
+    dwell, band = Counter(), Counter()
+    for r in _read_csv("fitted_area_dwelling_income.csv"):
+        if r["area"] == area:
+            label = sampler_module._income_label(float(r["income_lo"]), float(r["income_hi"]) if r["income_hi"] else None)
+            dwell[r["dwelling"]] += float(r["prob_in_area"])
+            band[label] += float(r["prob_in_area"])
+    return _shares(dwell), _shares(band)
+
+
+@pytest.fixture(scope="module")
+def big_draws():
+    """40,000 personas per town with ChromaDB passages (shared by the step 14 checks)."""
+    return {town: sample_synthetic_cohort(town, n=40000, seed=2026) for town in RAG_TOWNS}
+
+
+@pytest.mark.parametrize("area", RAG_TOWNS)
+def test_town_mix_matches_census(area, big_draws):
+    """
+    Agreed check: income bands within 1 point of the census (rebalanced), home types within 2 points
+    (household rules move them slightly). Exception: Bukit Timah's lowest band (BUKIT_TIMAH_LOW_BAND_GAP).
+    """
+    cohort = big_draws[area]
+    census_dwell, census_band = _census_mix(area)
+    drawn_dwell = _shares(Counter(p.dwelling_type for p in cohort))
+    drawn_band = _shares(Counter(p.income_bracket for p in cohort))
+    for key, share in census_dwell.items():
+        assert abs(drawn_dwell.get(key, 0.0) - share) < 0.02, f"{area} {key}: {drawn_dwell.get(key, 0):.3f} vs {share:.3f}"
+    for key, share in census_band.items():
+        limit = BUKIT_TIMAH_LOW_BAND_GAP if (area, key) == ("Bukit Timah", "below S$1,000") else 0.01
+        assert abs(drawn_band.get(key, 0.0) - share) < limit, f"{area} {key}: {drawn_band.get(key, 0):.3f} vs {share:.3f}"
+
+
+@pytest.mark.parametrize("area", RAG_TOWNS)
+def test_household_rules_apply(area, big_draws):
+    """Retired + alone -> below S$1,000; alone -> smaller flats; with spouse and child -> bigger homes."""
+    cohort = big_draws[area]
+    groups = {}
+    for p in cohort:
+        groups.setdefault(sampler_module._household_group(p.age, p.in_labour_force, p.living_arrangement), []).append(p)
+
+    retired_alone = groups["alone_retired"]
+    assert retired_alone and all(p.income_bracket == "below S$1,000" for p in retired_alone)
+
+    def share(ps, kinds):
+        return sum(p.dwelling_type in kinds for p in ps) / len(ps)
+
+    alone = retired_alone + groups.get("alone_working", [])
+    assert share(alone, SMALL_FLATS) > share(cohort, SMALL_FLATS)
+    with_family = groups["with_family"]
+    assert share(with_family, BIG_HOMES) >= share(cohort, BIG_HOMES)
+
+
+def test_town_without_lowest_band_uses_its_lowest_band(recwarn):
+    """Tanglin has no 'below S$1,000' rows; retired-alone personas take its lowest band, with no maths warnings."""
+    cohort = sample_synthetic_cohort("Tanglin", n=20000, seed=4)
+    retired_alone = [p for p in cohort
+                     if sampler_module._household_group(p.age, p.in_labour_force, p.living_arrangement) == "alone_retired"]
+    lowest = min(p.monthly_household_income_sgd for p in cohort)
+    assert retired_alone
+    assert len({p.income_bracket for p in retired_alone}) == 1  # one band: the lowest present
+    assert all(p.monthly_household_income_sgd < lowest + 1000 for p in retired_alone)
+    assert not [w for w in recwarn if issubclass(w.category, RuntimeWarning)]
+
+
+def test_household_group_rules():
+    group = sampler_module._household_group
+    assert group(83, False, "alone") == "alone_retired"
+    assert group(83, False, "domestic_worker_only") == "alone_retired"
+    assert group(72, True, "alone") == "alone_working"
+    assert group(70, False, "spouse_and_child") == "with_family"
+    assert group(70, True, "spouse_only") == "rest"
+    assert group(62, False, None) == "rest"
+    assert group(40, None, None) == "rest"
+
+
+def test_unfiltered_personas_unchanged_by_household_rules():
+    """
+    Draw order changed (person first, household second), but a persona with no rule keeps the same
+    home and income for the same seed, unless it drew 'below S$1,000' and was rebalanced.
+    The seed 12345 Ang Mo Kio personas below are 'rest' and not in the lowest band.
+    """
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=4, seed=12345)
+    assert [(p.dwelling_type, p.monthly_household_income_sgd, p.income_bracket) for p in cohort] == [
+        ("condo", 31055.63, "S$30,000 to S$34,999"),
+        ("4 room", 13086.38, "S$13,000 to S$13,999"),
+        ("3 room", 5097.17, "S$5,000 to S$5,999"),
+        ("3 room", 9012.42, "S$9,000 to S$9,999"),
+    ]
 
 
 def test_sampler_serialization_and_fields():

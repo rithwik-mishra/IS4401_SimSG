@@ -207,6 +207,28 @@ def test_build_persona_prompt_contains_all_demographics():
     assert "Hawker kopi ranges from $1.20" in prompt
 
 
+def test_senior_lines_in_prompt_only_for_their_ages():
+    """60+ get a 'Work:' line; 65+ also get 'Living arrangement:'; under 60 the profile is unchanged."""
+    concept = decompose_query_rule_based("S$7 kopi bar in Ang Mo Kio")
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=300, seed=5)
+    seen = set()
+    for p in cohort:
+        prompt = build_price_limits_prompt(p, concept, rag_chunks=None)
+        # line starts only ("Monthly Household Income from Work:" also contains "Work:")
+        assert ("\nWork:" in prompt) == (p.age >= 60)
+        assert ("\nLiving arrangement:" in prompt) == (p.age >= 65)
+        if p.in_labour_force is True:
+            assert "Work: in the labour force (working or looking for work)" in prompt
+            seen.add("working")
+        if p.in_labour_force is False:
+            assert "Work: not in the labour force" in prompt
+            seen.add("not working")
+        if p.living_arrangement == "alone":
+            assert "Living arrangement: lives alone" in prompt
+            seen.add("alone")
+    assert {"working", "not working", "alone"} <= seen
+
+
 def test_purchase_prompt_reveals_price_and_asks_decision_only():
     p = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=123)[0]
     concept = decompose_query_rule_based("Artisanal Cold Brew Coffee for $6.50 in Ang Mo Kio")

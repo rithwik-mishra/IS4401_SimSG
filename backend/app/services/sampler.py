@@ -11,6 +11,9 @@ Order of draws for each persona (each step uses only the tables named):
     3. exact age / income                 random within the drawn age group / income band
     4. daily eating-out spend             spend_per_member_dwelling.csv (HES 2023, by dwelling,
                                           x HES_PRICE_FACTOR_TO_2025 for 2025 prices),
+    5. labour force status (ages 60+)     labour_force_rate_age_sex.csv (2025, national, by age x sex)
+    6. living arrangement (ages 65+)      senior_living_arrangement_age.csv (2025, national, by age)
+       (5 and 6 use their own random streams, so steps 1-4 are unchanged for every seed)
                                           looked up, not drawn: monthly spend per member / 30
 
 The previous sampler (layer1_seed.json + hes_expenditure_benchmarks.json) is kept
@@ -51,8 +54,14 @@ CENSUS_DIR = _DATA_DIR / "sheets" / "processed"
 FITTED_PATH = CENSUS_DIR / "fitted_area_dwelling_income.csv"
 AGE_SEX_PATH = CENSUS_DIR / "resident_area_age_sex.csv"
 SPEND_PATH = CENSUS_DIR / "spend_per_member_dwelling.csv"
+# National tables made by pipeline/clean_data.py from two raw downloads (see that script):
+LABOUR_FORCE_PATH = CENSUS_DIR / "labour_force_rate_age_sex.csv"     # 2025, rate by age group x sex
+LIVING_PATH = CENSUS_DIR / "senior_living_arrangement_age.csv"       # 2025, residents 65+ by age group
 
 MIN_AGE = 20  # personas are adults aged 20 and over
+LABOUR_FORCE_MIN_AGE = 60  # labour force status is drawn for ages 60+ (rates below 60 mix two surveys; see pipeline)
+LIVING_MIN_AGE = 65        # the living-arrangement table covers residents aged 65+
+RETIREE_MIN_AGE = 65       # "retiree" = aged 65+ and not in the labour force
 DAYS_PER_MONTH = 30
 EATING_OUT_CATEGORY = "Food and Beverage Serving Services"  # HES: hawkers, food courts, cafes, restaurants
 
@@ -97,7 +106,27 @@ class SyntheticPersona(BaseModel):
     )
     archetype: Literal[
         "retiree", "student", "working_class", "heartland_family", "affluent_pro"
-    ] = Field(..., description="SimSG consumer archetype (age, then home type); not shown to the persona AI")
+    ] = Field(
+        ...,
+        description=(
+            "SimSG consumer archetype: 'retiree' = 65+ and not in the labour force, 'student' = 20-24, "
+            "otherwise by home type; not shown to the persona AI"
+        ),
+    )
+    in_labour_force: Optional[bool] = Field(
+        default=None,
+        description=(
+            "Ages 60+ only: working or looking for work, drawn from the 2025 national labour force rate "
+            "for the age group and sex. None under 60"
+        ),
+    )
+    living_arrangement: Optional[str] = Field(
+        default=None,
+        description=(
+            "Ages 65+ only: living arrangement key (spouse_and_child, spouse_only, child_no_spouse, alone, "
+            "domestic_worker_only, others), drawn from the 2025 national shares for the age group. None under 65"
+        ),
+    )
     daily_dining_budget_sgd: float = Field(
         ...,
         ge=0.0,
@@ -141,6 +170,14 @@ class RepresentativePersona(BaseModel):
     income_bracket: Optional[str] = Field(
         default=None,
         description="Census household income-from-work band shown in the app, e.g. 'S$7,000 to S$7,999'",
+    )
+    in_labour_force: Optional[bool] = Field(
+        default=None,
+        description="Ages 60+ only: in the labour force (working or looking for work); null under 60",
+    )
+    living_arrangement: Optional[str] = Field(
+        default=None,
+        description="Ages 65+ only: living arrangement as shown to the AI, e.g. 'lives alone'; null under 65",
     )
     daily_dining_budget_sgd: float = Field(
         ...,
@@ -275,6 +312,50 @@ def average_daily_eating_out_sgd() -> float:
     return sum(eating_out_daily[d] for d in DWELLING_TYPES) / len(DWELLING_TYPES)
 
 
+@lru_cache(maxsize=1)
+def _load_senior_tables() -> Tuple[Dict[Tuple[str, str], float], Dict[str, List[Tuple[str, float]]], Dict[str, str]]:
+    """
+    Loads the two national senior tables written by pipeline/clean_data.py:
+      labour_force_rate[(age_group, sex)] -> rate (age groups ..., '60-64', '65-69', '70+')
+      living_shares[age_group]            -> [(arrangement key, share), ...] ('65-69' ... '85+')
+      living_text[arrangement key]        -> wording for the persona prompt
+    """
+    for path in (LABOUR_FORCE_PATH, LIVING_PATH):
+        if not path.exists():
+            raise FileNotFoundError(f"Census table not found at {path} (run pipeline/clean_data.py)")
+
+    labour_force_rate: Dict[Tuple[str, str], float] = {}
+    with LABOUR_FORCE_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            labour_force_rate[(row["age_group"], row["sex"])] = float(row["rate"])
+
+    living_shares: Dict[str, List[Tuple[str, float]]] = {}
+    living_text: Dict[str, str] = {}
+    with LIVING_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            living_shares.setdefault(row["age_group"], []).append((row["arrangement"], float(row["share"])))
+            living_text[row["arrangement"]] = row["arrangement_text"]
+
+    return labour_force_rate, living_shares, living_text
+
+
+def _labour_force_age_group(age: int, age_bracket: str) -> str:
+    """The labour force table's oldest group is '70+'."""
+    return "70+" if age >= 70 else age_bracket
+
+
+def _living_age_group(age: int, age_bracket: str) -> str:
+    """The living-arrangement table's oldest group is '85+'."""
+    return "85+" if age >= 85 else age_bracket
+
+
+def living_arrangement_text(key: Optional[str]) -> Optional[str]:
+    """Prompt wording for a living-arrangement key, e.g. 'alone' -> 'lives alone'."""
+    if key is None:
+        return None
+    return _load_senior_tables()[2][key]
+
+
 # ---------------------------------------------------------------------------
 # Persona IDs and archetypes
 # ---------------------------------------------------------------------------
@@ -310,16 +391,18 @@ ARCHETYPE_COHORT: Dict[str, str] = {
 
 
 def _assign_archetype(
-    age: int, dwelling_type: str
+    age: int, dwelling_type: str, in_labour_force: Optional[bool] = None
 ) -> Literal["retiree", "student", "working_class", "heartland_family", "affluent_pro"]:
     """
-    SimSG archetype from age, then home type (the same groups econometrics.py uses).
+    SimSG archetype from age and labour force status, then home type (the same groups econometrics.py uses).
     Household income is not used: census incomes are for the whole household, so a young
     adult living with parents would otherwise look affluent.
-      65+ -> retiree; 20-24 -> student (young adult); condo/landed -> affluent_pro;
-      4 room, 5 room/exec -> heartland_family; 1-2 room, 3 room -> working_class
+      65+ and not in the labour force -> retiree; 20-24 -> student (young adult);
+      otherwise by home type: condo/landed -> affluent_pro; 4 room, 5 room/exec -> heartland_family;
+      1-2 room, 3 room -> working_class (so a 67-year-old still working in a 4-room flat is heartland_family).
+    in_labour_force=None (status unknown) keeps the old rule: every 65+ is a retiree.
     """
-    if age >= 65:
+    if age >= RETIREE_MIN_AGE and not in_labour_force:
         return "retiree"
     if age <= 24:
         return "student"
@@ -334,6 +417,134 @@ def _draw_rows(rows: List[Dict[str, Any]], n: int, rng: np.random.Generator) -> 
     weights = np.array([r["weight"] for r in rows], dtype=float)
     idx = rng.choice(len(rows), size=n, p=weights / weights.sum())
     return [rows[int(i)] for i in idx]
+
+
+# ---------------------------------------------------------------------------
+# Household draw that fits the person (step 14)
+# ---------------------------------------------------------------------------
+# Home type + income is drawn AFTER age, sex, labour force and living arrangement, with three rules
+# for people aged 65+ (no age-linked household data exists below 65):
+#   "alone_retired": not in the labour force AND lives alone (or only with a domestic worker)
+#       -> income band "below S$1,000" (no one in the household earns), home types weighted by the
+#          national share of 1-person households in each home type
+#   "alone_working": in the labour force AND lives alone (or only with a domestic worker)
+#       -> home types weighted by the share of 1-person households (income: their own pay; no rule)
+#   "with_family":   lives with spouse and at least one child
+#       -> home types weighted by the share of households with 3+ people
+#   everyone else ("rest") -> the town's census rows, as before
+# Domestic workers are not resident household members, so "only a domestic worker" counts as 1 person.
+#
+# Rebalancing: the census "below S$1,000" share already includes the alone_retired households, so
+# for "rest" a below-S$1,000 draw is kept only with probability keep_low (else moved to another band
+# in proportion to the census), so the town's overall income mix still matches the census.
+HOUSEHOLD_SIZE_PATH = CENSUS_DIR / "household_dwelling_size.csv"
+LOW_INCOME_BAND_LO = 0.0  # the "below S$1,000" band starts at 0
+ALONE_ARRANGEMENTS = ("alone", "domestic_worker_only")
+
+
+@lru_cache(maxsize=1)
+def _household_size_shares() -> Tuple[Dict[str, float], Dict[str, float]]:
+    """National share of 1-person and of 3+-person households in each home type."""
+    by_dwelling: Dict[str, Dict[int, float]] = {}
+    with HOUSEHOLD_SIZE_PATH.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            by_dwelling.setdefault(row["dwelling"], {})[int(row["household_size"])] = float(row["households"])
+    one = {d: s.get(1, 0.0) / sum(s.values()) for d, s in by_dwelling.items()}
+    three_plus = {d: sum(v for k, v in s.items() if k >= 3) / sum(s.values()) for d, s in by_dwelling.items()}
+    return one, three_plus
+
+
+def _household_group(age: int, in_labour_force: Optional[bool], living_arrangement: Optional[str]) -> str:
+    if age < LIVING_MIN_AGE or living_arrangement is None:
+        return "rest"
+    if living_arrangement in ALONE_ARRANGEMENTS:
+        return "alone_working" if in_labour_force else "alone_retired"
+    if living_arrangement == "spouse_and_child":
+        return "with_family"
+    return "rest"
+
+
+def _cdf(weights: np.ndarray) -> np.ndarray:
+    """Cumulative distribution exactly as numpy's Generator.choice builds it for p = weights / sum."""
+    p = weights / weights.sum()
+    cdf = p.cumsum()
+    return cdf / cdf[-1]
+
+
+@lru_cache(maxsize=64)
+def _household_plan(area: str) -> Dict[str, Any]:
+    """
+    Per-town cumulative distributions over the census household rows for each persona group,
+    plus the rebalancing probability for "rest". Expected group shares come from the town's
+    age x sex table, the labour force rates and the living-arrangement shares.
+    """
+    households, people, _ = _load_census_tables()
+    labour_force_rate, living_shares, _ = _load_senior_tables()
+    one, three_plus = _household_size_shares()
+
+    rows = households[area]
+    base = np.array([r["weight"] for r in rows], dtype=float)
+    dwelling = [r["dwelling"] for r in rows]
+    low = np.array([r["income_lo"] == LOW_INCOME_BAND_LO for r in rows])
+    w_one = base * np.array([one[d] for d in dwelling])
+    w_family = base * np.array([three_plus[d] for d in dwelling])
+    # Retired + alone: "below S$1,000". A few towns have no such rows in the census table
+    # (e.g. Tanglin); they fall back to the town's lowest income band that exists.
+    retired_rows = low & (base > 0)
+    if not retired_rows.any():
+        lowest = min(r["income_lo"] for r, w in zip(rows, base) if w > 0)
+        retired_rows = np.array([r["income_lo"] == lowest for r in rows]) & (base > 0)
+        logger.info(f"{area}: no 'below S$1,000' households in the census; retired-alone personas use "
+                    f"the lowest band present (from S${lowest:,.0f})")
+    w_alone_retired = np.where(retired_rows, w_one, 0.0)
+
+    # Expected share of adults in each group (age x sex rows of the town)
+    total = sum(r["weight"] for r in people[area])
+    share = {"alone_retired": 0.0, "alone_working": 0.0, "with_family": 0.0}
+    for r in people[area]:
+        if r["age_lo"] < LIVING_MIN_AGE:
+            continue
+        w = r["weight"] / total
+        rate = labour_force_rate[("70+" if r["age_lo"] >= 70 else r["age_group"], r["sex"])]
+        living = dict(living_shares["85+" if r["age_lo"] >= 85 else r["age_group"]])
+        alone = sum(living.get(k, 0.0) for k in ALONE_ARRANGEMENTS)
+        share["alone_retired"] += w * (1 - rate) * alone
+        share["alone_working"] += w * rate * alone
+        share["with_family"] += w * living.get("spouse_and_child", 0.0)
+    share_rest = 1.0 - sum(share.values())
+
+    def low_share(weights: np.ndarray) -> float:
+        return float(weights[low].sum() / weights.sum())
+
+    # Overall below-S$1,000 share must equal the census share; solve for what "rest" may keep
+    census_low = low_share(base)
+    from_groups = (share["alone_retired"] * low_share(w_alone_retired)
+                   + share["alone_working"] * low_share(w_one)
+                   + share["with_family"] * low_share(w_family))
+    target_rest_low = (census_low - from_groups) / share_rest
+    keep_low = min(1.0, max(0.0, target_rest_low / census_low)) if census_low > 0 else 1.0
+    if target_rest_low < 0:
+        logger.info(f"{area}: below-S$1,000 share can't be fully rebalanced; retired-alone personas alone "
+                    f"exceed the census share ({from_groups:.1%} vs {census_low:.1%})")
+
+    return {
+        "rows": rows,
+        "low": low,
+        "cdf": {
+            "rest": _cdf(base),
+            "alone_retired": _cdf(w_alone_retired),
+            "alone_working": _cdf(w_one),
+            "with_family": _cdf(w_family),
+        },
+        "cdf_not_low": _cdf(np.where(low, 0.0, base)),
+        "keep_low": keep_low,
+        "group_share": {**share, "rest": share_rest},
+        "census_low": census_low,
+    }
+
+
+def _pick(cdf: np.ndarray, u: float) -> int:
+    return int(cdf.searchsorted(u, side="right"))
 
 
 # ---------------------------------------------------------------------------
@@ -356,6 +567,7 @@ def sample_synthetic_cohort(
       List of SyntheticPersona Pydantic models.
     """
     households, people, eating_out_daily = _load_census_tables()
+    labour_force_rate, living_shares, _ = _load_senior_tables()
 
     areas = {a.lower(): a for a in list_supported_areas()}
     area_key = planning_area.lower().strip()
@@ -366,20 +578,45 @@ def sample_synthetic_cohort(
     formal_name = areas[area_key]
     area_code = _get_area_code(formal_name)
 
-    # One independent random stream per step, so personas 1..k stay the same when n grows
-    rng_household, rng_person, rng_detail = (
-        np.random.default_rng(s) for s in np.random.SeedSequence(seed).spawn(3)
+    # One independent random stream per step, so personas 1..k stay the same when n grows.
+    # Streams were added over time (4-5: labour force, living arrangement; 6: income rebalancing);
+    # spawning more leaves the earlier streams, and so their draws, unchanged for the same seed.
+    rng_household, rng_person, rng_detail, rng_labour, rng_living, rng_rebalance = (
+        np.random.default_rng(s) for s in np.random.SeedSequence(seed).spawn(6)
     )
+    plan = _household_plan(formal_name)
 
-    # 1. dwelling + income band (weighted by residents in the area)
-    household_draws = _draw_rows(households[formal_name], n, rng_household)
-    # 2. sex + age group, adults only
+    # 1. sex + age group, adults only
     person_draws = _draw_rows(people[formal_name], n, rng_person)
+    # One uniform number per persona for the household draw (the same numbers numpy's choice used
+    # before step 14), so a persona with no household rule gets exactly the same home and income.
+    u_household = rng_household.random(n)
 
     cohort: List[SyntheticPersona] = []
-    for i, (hh, person) in enumerate(zip(household_draws, person_draws)):
-        # 3. exact age and income, uniform within the drawn group / band
+    for i, person in enumerate(person_draws):
+        # 2. exact age, uniform within the drawn group
         age = int(rng_detail.integers(person["age_lo"], person["age_hi"] + 1))
+
+        # 3. labour force status (60+), from the national rate for the age group and sex
+        in_labour_force: Optional[bool] = None
+        if age >= LABOUR_FORCE_MIN_AGE:
+            rate = labour_force_rate[(_labour_force_age_group(age, person["age_group"]), person["sex"])]
+            in_labour_force = bool(rng_labour.random() < rate)
+
+        # 4. living arrangement (65+), from the national shares for the age group
+        living_arrangement: Optional[str] = None
+        if age >= LIVING_MIN_AGE:
+            options = living_shares[_living_age_group(age, person["age_group"])]
+            keys, shares = zip(*options)
+            p = np.array(shares, dtype=float)
+            living_arrangement = str(keys[int(rng_living.choice(len(keys), p=p / p.sum()))])
+
+        # 5. home type + income band from the town's census rows, with the rule for this person's group
+        group = _household_group(age, in_labour_force, living_arrangement)
+        row_index = _pick(plan["cdf"][group], u_household[i])
+        if group == "rest" and plan["low"][row_index] and rng_rebalance.random() >= plan["keep_low"]:
+            row_index = _pick(plan["cdf_not_low"], rng_rebalance.random())
+        hh = plan["rows"][row_index]
         monthly_income = round(float(rng_detail.uniform(hh["income_lo"], hh["income_hi"])), 2)
         dwelling_type = hh["dwelling"]
 
@@ -393,9 +630,11 @@ def sample_synthetic_cohort(
                 dwelling_type=dwelling_type,
                 monthly_household_income_sgd=monthly_income,
                 income_bracket=hh["income_label"],
-                archetype=_assign_archetype(age, dwelling_type),
-                # 4. HES eating-out spend for the dwelling type
+                archetype=_assign_archetype(age, dwelling_type, in_labour_force),
+                # 6. HES eating-out spend for the dwelling type
                 daily_dining_budget_sgd=round(eating_out_daily[dwelling_type], 2),
+                in_labour_force=in_labour_force,
+                living_arrangement=living_arrangement,
             )
         )
 
@@ -549,7 +788,7 @@ def select_representative_demographic_personas(
         arch = getattr(p, "archetype", "").lower()
 
         if cohort == "Senior / Retiree":
-            if age >= 65 or arch == "retiree":
+            if arch == "retiree":  # 65+ and not in the labour force
                 return 100.0 + age
             return -1.0
         elif cohort == "Young Adult / Student":
@@ -624,6 +863,8 @@ def select_representative_demographic_personas(
                 dwelling_type=best_p.dwelling_type,
                 monthly_income_sgd=round(best_p.monthly_household_income_sgd, 2),
                 income_bracket=best_p.income_bracket,
+                in_labour_force=best_p.in_labour_force,
+                living_arrangement=living_arrangement_text(best_p.living_arrangement),
                 daily_dining_budget_sgd=round(best_p.daily_dining_budget_sgd, 2),
                 buy_probability_pct=int(ev_data.get("buy_probability_pct", 50)),
                 sentiment=sentiment_val,
@@ -702,6 +943,8 @@ def format_all_demographic_personas(
             dwelling_type=p.dwelling_type,
             monthly_income_sgd=round(p.monthly_household_income_sgd, 2),
             income_bracket=p.income_bracket,
+            in_labour_force=p.in_labour_force,
+            living_arrangement=living_arrangement_text(p.living_arrangement),
             daily_dining_budget_sgd=round(p.daily_dining_budget_sgd, 2),
             buy_probability_pct=int(ev_data.get("buy_probability_pct", 50)),
             sentiment=sentiment_val,

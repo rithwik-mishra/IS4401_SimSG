@@ -148,10 +148,16 @@ def _parse_age(age_val: Any) -> Tuple[Optional[float], Optional[float]]:
 
 
 def _is_senior(row: Dict[str, Any]) -> bool:
-    """Age >= 65"""
+    """
+    Senior / Retiree. When the record has an archetype (census sampler personas), it decides:
+    only 'retiree' (65+ and not in the labour force) counts, so a 67-year-old who still works is
+    grouped by home type, as in the app's persona list. Records without one fall back to age >= 65.
+    """
     arch = str(row.get("archetype", "")).strip().lower()
     if arch in {"retiree", "senior"}:
         return True
+    if arch:
+        return False
     min_age, _ = _parse_age(row.get("age"))
     if min_age is not None and min_age >= 65:
         return True

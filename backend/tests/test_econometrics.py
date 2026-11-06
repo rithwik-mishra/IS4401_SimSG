@@ -165,6 +165,15 @@ def test_psm_intersections_order(synthetic_psm_records):
     assert intersections.pmc <= intersections.pme
 
 
+def test_working_senior_is_not_counted_as_senior_cohort():
+    """With an archetype, only retirees (65+ not in the labour force) count as Senior / Retiree."""
+    working = {"age": 70, "archetype": "heartland_family", "dwelling": "4 room", "likelihood_1_to_5": 3}
+    retired = {"age": 70, "archetype": "retiree", "dwelling": "4 room", "likelihood_1_to_5": 3}
+    no_archetype = {"age": 70, "dwelling": "4 room", "likelihood_1_to_5": 3}
+    counts = {c.cohort_name: c.count for c in compute_cohort_breakdown([working, retired, no_archetype])}
+    assert counts[COHORT_SENIOR] == 2  # the retiree, and the record with no archetype (age rule)
+
+
 def test_cohort_segmentation_with_singstat_sampler():
     """
     Test cohort segmentation on real personas drawn from SingStat tables via the census sampler

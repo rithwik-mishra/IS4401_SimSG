@@ -90,9 +90,22 @@ backend/
 Run in order to rebuild sampling tables from source workbooks:
 
 ```
-python pipeline/clean_data.py     # data/sheets/cleaned/*.xlsx -> data/sheets/processed/*.csv
+python pipeline/clean_data.py     # data/sheets/cleaned/*.xlsx + 2 raw CSVs -> data/sheets/processed/*.csv
 python pipeline/fit.py            # iterative proportional fitting of dwelling x income per planning area
 ```
+
+`clean_data.py` also reads two national tables straight from `data/sheets/raw/` (already
+machine-readable, so there is no hand-cleaned copy):
+
+| Raw download | Processed table | Used for |
+| --- | --- | --- |
+| `2025_Resident_LabourForce_AgeGroup_Gender.csv` (resident labour force by age, sex, marital status, ethnic group) | `labour_force_rate_age_sex.csv`: labour force ÷ national population of the same age and sex (the `Total` row of the age workbook), ages 70+ grouped | labour force status for personas aged 60+ |
+| `Resident65Plus_LivingArrangement_AgeGroup.csv` (residents 65+ by living arrangement and age group, annual) | `senior_living_arrangement_age.csv`: 2025 shares per age group | living arrangement for personas aged 65+ |
+
+The labour force and population tables come from different surveys, so a few prime-age rates
+exceed 100% (logged in `checks/cleaning_report.txt`); the sampler only uses ages 60+, where the
+rates are 0-100%. These two tables are national, so `fit.py` does not use them. To update them,
+replace the raw CSV with a newer download and rerun `clean_data.py`.
 
 Then draw personas:
 
@@ -103,7 +116,24 @@ python -m app.services.sampler "Ang Mo Kio" 10 --seed 42  # reproducible
 
 Sampling order: dwelling + income band, then sex + age group (drawn separately),
 then an exact age and income within the drawn group and band, then the HES 2023
-eating-out spend per household member for the dwelling type. Income is shown to
+eating-out spend per household member for the dwelling type (x1.04 for 2025 prices).
+Ages 60+ also get a labour force status (2025 rate for their age and sex) and ages 65+
+a living arrangement (2025 shares for their age). "Retiree" means aged 65+ and not in the
+labour force; a senior still working is grouped by home type.
+
+The person is drawn first (sex + age group, exact age, labour force, living arrangement), then
+their home type + income band, with three rules for people aged 65+:
+- not in the labour force and living alone (or only with a domestic worker): income band
+  "below S$1,000" (no one in the household earns), home types weighted towards 1-person households
+- living alone and still working: home types weighted towards 1-person households
+- living with spouse and at least one child: home types weighted towards households of 3+ people
+
+Home-type weights use the national share of 1-person and 3+-person households per home type
+(`household_dwelling_size.csv`). The census "below S$1,000" share already includes the retired
+seniors living alone, so other personas keep a below-S$1,000 draw only often enough for the town's
+overall income mix to match the census. Bukit Timah is the exception: national rates predict more
+retired seniors living alone there than its census lowest band holds, so that band runs about
+1.6 points high. Everyone else keeps the same home and income for the same seed. Income is shown to
 the AI and in the app only as its census band (household income from work).
 
 ## Legacy respondent agent

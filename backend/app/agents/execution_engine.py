@@ -50,10 +50,10 @@ else:
 # Schema Imports (Robust across package relative and absolute paths)
 # ---------------------------------------------------------------------------
 try:
-    from app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd
+    from app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd, living_arrangement_text
     from app.services.query_decomposer import DecomposedConcept
 except ImportError:
-    from backend.app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd
+    from backend.app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd, living_arrangement_text
     from backend.app.services.query_decomposer import DecomposedConcept
 
 # Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
@@ -284,6 +284,26 @@ def format_rag_context(rag_chunks: Optional[List[Any]], planning_area: str) -> s
     return "\n".join(lines)
 
 
+def senior_profile_lines(persona: SyntheticPersona) -> str:
+    """
+    Extra profile lines for older personas (empty for anyone under 60):
+      60+: labour force status (2025 national rate by age and sex)
+      65+: living arrangement (2025 national shares by age)
+    """
+    lines = []
+    in_labour_force = getattr(persona, "in_labour_force", None)
+    if in_labour_force is not None:
+        lines.append(
+            "Work: in the labour force (working or looking for work)"
+            if in_labour_force
+            else "Work: not in the labour force (not working and not looking for work)"
+        )
+    arrangement = living_arrangement_text(getattr(persona, "living_arrangement", None))
+    if arrangement:
+        lines.append(f"Living arrangement: {arrangement}")
+    return "".join(f"{line}\n" for line in lines)
+
+
 def build_price_limits_prompt(
     persona: SyntheticPersona,
     concept: DecomposedConcept,
@@ -305,7 +325,7 @@ def build_price_limits_prompt(
 Age: {persona.age} ({persona.age_bracket})
 Gender: {persona.gender}
 Dwelling: {persona.dwelling_type}
-Monthly Household Income from Work: {persona.income_bracket} (whole household combined; excludes pensions, CPF payouts, rental income and support from family)
+{senior_profile_lines(persona)}Monthly Household Income from Work: {persona.income_bracket} (whole household combined; excludes pensions, CPF payouts, rental income and support from family)
 Typical Eating-Out Spend: S${persona.daily_dining_budget_sgd:.2f} per person per day (HES 2023 average for your home type, adjusted to 2025 prices; not your personal limit)
 
 --- PROPOSED BUSINESS CONCEPT ---
