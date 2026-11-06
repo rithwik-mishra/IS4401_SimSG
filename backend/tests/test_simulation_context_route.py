@@ -1,7 +1,7 @@
 """
 backend/tests/test_simulation_context_route.py
 ----------------------------------------------
-Automated testing module for testing the FastAPI Layer 1 + 2 simulation routes.
+Automated testing module for the FastAPI diagnostic routes (census areas + Layer 2 ChromaDB context).
 Uses FastAPI's TestClient with httpx for end-to-end HTTP validation without
 needing an external network port.
 
@@ -41,10 +41,14 @@ def test_diagnostics_route(client: TestClient):
     assert response.status_code == 200, f"Expected 200, got {response.status_code}"
     data = response.json()
     assert data["status"] == "healthy"
-    assert data["layer1"]["total_areas_count"] >= 5
+    assert data["census_sampler"]["total_areas_count"] == 29
     assert data["layer2_chromadb"]["total_documents_indexed"] == 18
-    assert data["hes_benchmarks"]["total_archetypes"] == 5
-    print(f"  [PASS] Diagnostics OK: {data['layer1']['total_areas_count']} areas, {data['layer2_chromadb']['total_documents_indexed']} Chroma docs")
+    assert len(data["layer2_chromadb"]["indexed_planning_areas"]) == 6
+    # Every town with ChromaDB passages can also be sampled from the census
+    assert set(data["layer2_chromadb"]["indexed_planning_areas"]) <= set(data["census_sampler"]["supported_planning_areas"])
+    # Layer 1 seed / HES benchmark sections are gone
+    assert "layer1" not in data and "hes_benchmarks" not in data
+    print(f"  [PASS] Diagnostics OK: {data['census_sampler']['total_areas_count']} census areas, {data['layer2_chromadb']['total_documents_indexed']} Chroma docs")
 
 
 def test_simulation_context_get(client: TestClient):
@@ -58,8 +62,7 @@ def test_simulation_context_get(client: TestClient):
     data = response.json()
 
     assert data["planning_area"] == "Ang Mo Kio"
-    assert "demographic_profile" in data
-    assert "spending_thresholds" in data
+    assert set(data) == {"planning_area", "user_pitch", "rag_context", "rag_query_used"}
     assert len(data["rag_context"]) == 3
 
     # Check that metadata filtering strictly matched Ang Mo Kio
@@ -79,9 +82,107 @@ def test_simulation_context_post(client: TestClient):
     data = response.json()
 
     assert data["planning_area"] == "Bukit Timah"
-    assert data["demographic_profile"]["archetype_weights"]["affluent_pro"] > 0.5
     assert len(data["rag_context"]) == 3
-    print(f"  [PASS] POST context OK: affluent_pro weight is {data['demographic_profile']['archetype_weights']['affluent_pro']}")
+    assert all(chunk["planning_area"] == "Bukit Timah" for chunk in data["rag_context"])
+    print(f"  [PASS] POST context OK: {len(data['rag_context'])} Bukit Timah passages")
+
+
+def test_simulation_areas_route(client: TestClient):
+    """GET /api/simulation/areas lists the census sampler's towns and which have ChromaDB passages."""
+    resp = client.get("/api/simulation/areas")
+    assert resp.status_code == 200, resp.text
+    data = resp.json()
+    assert data["total_areas"] == 29
+    assert "Ang Mo Kio" in data["areas"]
+    assert data["rag_coverage"]["coverage_count"] == 6
+    assert "Ang Mo Kio" in data["rag_coverage"]["covered_areas"]
+
+
+def test_old_respondent_routes_are_not_registered(client: TestClient):
+    """The respondent.py routes moved to app/legacy in step 10; /api/simulate replaces them."""
+    for path in ("/api/v1/simulation/preview", "/api/simulation/preview", "/api/simulation/run"):
+        assert client.post(path, json={"planning_area": "Ang Mo Kio", "question": "x"}).status_code == 404
+
+
+def test_live_code_does_not_use_backend_agents_folder():
+    """backend/agents/ was removed in step 10; nothing outside app/legacy may import agents.*."""
+    import re
+    backend_dir = Path(__file__).resolve().parents[1]
+    assert not (backend_dir / "agents").exists()
+    offenders = []
+    for path in list((backend_dir / "app").rglob("*.py")) + list((backend_dir / "tests").rglob("*.py")):
+        if "legacy" in path.parts:
+            continue
+        if re.search(r"^\s*(from|import)\s+(backend\.)?agents\b", path.read_text(encoding="utf-8"), re.MULTILINE):
+            offenders.append(str(path))
+    assert offenders == []
+
+
+def test_chroma_passages_have_no_persona_type_figures_or_ceilings():
+    """
+    Step 12: the corpus no longer carries the layer1 / HES persona-type shares, per-type price
+    ceilings, ethnic or language percentages, or the S$51+ typo. Every town still has 3 passages.
+    """
+    import re
+    from app.services.simulation_context import get_simulation_context_service
+
+    svc = get_simulation_context_service()
+    data = svc._collection.get(include=["documents", "metadatas"])
+    docs = list(zip(data["metadatas"], data["documents"]))
+    assert len(docs) == 18
+
+    forbidden = [
+        r"archetype", r"heartland family", r"affluent_pro", r"ceiling", r"willing to pay", r"pays up to",
+        r"tolerance for", r"dominant heartland", r"retiree-heavy", r"S\$51", r"(Malay|Indian)[^.]{0,25}\d+%",
+        r"Malay-speaking", r"~(46|63|38|42)%",
+    ]
+    for meta, text in docs:
+        for pattern in forbidden:
+            assert not re.search(pattern, text, re.IGNORECASE), f"{meta['planning_area']} {meta['category']}: '{pattern}'"
+
+    per_area = {}
+    for meta, _ in docs:
+        per_area.setdefault(meta["planning_area"], set()).add(meta["category"])
+    assert len(per_area) == 6
+    assert all(cats == {"pricing_benchmarks", "competitors_and_supply", "foot_traffic_and_lifestyle"} for cats in per_area.values())
+
+
+def test_corpus_json_matches_chroma():
+    """The ingested passages are exactly data/rag_corpus/layer2_corpus.json (rebuild + reload stayed in sync)."""
+    import json
+    from app.services.simulation_context import get_simulation_context_service
+
+    corpus = json.loads((Path(__file__).resolve().parents[1] / "data" / "rag_corpus" / "layer2_corpus.json").read_text(encoding="utf-8"))
+    data = get_simulation_context_service()._collection.get(include=["documents"])
+    assert dict(zip(data["ids"], data["documents"])) == {c["id"]: c["text"] for c in corpus}
+
+
+def test_simulation_context_area_is_case_insensitive(client: TestClient):
+    response = client.get("/api/test/simulation-context", params={"planning_area": "ang mo kio", "user_pitch": "kopi"})
+    assert response.status_code == 200, response.text
+    assert response.json()["planning_area"] == "Ang Mo Kio"
+
+
+def test_context_service_does_not_read_layer1_or_hes_files(monkeypatch):
+    """A fresh SimulationContextService (and a context lookup) never opens the layer1 / HES benchmark files."""
+    from app.services.simulation_context import SimulationContextService
+
+    forbidden = ("layer1_seed.json", "hes_expenditure_benchmarks.json", "layer1_master.csv")
+    real_open, real_read_text = Path.open, Path.read_text
+
+    def guarded_open(self, *args, **kwargs):
+        assert self.name not in forbidden, f"context service read {self.name}"
+        return real_open(self, *args, **kwargs)
+
+    def guarded_read_text(self, *args, **kwargs):
+        assert self.name not in forbidden, f"context service read {self.name}"
+        return real_read_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "open", guarded_open)
+    monkeypatch.setattr(Path, "read_text", guarded_read_text)
+    svc = SimulationContextService()
+    ctx = svc.get_simulation_context("Tampines", "bubble tea")
+    assert len(ctx.rag_context) == 3
 
 
 def test_unknown_planning_area_404(client: TestClient):

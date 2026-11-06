@@ -2,12 +2,13 @@
 backend/app/routers/simulate.py
 ---------------------------------
 Production FastAPI Router for SimSG's complete End-to-End Simulation Pipeline:
-  1. Natural Language Query Decomposer (gpt-4o-mini / rule-based fallback)
+  (AI stages use the provider/model from backend/.env: SIMSG_PROVIDER, SIMSG_MODEL)
+  1. Natural Language Query Decomposer (configured model / rule-based fallback)
   2. ChromaDB Layer 2 Qualitative RAG (simsg_layer2_rag)
   3. Monte Carlo Demographic Sampler (N=30 from SingStat & HES 2023)
-  4. Async Batch Persona Execution Engine (gpt-4o-mini, Semaphore(25))
+  4. Async Batch Persona Execution Engine (configured model, Semaphore(25))
   5. Deterministic Econometric & Statistical Engine (NumPy/SciPy PSM curves & cohorts)
-  6. Macro Synthesis & Strategic Pivot Agent (gpt-4o-mini)
+  6. Macro Synthesis & Strategic Pivot Agent (configured model)
   7. Selective Representative Personas (N=5 distinct demographic archetypes for React table)
   8. Streamlined 3-part response: [recommendations, personas, statistics]
 """
@@ -15,7 +16,8 @@ Production FastAPI Router for SimSG's complete End-to-End Simulation Pipeline:
 from __future__ import annotations
 
 import logging
-from typing import Any, List
+import secrets
+from typing import Any, List, Tuple
 from fastapi import APIRouter, Depends, HTTPException, status
 
 logger = logging.getLogger(__name__)
@@ -31,6 +33,10 @@ try:
         RepresentativePersona,
         SimulateRequest,
         SimulateResponse,
+        SimulatePreviewResponse,
+        AIStatusResponse,
+        AIUsage,
+        PersonaPromptPreview,
         SyntheticPersona,
     )
     from app.services.query_decomposer import decompose_query
@@ -44,8 +50,14 @@ try:
         SimulationContextService,
         get_simulation_context_service,
     )
-    from app.agents.execution_engine import run_persona_evaluations
+    from app.agents.execution_engine import (
+        SYSTEM_PROMPT,
+        build_price_limits_prompt,
+        build_purchase_prompt,
+        run_persona_evaluations,
+    )
     from app.agents.synthesis_agent import generate_macro_synthesis
+    from app.services.llm_settings import describe_missing_provider, get_llm_settings
 except ImportError:
     from backend.app.schemas import (
         DecomposedConcept,
@@ -56,6 +68,10 @@ except ImportError:
         RepresentativePersona,
         SimulateRequest,
         SimulateResponse,
+        SimulatePreviewResponse,
+        AIStatusResponse,
+        AIUsage,
+        PersonaPromptPreview,
         SyntheticPersona,
     )
     from backend.app.services.query_decomposer import decompose_query
@@ -69,14 +85,19 @@ except ImportError:
         SimulationContextService,
         get_simulation_context_service,
     )
-    from backend.app.agents.execution_engine import run_persona_evaluations
+    from backend.app.agents.execution_engine import (
+        SYSTEM_PROMPT,
+        build_price_limits_prompt,
+        build_purchase_prompt,
+        run_persona_evaluations,
+    )
     from backend.app.agents.synthesis_agent import generate_macro_synthesis
+    from backend.app.services.llm_settings import describe_missing_provider, get_llm_settings
 
 router = APIRouter(
     prefix="/api",
     tags=["SimSG End-to-End Simulation Engine"],
 )
-
 
 @router.get(
     "/simulate",
@@ -98,21 +119,31 @@ def simulate_info():
     }
 
 
-@router.post(
-    "/simulate",
-    response_model=SimulateResponse,
-    summary="Execute Complete Focus Group Simulation & Market Validation",
+@router.get(
+    "/ai-status",
+    response_model=AIStatusResponse,
+    summary="Which AI Model Runs Would Use",
     description=(
-        "Takes an unstructured user pitch, decomposes it, samples N=30 SingStat personas, "
-        "retrieves ChromaDB qualitative context, executes concurrent LLM evaluations, "
-        "computes deterministic Van Westendorp PSM econometrics, and synthesizes strategic pivots. "
-        "Outputs streamlined views: 1) overall recommendations/insights, 2) selective N=5 demographic table, 3) statistics."
+        "Reports whether /api/simulate would call the AI (provider and model from backend/.env) "
+        "or use the rule-based backup because no usable API key is set. Never returns the key itself. "
+        "Read at request time, so it reflects the server's current settings."
     ),
 )
-async def simulate(
+def ai_status() -> AIStatusResponse:
+    settings = get_llm_settings()
+    if settings is None:
+        return AIStatusResponse(persona_engine="rule_based", reason=describe_missing_provider())
+    return AIStatusResponse(persona_engine="llm", llm_provider=settings.provider, llm_model=settings.model)
+
+
+def _prepare_inputs(
     req: SimulateRequest,
-    context_service: SimulationContextService = Depends(get_simulation_context_service),
-) -> SimulateResponse:
+    context_service: SimulationContextService,
+) -> Tuple[DecomposedConcept, List[RAGChunk], int, List[SyntheticPersona]]:
+    """
+    Steps 1-3 of the pipeline (pitch -> concept, ChromaDB context, personas).
+    Shared by /api/simulate and /api/simulate/preview so both see identical inputs.
+    """
     logger.info(f"Received simulation request: query='{req.raw_query[:60]}...', N={req.sample_size}")
 
     # -----------------------------------------------------------------------
@@ -168,14 +199,20 @@ async def simulate(
 
     # -----------------------------------------------------------------------
     # Step 3: Monte Carlo Demographic Sampling (N=30)
+    # Always sample with a concrete seed so any run can be repeated:
+    # use the caller's seed, or pick one and return it in the response.
     # -----------------------------------------------------------------------
+    seed: int = req.seed if req.seed is not None else secrets.randbelow(1_000_000)
     try:
         personas: List[SyntheticPersona] = sample_synthetic_cohort(
             planning_area=concept.target_planning_area,
             n=req.sample_size,
-            seed=req.seed,
+            seed=seed,
         )
-        logger.info(f"Step 3 Complete: Sampled {len(personas)} synthetic personas for {concept.target_planning_area}")
+        logger.info(
+            f"Step 3 Complete: Sampled {len(personas)} synthetic personas for {concept.target_planning_area} "
+            f"(seed={seed}, {'given' if req.seed is not None else 'generated'})"
+        )
     except ValueError as val_err:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -187,6 +224,27 @@ async def simulate(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Persona sampling failed: {exc}",
         ) from exc
+
+    return concept, rag_chunks, seed, personas
+
+
+@router.post(
+    "/simulate",
+    response_model=SimulateResponse,
+    summary="Execute Complete Focus Group Simulation & Market Validation",
+    description=(
+        "Takes an unstructured user pitch, decomposes it, samples N=30 SingStat personas, "
+        "retrieves ChromaDB qualitative context, executes concurrent LLM evaluations, "
+        "computes deterministic Van Westendorp PSM econometrics, and synthesizes strategic pivots. "
+        "Outputs streamlined views: 1) overall recommendations/insights, 2) selective N=5 demographic table, 3) statistics."
+    ),
+)
+async def simulate(
+    req: SimulateRequest,
+    context_service: SimulationContextService = Depends(get_simulation_context_service),
+) -> SimulateResponse:
+    # Steps 1-3: concept, ChromaDB context, seeded personas
+    concept, rag_chunks, seed, personas = _prepare_inputs(req, context_service)
 
     # -----------------------------------------------------------------------
     # Step 4: Async Parallel Evaluation Engine (Bounded Concurrency Semaphore=25)
@@ -260,8 +318,70 @@ async def simulate(
     # Step 8: Return Clean 3-Part Output: Recommendations, Personas Table, Statistics
     # (Context, raw pitch decomposition, and raw prompt chunks omitted)
     # -----------------------------------------------------------------------
+    # Which steps the AI actually answered (each falls back to its rule-based backup on its own)
+    persona_ai = sum(1 for e in evaluations if getattr(e, "_used_ai", False))
+    ai_usage = AIUsage(
+        pitch_reader="ai" if getattr(concept, "_used_ai", False) else "backup",
+        persona_ai=persona_ai,
+        persona_backup=len(evaluations) - persona_ai,
+        report_writer="ai" if getattr(synthesis, "_used_ai", False) else "backup",
+    )
+    logger.info(
+        f"AI usage: pitch={ai_usage.pitch_reader}, personas={persona_ai} AI / {ai_usage.persona_backup} backup, "
+        f"report={ai_usage.report_writer}"
+    )
+
     return SimulateResponse(
         recommendations=synthesis,
         personas=[p.model_dump() if hasattr(p, "model_dump") else p for p in representative_personas],
         statistics=econometrics,
+        seed=seed,
+        ai_usage=ai_usage,
+    )
+
+
+@router.post(
+    "/simulate/preview",
+    response_model=SimulatePreviewResponse,
+    summary="Preview the Persona Prompts Without Running the Simulation",
+    description=(
+        "Runs steps 1-3 of /api/simulate (pitch decomposition, ChromaDB context, seeded personas) and returns "
+        "the exact prompts the persona AI would receive. Each persona is interviewed in two parts: "
+        "price_limits_prompt (price hidden, asks the 4 price limits), then purchase_prompt (price revealed, "
+        "asks buy %, reaction and objection) in the same conversation. No persona AI calls are made. "
+        "With an API key, step 1 still uses the AI to read the pitch, exactly as /api/simulate does."
+    ),
+)
+def simulate_preview(
+    req: SimulateRequest,
+    context_service: SimulationContextService = Depends(get_simulation_context_service),
+) -> SimulatePreviewResponse:
+    concept, rag_chunks, seed, personas = _prepare_inputs(req, context_service)
+
+    # Same condition run_persona_evaluations uses to decide between the AI and the offline formulas
+    settings = None if req.use_mock else get_llm_settings()
+    persona_engine = "llm" if settings else "rule_based"
+
+    previews = [
+        PersonaPromptPreview(
+            persona=p,
+            price_limits_prompt=build_price_limits_prompt(p, concept, rag_chunks),
+            purchase_prompt=build_purchase_prompt(p, concept),
+        )
+        for p in personas
+    ]
+    logger.info(
+        f"Preview Complete: {len(previews)} persona prompts (seed={seed}, engine={persona_engine}"
+        + (f", provider={settings.provider}, model={settings.model})" if settings else ")")
+    )
+
+    return SimulatePreviewResponse(
+        seed=seed,
+        persona_engine=persona_engine,
+        llm_provider=settings.provider if settings else None,
+        llm_model=settings.model if settings else None,
+        concept=concept,
+        rag_chunks=rag_chunks,
+        system_prompt=SYSTEM_PROMPT,
+        personas=previews,
     )

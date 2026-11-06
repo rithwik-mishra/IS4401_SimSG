@@ -1,40 +1,10 @@
 from pydantic import BaseModel, Field, field_validator
-from typing import Any, Optional
+from typing import Any, Literal, Optional
 import logging
 
-class ArchetypeWeights(BaseModel):
-    retiree: float
-    student: float
-    working_class: float
-    heartland_family: float
-    affluent_pro: float
-
-
-class DemographicProfile(BaseModel):
-    planning_area: str
-    total_adult_pop_2026: int
-    total_households: int
-    archetype_weights: ArchetypeWeights
-    age_distribution: dict[str, float]
-    dwelling_distribution: dict[str, float]
-    income_distribution: dict[str, float]
-    home_language: dict[str, float]
-
-
-class ArchetypeSpendingProfile(BaseModel):
-    description: str
-    monthly_food_budget_sgd: float
-    hawker_tolerance_per_meal_sgd: float
-    cafe_willingness_to_pay_sgd: float
-    specialty_coffee_ceiling_sgd: float
-    bubble_tea_frequency: str
-    cdc_voucher_reliance: bool
-    price_sensitivity: str
-
-
-class SpendingThresholds(BaseModel):
-    archetypes: dict[str, ArchetypeSpendingProfile]
-    national_benchmarks: dict[str, Any]
+# Layer 1 / HES benchmark shapes (ArchetypeWeights, DemographicProfile, ArchetypeSpendingProfile,
+# SpendingThresholds) were removed in step 9: personas now come from the census sampler, and
+# nothing loads layer1_seed.json or hes_expenditure_benchmarks.json any more.
 
 
 class RAGChunk(BaseModel):
@@ -47,13 +17,11 @@ class RAGChunk(BaseModel):
 
 class SimulationContextPayload(BaseModel):
     """
-    Full consolidated payload returned by SimulationContextService.get_simulation_context().
-    This dict is passed directly to the LangGraph simulation graph as its initial state.
+    Payload returned by SimulationContextService.get_simulation_context() (shown by /api/test/simulation-context):
+    the town's top ChromaDB passages for a pitch.
     """
     planning_area: str
     user_pitch: str
-    demographic_profile: DemographicProfile
-    spending_thresholds: SpendingThresholds
     rag_context: list[RAGChunk]
     rag_query_used: str
 
@@ -68,6 +36,7 @@ class SimulationContextPayload(BaseModel):
 
 # ---------------------------------------------------------------------------
 # Integrated Simulation Engine Schemas (Sampler + ChromaDB + Respondent)
+# Used only by the legacy /simulation/preview and /run routes (app/legacy/simulation_routes.py).
 # ---------------------------------------------------------------------------
 
 class SimulationRunRequest(BaseModel):
@@ -207,7 +176,12 @@ class SimulateRequest(BaseModel):
     )
     seed: Optional[int] = Field(
         default=None,
-        description="Optional random seed for deterministic demographic reproducibility",
+        ge=0,
+        le=2_147_483_647,
+        description=(
+            "Optional random seed for persona sampling. The same seed redraws the same personas. "
+            "If omitted, the server picks one and returns it in the response."
+        ),
     )
     use_mock: bool = Field(
         default=False,
@@ -216,6 +190,14 @@ class SimulateRequest(BaseModel):
 
 
 
+
+
+class AIUsage(BaseModel):
+    """Which pipeline steps the AI actually answered in this run, and which used the rule-based backup."""
+    pitch_reader: Literal["ai", "backup"] = Field(..., description="Step 1: who read the pitch")
+    persona_ai: int = Field(..., ge=0, description="Step 4: personas answered by the AI (both interview parts)")
+    persona_backup: int = Field(..., ge=0, description="Step 4: personas that used the backup (no key, use_mock, or an AI error)")
+    report_writer: Literal["ai", "backup"] = Field(..., description="Step 6: who wrote the report")
 
 
 class SimulateResponse(BaseModel):
@@ -237,6 +219,17 @@ class SimulateResponse(BaseModel):
         ...,
         description="Deterministic econometric and statistical metrics (PSM curves, intersections, sentiment, cohort breakdown)",
     )
+    seed: int = Field(
+        ...,
+        description=(
+            "Seed used to draw the personas. Send it back as `seed` to redraw the same personas. "
+            "Without an API key the whole result repeats; with one, the AI answers can still differ."
+        ),
+    )
+    ai_usage: Optional[AIUsage] = Field(
+        default=None,
+        description="Which steps the AI answered and which fell back to the rule-based backup (shown in the Testing panel)",
+    )
 
     @property
     def synthesis(self) -> MacroSynthesisReport:
@@ -249,3 +242,54 @@ class SimulateResponse(BaseModel):
     @property
     def insights(self) -> MacroSynthesisReport:
         return self.recommendations
+
+
+# ---------------------------------------------------------------------------
+# AI Status (GET /api/ai-status), shown in the frontend's Testing panel
+# ---------------------------------------------------------------------------
+
+class AIStatusResponse(BaseModel):
+    persona_engine: str = Field(
+        ...,
+        description="'llm' if runs would call the AI, 'rule_based' if they would use the backup formulas (no usable key)",
+    )
+    llm_provider: Optional[str] = Field(default=None, description="SIMSG_PROVIDER in use ('openai' or 'soclaas'); null when rule_based")
+    llm_model: Optional[str] = Field(default=None, description="Model every AI stage would use; null when rule_based")
+    reason: Optional[str] = Field(default=None, description="Why no AI is used (e.g. no usable API key); null when llm")
+
+
+# ---------------------------------------------------------------------------
+# Pipeline Preview Schemas (POST /api/simulate/preview)
+# Shows what /api/simulate would send to the persona AI, without running it.
+# ---------------------------------------------------------------------------
+
+class PersonaPromptPreview(BaseModel):
+    persona: SyntheticPersona = Field(..., description="The sampled persona, exactly as the persona engine receives it")
+    price_limits_prompt: str = Field(
+        ...,
+        description="Part 1 of the interview: the concept with its price hidden, asking only for the 4 price limits",
+    )
+    purchase_prompt: str = Field(
+        ...,
+        description="Part 2, sent in the same conversation after the AI's part 1 answer: reveals the price and asks for buy %, reaction and objection",
+    )
+
+
+class SimulatePreviewResponse(BaseModel):
+    seed: int = Field(..., description="Seed used to draw the personas; send it to /api/simulate to run these exact personas")
+    persona_engine: str = Field(
+        ...,
+        description="'llm' if /api/simulate would call the AI for these personas, 'rule_based' if it would use the offline formulas (no API key, or use_mock)",
+    )
+    llm_provider: Optional[str] = Field(
+        default=None,
+        description="AI provider the run would use (SIMSG_PROVIDER: 'openai' or 'soclaas'); null when rule_based",
+    )
+    llm_model: Optional[str] = Field(
+        default=None,
+        description="Model the run would use (SIMSG_MODEL or SOCLAAS_MODEL); null when rule_based",
+    )
+    concept: DecomposedConcept = Field(..., description="The pitch after step 1 (name, category, price, town)")
+    rag_chunks: list[RAGChunk] = Field(..., description="ChromaDB context from step 2, as placed in every prompt")
+    system_prompt: str = Field(..., description="System prompt shared by every persona")
+    personas: list[PersonaPromptPreview] = Field(..., description="Each persona and the exact two prompts it would be sent")

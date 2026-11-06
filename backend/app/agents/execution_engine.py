@@ -7,9 +7,12 @@ decomposed business pitch and Layer 2 ChromaDB qualitative neighborhood context.
 
 Core Capabilities:
   - Bounded concurrent execution using asyncio.gather and asyncio.Semaphore(25).
-  - Uses `gpt-4o-mini` with structured JSON output enforcement.
-  - Contextual prompt conditioning across demographic attributes, daily dining budget,
-    price baselines, linguistic register, and local neighborhood conditions.
+  - Uses the provider/model from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL) with structured JSON output enforcement.
+  - Two-part interview per persona, so price limits are not anchored on the seller's price:
+      1. price limits: concept with prices hidden -> 4 Van Westendorp thresholds
+      2. purchase: same conversation, price revealed -> buy %, sentiment, quote, objection
+  - Contextual prompt conditioning across demographic attributes, typical eating-out spend,
+    and local neighborhood conditions (including local prices from ChromaDB).
   - Monotonicity post-processing enforcing Van Westendorp price thresholds:
       too_cheap <= cheap < expensive <= too_expensive
   - Resilient offline fallback: Deterministic rule-based evaluation when API key is
@@ -27,7 +30,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union
 
 from dotenv import load_dotenv
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, PrivateAttr, field_validator
 
 logger = logging.getLogger("simsg.execution_engine")
 
@@ -43,35 +46,21 @@ else:
     load_dotenv()
 
 
-def get_openai_api_key(passed_key: Optional[str] = None) -> Optional[str]:
-    """
-    Resolves OpenAI API key with explicit priority:
-    1. passed_key
-    2. OPEN_API_KEY from backend/.env
-    3. OPENAI_API_KEY from backend/.env
-    """
-    key = passed_key or os.getenv("OPEN_API_KEY") or os.getenv("OPENAI_API_KEY")
-    if key:
-        key = key.strip()
-        if key.startswith("your_") or key == "":
-            return None
-        return key
-    return None
-
-
 # ---------------------------------------------------------------------------
 # Schema Imports (Robust across package relative and absolute paths)
 # ---------------------------------------------------------------------------
 try:
-    from app.services.sampler import SyntheticPersona
+    from app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd, living_arrangement_text
     from app.services.query_decomposer import DecomposedConcept
 except ImportError:
-    try:
-        from backend.app.services.sampler import SyntheticPersona
-        from backend.app.services.query_decomposer import DecomposedConcept
-    except ImportError:
-        SyntheticPersona = Any  # type: ignore
-        DecomposedConcept = Any  # type: ignore
+    from backend.app.services.sampler import SyntheticPersona, average_daily_eating_out_sgd, living_arrangement_text
+    from backend.app.services.query_decomposer import DecomposedConcept
+
+# Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
+try:
+    from app.services.llm_settings import describe_missing_provider, get_llm_settings
+except ImportError:
+    from backend.app.services.llm_settings import describe_missing_provider, get_llm_settings
 
 
 # ---------------------------------------------------------------------------
@@ -81,6 +70,9 @@ class PersonaEvaluationOutput(BaseModel):
     """
     Individual synthetic resident evaluation output for a business concept pitch.
     """
+
+    # True only when both AI calls answered (False = rule-based backup). Not part of the data or JSON schema.
+    _used_ai: bool = PrivateAttr(default=False)
 
     persona_id: str = Field(..., description="Unique persona identifier (e.g. 'AMK-001')")
     buy_probability_pct: int = Field(
@@ -115,7 +107,7 @@ class PersonaEvaluationOutput(BaseModel):
     )
     in_character_quote: str = Field(
         ...,
-        description="Authentic reaction quote matching persona linguistic style",
+        description="Authentic reaction quote in standard Singapore English",
     )
     primary_objection: str = Field(
         ...,
@@ -197,9 +189,24 @@ def repair_price_monotonicity(
 
 
 # ---------------------------------------------------------------------------
-# Structured JSON Schema for OpenAI
+# Structured JSON Schemas for OpenAI (one per part of the two-part interview)
 # ---------------------------------------------------------------------------
-PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
+# Part 1: the four Van Westendorp price limits, asked before the persona sees the price
+PRICE_LIMITS_SCHEMA: Dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "persona_id": {"type": "string"},
+        "too_cheap": {"type": "number"},
+        "cheap": {"type": "number"},
+        "expensive": {"type": "number"},
+        "too_expensive": {"type": "number"},
+    },
+    "required": ["persona_id", "too_cheap", "cheap", "expensive", "too_expensive"],
+    "additionalProperties": False,
+}
+
+# Part 2: the purchase decision at the seller's price, asked after the price is revealed
+PURCHASE_SCHEMA: Dict[str, Any] = {
     "type": "object",
     "properties": {
         "persona_id": {"type": "string"},
@@ -208,10 +215,6 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
             "minimum": 0,
             "maximum": 100,
         },
-        "too_cheap": {"type": "number"},
-        "cheap": {"type": "number"},
-        "expensive": {"type": "number"},
-        "too_expensive": {"type": "number"},
         "sentiment_label": {
             "type": "string",
             "enum": ["Positive", "Neutral", "Negative"],
@@ -225,10 +228,6 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
     "required": [
         "persona_id",
         "buy_probability_pct",
-        "too_cheap",
-        "cheap",
-        "expensive",
-        "too_expensive",
         "sentiment_label",
         "in_character_quote",
         "primary_objection",
@@ -241,11 +240,29 @@ PERSONA_EVALUATION_SCHEMA: Dict[str, Any] = {
 # Prompt Construction
 # ---------------------------------------------------------------------------
 SYSTEM_PROMPT = """You are an advanced consumer simulation agent representing an authentic Singapore resident in an empirical market research focus group.
-You MUST strictly adopt the persona's demographic background, dwelling, household income, daily dining budget, reference price anchors, and linguistic style.
+You MUST strictly adopt the persona's demographic background, dwelling and household income. The eating-out figure in your profile is an average for your home type, a guide to typical spending, not a hard limit.
 You are evaluating a proposed business concept planned for your neighborhood.
-Evaluate whether you would realistically buy this offering at the proposed candidate price, how likely you are to purchase (0-100%), and provide your 4 Van Westendorp price thresholds (in SGD).
+You will be interviewed in two parts: first, before you are told the seller's price, you give your own 4 Van Westendorp price thresholds (in SGD); then you are told the price and say how likely you are to buy (0-100%).
 Your responses must be grounded in Singapore's local consumer reality (hawker vs cafe price gaps, CDC voucher habits, neighborhood foot traffic).
+Ground rules:
+- Do not invent other facts about yourself (no job, children, hobbies or health unless stated in your profile).
+- The monthly household income is income from work for the whole household, combined, not just you. It leaves out pensions, CPF payouts, rental income and support from family, so a low figure does not mean you have no money to live on.
+- If the price is too high for your household, or the product does not suit you, say you would not buy. Answer honestly; most real people say no to most new products.
 You must output a single JSON object matching the requested schema strictly. Do not include markdown code fences or extraneous text."""
+
+PRICE_HIDDEN = "[price not shown]"
+
+# Money amounts in a pitch: S$7, $6.50, SGD 12, 7 dollars, 4.5 bucks, 8sgd
+_PRICE_PATTERN = re.compile(
+    r"(?:S\$|SGD\s*|\$)\s*\d+(?:[.,]\d+)?"
+    r"|\b\d+(?:[.,]\d+)?\s*(?:sgd|dollars?|bucks)\b",
+    re.IGNORECASE,
+)
+
+
+def hide_prices(text: str) -> str:
+    """Replaces money amounts in pitch text, so part 1 of the interview never shows the seller's price."""
+    return _PRICE_PATTERN.sub(PRICE_HIDDEN, text or "")
 
 
 def format_rag_context(rag_chunks: Optional[List[Any]], planning_area: str) -> str:
@@ -267,12 +284,36 @@ def format_rag_context(rag_chunks: Optional[List[Any]], planning_area: str) -> s
     return "\n".join(lines)
 
 
-def build_persona_prompt(
+def senior_profile_lines(persona: SyntheticPersona) -> str:
+    """
+    Extra profile lines for older personas (empty for anyone under 60):
+      60+: labour force status (2025 national rate by age and sex)
+      65+: living arrangement (2025 national shares by age)
+    """
+    lines = []
+    in_labour_force = getattr(persona, "in_labour_force", None)
+    if in_labour_force is not None:
+        lines.append(
+            "Work: in the labour force (working or looking for work)"
+            if in_labour_force
+            else "Work: not in the labour force (not working and not looking for work)"
+        )
+    arrangement = living_arrangement_text(getattr(persona, "living_arrangement", None))
+    if arrangement:
+        lines.append(f"Living arrangement: {arrangement}")
+    return "".join(f"{line}\n" for line in lines)
+
+
+def build_price_limits_prompt(
     persona: SyntheticPersona,
     concept: DecomposedConcept,
     rag_chunks: Optional[List[Any]] = None,
 ) -> str:
-    """Builds the comprehensive evaluation prompt for a single synthetic resident."""
+    """
+    Part 1 of the interview: persona profile, the concept with every price removed, and local context.
+    Asks only for the 4 price thresholds, so they are not anchored on the seller's price.
+    Local prices in the neighbourhood context are kept: they are reference points, not the seller's price.
+    """
     description = (
         getattr(concept, "concept_description", None)
         or getattr(concept, "description", "")
@@ -284,36 +325,44 @@ def build_persona_prompt(
 Age: {persona.age} ({persona.age_bracket})
 Gender: {persona.gender}
 Dwelling: {persona.dwelling_type}
-Monthly Household Income: S${persona.monthly_household_income_sgd:,.0f} ({persona.income_bracket})
-Consumer Archetype: {persona.archetype}
-Daily Dining Budget: S${persona.daily_dining_budget_sgd:.2f}
-Reference Baselines: Traditional Hawker Kopi S${persona.hawker_baseline_kopi_sgd:.2f} | Specialty Cafe Coffee S${persona.cafe_baseline_coffee_sgd:.2f}
-Primary Home Language: {persona.home_language}
-Linguistic Style: {persona.linguistic_style}
+{senior_profile_lines(persona)}Monthly Household Income from Work: {persona.income_bracket} (whole household combined; excludes pensions, CPF payouts, rental income and support from family)
+Typical Eating-Out Spend: S${persona.daily_dining_budget_sgd:.2f} per person per day (HES 2023 average for your home type, adjusted to 2025 prices; not your personal limit)
 
 --- PROPOSED BUSINESS CONCEPT ---
-Concept Name: {concept.concept_name}
+Concept Name: {hide_prices(concept.concept_name)}
 Category: {concept.category_type}
-Candidate Price: S${concept.candidate_price_sgd:.2f}
-Description: {description}
+Description: {hide_prices(description)}
 Target Planning Area: {concept.target_planning_area}
 
 --- LOCAL NEIGHBORHOOD CONTEXT (RAG) ---
 {rag_text}
 
---- YOUR TASK ---
-Adopt this persona completely. Consider your daily dining budget of S${persona.daily_dining_budget_sgd:.2f}, your reference price baselines, and local alternatives in {concept.target_planning_area}.
-Answer the following in character:
+--- YOUR TASK (PART 1 OF 2: YOUR OWN PRICES) ---
+Adopt this persona completely. The seller has not told you their price yet. Consider your household income, the typical eating-out spend of about S${persona.daily_dining_budget_sgd:.2f} per day for households like yours, and the local prices and alternatives in {concept.target_planning_area} described in the neighbourhood context above.
+Answer the following in character, from your own sense of value:
 1. `persona_id`: "{persona.persona_id}"
-2. `buy_probability_pct`: An integer from 0 to 100 representing how likely you are to buy this product at the candidate price of S${concept.candidate_price_sgd:.2f} during a typical week.
-3. `too_cheap`: Price in SGD below which you would question the product's quality or freshness.
-4. `cheap`: Price in SGD you would consider a bargain / great value for money.
-5. `expensive`: Price in SGD that feels pricey, but you might still consider buying as a treat.
-6. `too_expensive`: Price in SGD where you would completely refuse to purchase because it is unreasonably expensive.
+2. `too_cheap`: Price in SGD below which you would question the product's quality or freshness.
+3. `cheap`: Price in SGD you would consider a bargain / great value for money.
+4. `expensive`: Price in SGD that feels pricey, but you might still consider buying as a treat.
+5. `too_expensive`: Price in SGD where you would completely refuse to purchase because it is unreasonably expensive.
 (Note: your thresholds should logically satisfy: too_cheap <= cheap < expensive <= too_expensive).
-7. `sentiment_label`: "Positive", "Neutral", or "Negative" reflecting your general reaction to this business concept.
-8. `in_character_quote`: A short 1-2 sentence authentic reaction quote spoken in your specified linguistic style ({persona.linguistic_style}).
-9. `primary_objection`: Your main hesitation, criticism, or constraint in 120 characters or fewer (e.g. "Price too high for daily kopi", "Prefer traditional hawker stall", "No CDC vouchers accepted").
+"""
+
+
+def build_purchase_prompt(persona: SyntheticPersona, concept: DecomposedConcept) -> str:
+    """
+    Part 2 of the interview, sent in the same conversation after the persona's part 1 answer:
+    reveals the seller's price and asks for the purchase decision.
+    """
+    return f"""--- YOUR TASK (PART 2 OF 2: THE SELLER'S PRICE) ---
+The seller's price for {concept.concept_name} is S${concept.candidate_price_sgd:.2f}.
+Stay in character as persona {persona.persona_id}, and keep your own price answers from part 1 in mind.
+Answer the following:
+1. `persona_id`: "{persona.persona_id}"
+2. `buy_probability_pct`: An integer from 0 to 100 representing how likely you are to buy this product at the seller's price of S${concept.candidate_price_sgd:.2f} during a typical week.
+3. `sentiment_label`: "Positive", "Neutral", or "Negative" reflecting your general reaction to this business concept at this price.
+4. `in_character_quote`: A short 1-2 sentence authentic reaction quote, written in standard Singapore English.
+5. `primary_objection`: Your main hesitation, criticism, or constraint in 120 characters or fewer (e.g. "Price too high for daily kopi", "Prefer traditional hawker stall", "No CDC vouchers accepted").
 """
 
 
@@ -376,11 +425,14 @@ def evaluate_persona_rule_based(
     arch = getattr(persona, "archetype", "heartland_family")
     base_anchor = cat_anchors.get(arch, 3.50)
 
-    # Adjust anchor by dwelling and daily budget
+    # Adjust anchor by dwelling and daily eating-out spend.
+    # Budget is compared with the average of the six HES dwelling figures (~S$10.99/day),
+    # so an average household scores 1.0 (census range ~0.71 for 1-2 room to ~1.37 for condo).
     dwelling = getattr(persona, "dwelling_type", "4 room")
     dwell_mult = _DWELLING_MULTIPLIERS.get(dwelling, 1.0)
-    budget = getattr(persona, "daily_dining_budget_sgd", 25.0)
-    budget_mult = min(1.6, max(0.6, budget / 25.0))
+    reference_budget = average_daily_eating_out_sgd()
+    budget = getattr(persona, "daily_dining_budget_sgd", reference_budget)
+    budget_mult = min(1.6, max(0.6, budget / reference_budget))
 
     anchor_price = base_anchor * (dwell_mult * 0.65 + budget_mult * 0.35)
 
@@ -413,41 +465,16 @@ def evaluate_persona_rule_based(
     else:
         sentiment = "Negative"
 
-    # Authentic in-character quote & primary objection based on linguistic style
-    ling_style = getattr(persona, "linguistic_style", "Mixed Code-Switch")
-    kopi_base = getattr(persona, "hawker_baseline_kopi_sgd", 1.30)
-    concept_name = getattr(concept, "concept_name", "this concept")
-
-    if ling_style == "Colloquial Singlish":
-        if sentiment == "Positive":
-            quote = f"S${cand_p:.2f} steady lah! If standard is good, will definitely come down support one."
-            objection = f"None, price is fair for {concept_name}."
-        elif sentiment == "Neutral":
-            quote = f"Can try once in a while lor, but every day spend S${cand_p:.2f} my wallet cannot take it lah."
-            objection = "Price is a bit steep for daily breakfast or routine dining."
-        else:
-            quote = f"Wah lau S${cand_p:.2f} so ex! Better go downstairs coffeeshop drink kopi S${kopi_base:.2f} more shiok."
-            objection = "Too expensive compared to traditional hawker alternatives."
-    elif ling_style == "Mixed Code-Switch":
-        if sentiment == "Positive":
-            quote = f"S${cand_p:.2f} is actually quite reasonable for {concept_name}, I will definitely drop by to try."
-            objection = f"None, reasonable price for {concept_name}."
-        elif sentiment == "Neutral":
-            quote = f"Pricing is okay-lah, maybe buy on weekends as a treat but not for everyday dining."
-            objection = "Price slightly high for everyday routine meals."
-        else:
-            quote = f"S${cand_p:.2f} is a bit steep lah, better options available around the neighbourhood."
-            objection = "High price barrier relative to neighborhood food options."
-    else:  # Standard Singapore English
-        if sentiment == "Positive":
-            quote = f"At S${cand_p:.2f}, this represents good value for money and fits nicely into my weekly budget."
-            objection = "None, highly competitive pricing."
-        elif sentiment == "Neutral":
-            quote = f"The S${cand_p:.2f} price point is acceptable, though whether I return depends on actual quality."
-            objection = "Price is marginally high for frequent repeat visits."
-        else:
-            quote = f"S${cand_p:.2f} is difficult to justify when comparable quality options exist nearby at a lower price."
-            objection = "Poor value proposition compared to existing alternatives."
+    # Quote & primary objection in standard Singapore English, chosen by sentiment
+    if sentiment == "Positive":
+        quote = f"At S${cand_p:.2f}, this represents good value for money and fits nicely into my weekly budget."
+        objection = "None, highly competitive pricing."
+    elif sentiment == "Neutral":
+        quote = f"The S${cand_p:.2f} price point is acceptable, though whether I return depends on actual quality."
+        objection = "Price is marginally high for frequent repeat visits."
+    else:
+        quote = f"S${cand_p:.2f} is difficult to justify when comparable quality options exist nearby at a lower price."
+        objection = "Poor value proposition compared to existing alternatives."
 
     return PersonaEvaluationOutput(
         persona_id=persona.persona_id,
@@ -463,8 +490,41 @@ def evaluate_persona_rule_based(
 
 
 # ---------------------------------------------------------------------------
-# LLM Async Invocation Worker
+# LLM Async Invocation Worker (two-part interview per persona)
 # ---------------------------------------------------------------------------
+async def _ask_json(
+    client: Any,
+    model: Optional[str],
+    messages: List[Dict[str, str]],
+    schema_name: str,
+    schema: Dict[str, Any],
+) -> Dict[str, Any]:
+    """One AI call that must return a JSON object: strict json_schema first, json_object as a fallback."""
+    try:
+        response = await client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={
+                "type": "json_schema",
+                "json_schema": {"name": schema_name, "strict": True, "schema": schema},
+            },
+            temperature=0.7,
+        )
+    except Exception as schema_err:
+        logger.debug(f"json_schema mode failed ({schema_err}); trying json_object.")
+        response = await client.chat.completions.create(
+            model=model,
+            messages=messages,
+            response_format={"type": "json_object"},
+            temperature=0.7,
+        )
+
+    raw_text = (response.choices[0].message.content or "").strip()
+    if raw_text.startswith("```"):
+        raw_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text)
+    return json.loads(raw_text)
+
+
 async def _evaluate_single_persona(
     sem: asyncio.Semaphore,
     client: Optional[Any],
@@ -472,70 +532,60 @@ async def _evaluate_single_persona(
     concept: DecomposedConcept,
     rag_chunks: Optional[List[Any]],
     use_mock: bool,
+    model: Optional[str] = None,
 ) -> PersonaEvaluationOutput:
-    """Evaluates a single persona with bounded concurrency and fallback."""
+    """
+    Evaluates a single persona with bounded concurrency and fallback, in two AI calls:
+      1. price limits: the concept without its price -> too_cheap / cheap / expensive / too_expensive
+      2. purchase: same conversation, price revealed -> buy %, sentiment, quote, objection
+    If either call fails, the persona falls back to the rule-based evaluation.
+    """
     if use_mock or client is None:
         return evaluate_persona_rule_based(persona, concept, rag_chunks)
 
-    prompt = build_persona_prompt(persona, concept, rag_chunks)
-    messages = [
+    messages: List[Dict[str, str]] = [
         {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": prompt},
+        {"role": "user", "content": build_price_limits_prompt(persona, concept, rag_chunks)},
     ]
 
     async with sem:
         try:
-            # Attempt structured output via json_schema
-            try:
-                response = await client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=messages,
-                    response_format={
-                        "type": "json_schema",
-                        "json_schema": {
-                            "name": "persona_evaluation",
-                            "strict": True,
-                            "schema": PERSONA_EVALUATION_SCHEMA,
-                        },
-                    },
-                    temperature=0.7,
-                )
-            except Exception as schema_err:
-                logger.debug(f"json_schema mode failed ({schema_err}); trying json_object.")
-                response = await client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=messages,
-                    response_format={"type": "json_object"},
-                    temperature=0.7,
-                )
-
-            raw_text = response.choices[0].message.content or ""
-            # Strip potential fences
-            raw_text = raw_text.strip()
-            if raw_text.startswith("```"):
-                raw_text = re.sub(r"^```(?:json)?\s*|\s*```$", "", raw_text)
-
-            data = json.loads(raw_text)
-
-            # Monotonicity repair on price thresholds
+            # Part 1: price limits, before the seller's price is shown
+            limits = await _ask_json(client, model, messages, "persona_price_limits", PRICE_LIMITS_SCHEMA)
             tc, c, exp, te = repair_price_monotonicity(
-                data.get("too_cheap", 1.0),
-                data.get("cheap", 2.0),
-                data.get("expensive", 4.0),
-                data.get("too_expensive", 6.0),
+                limits.get("too_cheap", 1.0),
+                limits.get("cheap", 2.0),
+                limits.get("expensive", 4.0),
+                limits.get("too_expensive", 6.0),
             )
 
-            return PersonaEvaluationOutput(
+            # Part 2: reveal the price; the persona's own (repaired) part 1 answer stays in the conversation.
+            # A new list, so the part 1 request is left exactly as it was sent.
+            part2_messages = messages + [
+                {
+                    "role": "assistant",
+                    "content": json.dumps({
+                        "persona_id": persona.persona_id,
+                        "too_cheap": tc, "cheap": c, "expensive": exp, "too_expensive": te,
+                    }),
+                },
+                {"role": "user", "content": build_purchase_prompt(persona, concept)},
+            ]
+            decision = await _ask_json(client, model, part2_messages, "persona_purchase", PURCHASE_SCHEMA)
+
+            result = PersonaEvaluationOutput(
                 persona_id=persona.persona_id,
-                buy_probability_pct=data.get("buy_probability_pct", 50),
+                buy_probability_pct=decision.get("buy_probability_pct", 50),
                 too_cheap=tc,
                 cheap=c,
                 expensive=exp,
                 too_expensive=te,
-                sentiment_label=data.get("sentiment_label", "Neutral"),
-                in_character_quote=str(data.get("in_character_quote", "")),
-                primary_objection=str(data.get("primary_objection", "None"))[:120],
+                sentiment_label=decision.get("sentiment_label", "Neutral"),
+                in_character_quote=str(decision.get("in_character_quote", "")),
+                primary_objection=str(decision.get("primary_objection", "None"))[:120],
             )
+            result._used_ai = True
+            return result
         except Exception as exc:
             logger.warning(
                 f"LLM evaluation failed for persona {persona.persona_id} ({exc}); using rule-based fallback."
@@ -570,17 +620,20 @@ async def run_persona_evaluations(
         return []
 
     client = None
+    model: Optional[str] = None
     if not use_mock:
-        api_key = get_openai_api_key()
-        if api_key:
+        settings = get_llm_settings()
+        if settings:
             try:
                 from openai import AsyncOpenAI
-                client = AsyncOpenAI(api_key=api_key)
+                client = AsyncOpenAI(**settings.client_kwargs())
+                model = settings.model
+                logger.info(f"Persona engine: provider={settings.provider}, model={settings.model}")
             except Exception as e:
                 logger.warning(f"Could not initialize AsyncOpenAI: {e}; falling back to mock.")
                 client = None
         else:
-            logger.info("No OpenAI API key found; running deterministic evaluation engine.")
+            logger.info(f"Persona engine: {describe_missing_provider()}; running deterministic evaluation engine.")
 
     sem = asyncio.Semaphore(concurrency)
     tasks = [
@@ -591,6 +644,7 @@ async def run_persona_evaluations(
             concept=concept,
             rag_chunks=rag_chunks,
             use_mock=use_mock,
+            model=model,
         )
         for p in personas
     ]

@@ -1,5 +1,5 @@
 import React from "react";
-import { formatSGD } from "@/lib/utils";
+import { formatIncomeBand, formatSGD } from "@/lib/utils";
 import { RepresentativePersona } from "@/types/api";
 import { MessageSquareQuote, DollarSign, Wallet, Building2, AlertCircle } from "lucide-react";
 
@@ -96,7 +96,7 @@ export function PersonaMessage({
         </div>
       </div>
 
-      {/* Singlish Reaction Quote Bubble */}
+      {/* Reaction Quote Bubble */}
       <div className="mt-4 relative rounded-xl bg-[#fafbf8] p-3.5 text-xs sm:text-[13px] text-[#263c35] italic border-l-2 border-[#b7cda5]">
         <MessageSquareQuote className="h-4 w-4 inline mr-1 text-[#b7cda5] not-italic" />
         "{persona.quote}"
@@ -120,10 +120,8 @@ export function PersonaMessage({
         </div>
         <div className="flex items-center gap-1">
           <Wallet className="h-3 w-3 text-[#748078]/70" />
-          <span className="truncate">
-            {persona.monthly_income_sgd > 0
-              ? `${formatSGD(persona.monthly_income_sgd)}/mo`
-              : "Dependent"}
+          <span className="truncate" title={`Household income from work: ${formatIncomeBand(persona)} per month`}>
+            {formatIncomeBand(persona, true)}/mo
           </span>
         </div>
         <div className="flex items-center gap-1">

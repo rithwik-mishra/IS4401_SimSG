@@ -1,16 +1,23 @@
 """
-SimSG - clean the seven source workbooks into tidy CSV tables.
+SimSG - clean the source tables into tidy CSV tables.
 
-Put this file in the project folder, next to data/, then run:
-    python clean_data.py
+Run from backend/:
+    python pipeline/clean_data.py
 
-Folder layout:
-    data/raw/         original downloads (not used by this script)
-    data/cleaned/     the seven Cleaned_*.xlsx workbooks  -> read, never modified
-    data/processed/   tidy CSV tables                     -> written by this script
-    data/checks/      cleaning_report.txt, published_area_totals.csv
+Folder layout (under data/sheets/):
+    raw/         original downloads. Two of them are read directly, since SingStat / MOM already
+                 publish them as machine-readable CSV (no hand-tidied copy needed):
+                   2025_Resident_LabourForce_AgeGroup_Gender.csv    resident labour force 2025, by age x sex
+                                                                    (x marital status x ethnic group; Totals used)
+                   Resident65Plus_LivingArrangement_AgeGroup.csv    residents 65+ by living arrangement x age group
+                                                                    (annual series; 2025 column used)
+    cleaned/     the seven Cleaned_*.xlsx workbooks  -> read, never modified
+    processed/   tidy CSV tables                     -> written by this script
+    checks/      cleaning_report.txt, published_area_totals.csv
 
 Every output table is in long format: one row per combination, one count column.
+The two senior tables (labour force rate, living arrangement) are national, not by area,
+so pipeline/fit.py does not use them; the sampler reads them directly.
 """
 
 import re
@@ -21,8 +28,16 @@ import pandas as pd
 BACKEND = Path(__file__).resolve().parents[1]
 DATA = BACKEND / "data" / "sheets"
 RAW = DATA / "cleaned"
+DOWNLOADS = DATA / "raw"  # original downloads; the two CSVs below are read straight from here
 CLEAN = DATA / "processed"
 CHECKS = DATA / "checks"
+
+RAW_CSV_FILES = {
+    "labour_force": "2025_Resident_LabourForce_AgeGroup_Gender.csv",
+    "living": "Resident65Plus_LivingArrangement_AgeGroup.csv",
+}
+LIVING_YEAR = "2025"
+LABOUR_FORCE_TOP_AGE = 70  # the labour force table's oldest group is "70 & Over"
 
 FILES = {
     "ethnic": "Cleaned_2025_Resident_Area_EthnicGroup_Gender.xlsx",
@@ -241,6 +256,119 @@ def clean_size():
 
 
 # ---------------------------------------------------------------------------
+# 8. Residents: labour force rate by age group x sex (national, 2025)
+# ---------------------------------------------------------------------------
+
+def national_population_age_sex():
+    """National residents by age group x sex: the 'Total' row of the age workbook (dropped from the area tables)."""
+    parts = []
+    for tab, sex in [("Males", "Male"), ("Females", "Female")]:
+        df = read("age", tab)
+        df = df.rename(columns={df.columns[0]: "area"})
+        total = df[df["area"].astype(str).str.strip() == "Total"].drop(columns=["area", "Total"])
+        long = total.melt(var_name="age_raw", value_name="population")
+        long["sex"] = sex
+        parts.append(long)
+    out = pd.concat(parts, ignore_index=True)
+    out[["age_group", "age_lo"]] = out["age_raw"].apply(lambda x: pd.Series(age_group(x)))
+    out["population"] = to_number(out["population"])
+    return out[["age_group", "age_lo", "sex", "population"]]
+
+
+def clean_labour_force():
+    """
+    Resident labour force (working or looking for work) by age group x sex, divided by the national
+    population of the same age and sex. The 'Total' ethnic group and 'Total' marital status columns
+    are used. Population ages 70+ are summed to match the labour force table's '70 & Over' group.
+    The two tables come from different surveys, so a few prime-age rates exceed 100% (see checks);
+    the sampler only uses ages 60 and over.
+    """
+    raw = pd.read_csv(DOWNLOADS / RAW_CSV_FILES["labour_force"], header=None, dtype=str)
+    header = [str(raw.iloc[r, c]).strip() for r, c in [(0, 1), (1, 1), (2, 1), (2, 2), (2, 3)]]
+    if header != ["Total", "Total", "Total", "Males", "Females"]:
+        raise ValueError(f"Unexpected labour force header (columns 1-3 should be Total/Total/Total,Males,Females): {header}")
+
+    body = raw.iloc[3:, :4].dropna(subset=[0])
+    body.columns = ["age_raw", "total", "Male", "Female"]
+    body["age_raw"] = body["age_raw"].str.strip()
+    body = body[body["age_raw"] != "Total"]
+    lf = body.melt(id_vars="age_raw", value_vars=["Male", "Female"], var_name="sex", value_name="labour_force")
+    lf[["age_group", "age_lo"]] = lf["age_raw"].apply(lambda x: pd.Series(age_group(x)))
+    lf["labour_force"] = to_number(lf["labour_force"].str.replace(",", "", regex=False))
+
+    pop = national_population_age_sex()
+    pop["age_group"] = pop.apply(
+        lambda r: f"{LABOUR_FORCE_TOP_AGE}+" if r["age_lo"] >= LABOUR_FORCE_TOP_AGE else r["age_group"], axis=1)
+    pop["age_lo"] = pop["age_lo"].clip(upper=LABOUR_FORCE_TOP_AGE)
+    pop = pop.groupby(["age_group", "age_lo", "sex"], as_index=False)["population"].sum()
+
+    out = lf.merge(pop, on=["age_group", "age_lo", "sex"], how="left")
+    out["rate"] = out["labour_force"] / out["population"]
+    out = out.sort_values(["age_lo", "sex"]).reset_index(drop=True)
+    return out[["age_group", "age_lo", "sex", "labour_force", "population", "rate"]]
+
+
+# ---------------------------------------------------------------------------
+# 9. Residents 65+: living arrangement by age group (national, 2025)
+# ---------------------------------------------------------------------------
+
+LIVING_ARRANGEMENTS = [
+    # (key, label prefix in the source table, wording used in the persona prompt)
+    ("spouse_and_child", "living with spouse & at least one child", "lives with spouse and at least one child"),
+    ("spouse_only", "living with spouse, no children", "lives with spouse, no children in the household"),
+    ("child_no_spouse", "living with children but without spouse", "lives with child(ren), without a spouse"),
+    ("alone", "living in one-person household", "lives alone"),
+    ("domestic_worker_only", "living with only domestic worker", "lives with only a domestic worker"),
+    ("others", "others", "lives with other relatives or others"),
+]
+
+
+def living_key(label):
+    s = str(label).strip().lower()
+    for key, prefix, _ in LIVING_ARRANGEMENTS:
+        if s.startswith(prefix):
+            return key
+    raise ValueError(f"Unknown living arrangement: {label!r}")
+
+
+def living_age_group(label):
+    """'65 - 69 Years' -> ('65-69', 65); '85 Years & Over' -> ('85+', 85)."""
+    return age_group(re.sub(r"(?i)\s*years?\s*", " ", str(label)).strip())
+
+
+def clean_living_arrangement():
+    """
+    Residents aged 65+ in resident households by living arrangement x age group, for LIVING_YEAR.
+    Counts people (not households), so it is not tied to the age of the household head.
+    Group rows (no indent) are the age totals; indented rows are the arrangements within them.
+    """
+    df = pd.read_csv(DOWNLOADS / RAW_CSV_FILES["living"], dtype=str)
+    if LIVING_YEAR not in df.columns:
+        raise ValueError(f"Column {LIVING_YEAR} not found in {RAW_CSV_FILES['living']}")
+    rows, published, current = [], {}, None
+    for label, value in zip(df.iloc[:, 0], df[LIVING_YEAR]):
+        if pd.isna(label):
+            continue
+        is_group = not str(label).startswith(" ")
+        count = float(str(value).replace(",", ""))
+        if is_group:
+            current = None if str(label).strip() == "Total" else living_age_group(label)
+            if current:
+                published[current[0]] = count
+            continue
+        if current is None:
+            continue  # arrangements of the all-ages 'Total' group
+        rows.append({"age_group": current[0], "age_lo": current[1], "arrangement": living_key(label),
+                     "residents": count})
+    out = pd.DataFrame(rows)
+    texts = {key: text for key, _, text in LIVING_ARRANGEMENTS}
+    out["arrangement_text"] = out["arrangement"].map(texts)
+    out["share"] = out["residents"] / out.groupby("age_group")["residents"].transform("sum")
+    out = out.sort_values(["age_lo", "arrangement"]).reset_index(drop=True)
+    return out[["age_group", "age_lo", "arrangement", "arrangement_text", "residents", "share"]], published
+
+
+# ---------------------------------------------------------------------------
 # Checks
 # ---------------------------------------------------------------------------
 
@@ -305,12 +433,42 @@ def run_checks(t, published_income, published_dwelling):
     return all(results)
 
 
+def run_senior_checks(lf, living, living_published):
+    """Checks for the two national senior tables (labour force rate, living arrangement)."""
+    results = []
+    results.append(check("Labour force table has 12 age groups x 2 sexes, no missing values",
+                         len(lf) == 24 and not lf[["labour_force", "population", "rate"]].isna().any().any(),
+                         f"{len(lf)} rows"))
+    nat = national_population_age_sex()
+    aged_15_plus = nat.query("age_lo >= 15")["population"].sum()
+    results.append(check("Population used for the rates = all residents aged 15+ (age workbook 'Total' row)",
+                         abs(aged_15_plus - lf["population"].sum()) < 1, f"{int(aged_15_plus):,} residents aged 15+"))
+    senior = lf[lf["age_lo"] >= 60]
+    results.append(check("Labour force rates for ages 60+ (the ones the sampler uses) are between 0% and 100%",
+                         bool(((senior["rate"] >= 0) & (senior["rate"] <= 1)).all()),
+                         ", ".join(f"{r.age_group} {r.sex[0]} {r.rate:.1%}" for r in senior.itertuples())))
+    over = lf[lf["rate"] > 1]
+    log(f"[INFO] Labour force rates above 100% (labour force and population tables come from different "
+        f"surveys; not used by the sampler): "
+        + (", ".join(f"{r.age_group} {r.sex} {r.rate:.1%}" for r in over.itertuples()) or "none"))
+
+    sums = living.groupby("age_group")["residents"].sum()
+    gaps = {g: abs(sums[g] - living_published[g]) for g in living_published}
+    results.append(check("Living arrangements add up to each published age-group total (rounding <= 300)",
+                         set(sums.index) == set(living_published) and max(gaps.values()) <= 300,
+                         f"max gap {max(gaps.values()):.0f}"))
+    results.append(check("Living arrangement table has 5 age groups x 6 arrangements, shares sum to 1",
+                         len(living) == 30 and bool((living.groupby("age_group")["share"].sum().sub(1).abs() < 1e-9).all())))
+    return all(results)
+
+
 # ---------------------------------------------------------------------------
 
 def main():
-    missing = [f for f in FILES.values() if not (RAW / f).exists()]
+    missing = [str(RAW / f) for f in FILES.values() if not (RAW / f).exists()]
+    missing += [str(DOWNLOADS / f) for f in RAW_CSV_FILES.values() if not (DOWNLOADS / f).exists()]
     if missing:
-        raise SystemExit(f"Not found in {RAW}:\n  " + "\n  ".join(missing))
+        raise SystemExit("Not found:\n  " + "\n  ".join(missing))
     CLEAN.mkdir(parents=True, exist_ok=True)
     CHECKS.mkdir(parents=True, exist_ok=True)
 
@@ -322,6 +480,8 @@ def main():
     tables["area_dwelling"], published_dwelling = clean_area_dwelling()
     tables["spend"] = clean_spend()
     tables["size"] = clean_size()
+    tables["labour_force"] = clean_labour_force()
+    tables["living"], living_published = clean_living_arrangement()
 
     names = {
         "ethnic": "resident_area_sex_ethnic.csv",
@@ -331,6 +491,8 @@ def main():
         "area_dwelling": "household_area_dwelling.csv",
         "spend": "spend_per_member_dwelling.csv",
         "size": "household_dwelling_size.csv",
+        "labour_force": "labour_force_rate_age_sex.csv",
+        "living": "senior_living_arrangement_age.csv",
     }
     for k, df in tables.items():
         df.to_csv(CLEAN / names[k], index=False)
@@ -354,6 +516,7 @@ def main():
 
     log("")
     ok = run_checks(tables, published_income, published_dwelling)
+    ok = run_senior_checks(tables["labour_force"], tables["living"], living_published) and ok
     log("")
     log("ALL CHECKS PASSED" if ok else "SOME CHECKS FAILED - fix before building the fit")
     (CHECKS / "cleaning_report.txt").write_text("\n".join(report_lines), encoding="utf-8")

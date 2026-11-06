@@ -9,15 +9,15 @@ const generateSample30Personas = (): RepresentativePersona[] => {
     { cohort: 'Affluent Private Property', dwelling: 'condo', income: 16800, budget: 52.0, ageBase: 35 },
   ];
 
-  const singlishQuotes = [
-    "Wah, artisanal kopi sounds shiok! But must see if the taste worth the price lah.",
-    "A bit steep for everyday drink, maybe once a week treat with colleagues can consider.",
-    "Hope got CDC voucher discount, then easier to support regularly.",
-    "Specialty cold brew is nice, but hawker kopi-c still my comfort morning drink.",
-    "If the coffee bean roast profile is really single-origin specialty grade, I am willing to pay.",
-    "Toast set bundle at reasonable price will definitely attract our family on weekends.",
-    "Very aesthetic place for studying or catch up, but hope the portion is substantial.",
-    "Must compare with my neighborhood kopitiam first lah, coffeeshop only S$1.50.",
+  const sampleQuotes = [
+    "Artisanal kopi sounds appealing, but I need to see if the taste is worth the price.",
+    "It is a bit steep for an everyday drink; I might consider it as a weekly treat with colleagues.",
+    "If it accepted CDC vouchers, it would be easier to visit regularly.",
+    "Specialty cold brew is nice, but hawker kopi is still my usual morning drink.",
+    "If the beans are genuinely single-origin specialty grade, I am willing to pay.",
+    "A toast set bundle at a reasonable price would attract our family on weekends.",
+    "It looks like a pleasant place to study or meet friends, but I hope the portions are substantial.",
+    "I would compare it with my neighbourhood coffeeshop first, where kopi is only S$1.50.",
   ];
 
   const objections = [
@@ -54,7 +54,7 @@ const generateSample30Personas = (): RepresentativePersona[] => {
       sentiment,
       price_ceiling_sgd: isAffluent ? 8.5 : isSenior ? 4.5 : 6.5,
       primary_objection: objections[i % objections.length],
-      quote: singlishQuotes[i % singlishQuotes.length],
+      quote: sampleQuotes[i % sampleQuotes.length],
       too_cheap: isAffluent ? 2.5 : 1.0,
       cheap: isAffluent ? 4.5 : 3.0,
       expensive: isAffluent ? 8.0 : 6.0,
@@ -75,9 +75,9 @@ export const SAMPLE_SIMULATION_RESULT: SimulateResponse = {
         theme: 'Price Sensitivity',
         frequency_pct: 60,
         representative_quotes: [
-          '希望有CDC优惠，才比较容易常来消费。',
-          'Price too high for daily kopi, need to save for other expenses.',
-          'Must see if can afford lah! Daily coffee at $7 is too steep.',
+          'If CDC vouchers were accepted, I would be more likely to visit often.',
+          'The price is too high for daily kopi; I need to save for other expenses.',
+          'I am not sure I can afford it. Daily coffee at $7 is too steep.',
         ],
       },
       {
@@ -86,15 +86,15 @@ export const SAMPLE_SIMULATION_RESULT: SimulateResponse = {
         representative_quotes: [
           'Will the taste justify the price compared to regular hawker kopi?',
           'Just hope the quality matches the premium price point.',
-          'Not sure if the specialty cold brew can beat traditional socks brew.',
+          'I am not sure the specialty cold brew can beat traditional sock-brewed kopi.',
         ],
       },
       {
         theme: 'Habit & Routine',
         frequency_pct: 10,
         representative_quotes: [
-          'Prefer my usual kopitiam uncle who knows my order: kopi-c gao siu dai.',
-          'Wah, artisanal kopi sounds shiok! But only for weekend treat lah.',
+          'I prefer my usual coffeeshop, where the stall owner already knows my order.',
+          'Artisanal kopi sounds appealing, but only as a weekend treat.',
         ],
       },
     ],

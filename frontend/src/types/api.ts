@@ -34,6 +34,12 @@ export interface RepresentativePersona {
   gender: 'Female' | 'Male' | string;
   dwelling_type: string;
   monthly_income_sgd: number;
+  /** Census household income-from-work band, e.g. "S$7,000 to S$7,999" (shown instead of the exact amount) */
+  income_bracket?: string | null;
+  /** Ages 60+ only: in the labour force (working or looking for work); null/absent under 60 */
+  in_labour_force?: boolean | null;
+  /** Ages 65+ only: living arrangement wording, e.g. "lives alone"; null/absent under 65 */
+  living_arrangement?: string | null;
   daily_dining_budget_sgd: number;
   buy_probability_pct: number;
   sentiment: 'Positive' | 'Neutral' | 'Negative' | string;
@@ -82,9 +88,20 @@ export interface EconometricAnalysisResult {
   cohort_breakdown: CohortBreakdown[];
 }
 
+/** Which pipeline steps the AI answered in a run, and which used the rule-based backup. */
+export interface AIUsage {
+  pitch_reader: 'ai' | 'backup';
+  persona_ai: number;
+  persona_backup: number;
+  report_writer: 'ai' | 'backup';
+}
+
 export interface SimulateResponse {
   recommendations: MacroSynthesisReport;
   personas: RepresentativePersona[];
   statistics: EconometricAnalysisResult;
+  // Seed the backend used to draw personas; absent on the built-in sample result.
+  seed?: number | null;
+  ai_usage?: AIUsage | null;
 }
 

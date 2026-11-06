@@ -17,3 +17,14 @@ from app.main import app
 def client():
     with TestClient(app) as test_client:
         yield test_client
+
+
+@pytest.fixture(autouse=True)
+def no_real_ai(monkeypatch):
+    """
+    Every test starts with no API keys and SIMSG_PROVIDER=openai, whatever backend/.env says,
+    so the suite never calls a real AI. Tests that need the AI path set a fake key and fake clients.
+    """
+    for var in ("OPEN_API_KEY", "OPENAI_API_KEY", "SOCLAAS_API_KEY"):
+        monkeypatch.delenv(var, raising=False)
+    monkeypatch.setenv("SIMSG_PROVIDER", "openai")

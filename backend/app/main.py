@@ -32,8 +32,7 @@ logger = logging.getLogger("simsg")
 async def lifespan(app: FastAPI):
     """
     Lifespan context manager: Pre-warms the SimulationContextService
-    on application startup to cache Layer 1 demographics, HES data,
-    and the ChromaDB persistent client connection.
+    on application startup to open the ChromaDB persistent client connection.
     """
     logger.info("Initializing SimSG services on startup...")
     try:
@@ -86,7 +85,10 @@ app.add_middleware(
 # Full End-to-End Simulation Pipeline (POST /api/simulate and /simulate)
 app.include_router(simulate.router)
 
+# Planning-area lookup (GET /api/simulation/areas). The older /simulation/preview and /run
+# routes (respondent.py pipeline) are kept unregistered in app/legacy/simulation_routes.py.
 # Aliases for reverse proxies that might strip /api prefix
+
 app.add_api_route(
     "/simulate",
     simulate.simulate,
@@ -101,11 +103,9 @@ app.add_api_route(
     include_in_schema=False,
 )
 
-# Granular Simulation Engine Endpoints (/api/v1/simulation/*)
-app.include_router(simulation.router, prefix="/api/v1")
 app.include_router(simulation.router, prefix="/api")
 
-# Testing & Diagnostics module (Layer 1 Seed, HES benchmarks, ChromaDB checks)
+# Testing & Diagnostics module (census sampler areas, ChromaDB checks)
 app.include_router(test_simulation.router)
 
 
@@ -118,9 +118,9 @@ def root():
         "docs_url": "/docs",
         "routes": {
             "simulate": "/api/simulate",
-            "simulation_preview": "/api/v1/simulation/preview",
-            "simulation_run": "/api/v1/simulation/run",
-            "simulation_areas": "/api/v1/simulation/areas",
+            "simulate_preview": "/api/simulate/preview",
+            "ai_status": "/api/ai-status",
+            "simulation_areas": "/api/simulation/areas",
             "diagnostics": "/api/test/diagnostics",
             "simulation_context_get": "/api/test/simulation-context?planning_area=Ang Mo Kio&user_pitch=S$7 specialty coffee",
             "simulation_context_post": "/api/test/simulation-context",

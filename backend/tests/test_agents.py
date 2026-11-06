@@ -7,7 +7,10 @@ Unit & Integration Tests for SimSG Agent Modules:
 """
 
 import asyncio
+import json
+import re
 import pytest
+from types import SimpleNamespace
 from typing import List
 
 try:
@@ -17,9 +20,15 @@ try:
         MacroSynthesisReport,
     )
     from app.agents.execution_engine import (
+        SYSTEM_PROMPT,
+        evaluate_persona_rule_based,
         repair_price_monotonicity,
         run_persona_evaluations,
-        build_persona_prompt,
+        build_price_limits_prompt,
+        build_purchase_prompt,
+        hide_prices,
+        PRICE_HIDDEN,
+        _evaluate_single_persona,
         format_rag_context,
     )
     from app.agents.synthesis_agent import (
@@ -27,7 +36,7 @@ try:
         generate_macro_synthesis_rule_based,
         build_synthesis_prompt,
     )
-    from app.services.sampler import sample_synthetic_cohort, SyntheticPersona
+    from app.services.sampler import sample_synthetic_cohort, SyntheticPersona, average_daily_eating_out_sgd
     from app.services.query_decomposer import decompose_query_rule_based, DecomposedConcept
     from app.services.econometrics import run_econometric_analysis, EconometricAnalysisResult
 except ImportError:
@@ -37,9 +46,15 @@ except ImportError:
         MacroSynthesisReport,
     )
     from backend.app.agents.execution_engine import (
+        SYSTEM_PROMPT,
+        evaluate_persona_rule_based,
         repair_price_monotonicity,
         run_persona_evaluations,
-        build_persona_prompt,
+        build_price_limits_prompt,
+        build_purchase_prompt,
+        hide_prices,
+        PRICE_HIDDEN,
+        _evaluate_single_persona,
         format_rag_context,
     )
     from backend.app.agents.synthesis_agent import (
@@ -47,7 +62,7 @@ except ImportError:
         generate_macro_synthesis_rule_based,
         build_synthesis_prompt,
     )
-    from backend.app.services.sampler import sample_synthetic_cohort, SyntheticPersona
+    from backend.app.services.sampler import sample_synthetic_cohort, SyntheticPersona, average_daily_eating_out_sgd
     from backend.app.services.query_decomposer import decompose_query_rule_based, DecomposedConcept
     from backend.app.services.econometrics import run_econometric_analysis, EconometricAnalysisResult
 
@@ -142,7 +157,7 @@ def test_persona_evaluation_output_negative_clamping():
 # ===========================================================================
 
 def test_build_persona_prompt_contains_all_demographics():
-    """Verify the generated prompt includes demographic attributes, budget, and baselines."""
+    """Verify the generated prompt includes demographic attributes, budget, concept and RAG context."""
     cohort = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=123)
     p = cohort[0]
     concept = decompose_query_rule_based("Artisanal Cold Brew Coffee for $6.50 in Ang Mo Kio")
@@ -152,25 +167,273 @@ def test_build_persona_prompt_contains_all_demographics():
         {"category": "competitors_and_supply", "text": "Yakun and Toast Box operate at AMK Hub."},
     ]
 
-    prompt = build_persona_prompt(p, concept, rag_chunks)
+    prompt = build_price_limits_prompt(p, concept, rag_chunks)
 
     # Demographic checks
     assert str(p.age) in prompt
     assert p.dwelling_type in prompt
-    assert p.archetype in prompt
+    # The archetype is an internal label (it would imply a job or children); the AI gets the census facts only
+    assert "Consumer Archetype" not in prompt
+    assert p.archetype not in prompt
     assert f"S${p.daily_dining_budget_sgd:.2f}" in prompt
-    assert f"S${p.hawker_baseline_kopi_sgd:.2f}" in prompt
-    assert f"S${p.cafe_baseline_coffee_sgd:.2f}" in prompt
-    assert p.linguistic_style in prompt
+    # Fixed kopi/cafe reference prices were dropped (unsourced); local prices come from the RAG context
+    # (checked by wording, not numbers: this pitch's own price S$6.50 equals the old cafe reference)
+    assert "Reference Baselines" not in prompt
+    assert "Traditional Hawker Kopi" not in prompt
+    assert "Specialty Cafe Coffee" not in prompt
+    # Speaking style was dropped (no research basis); the prompt must not carry it
+    assert "Linguistic Style" not in prompt
+    # Census budget is an HES average for the home type, labelled so the AI does not treat it as a cap
+    assert p.age_bracket in prompt
+    # Income: the census band only (the exact drawn amount is not shown), labelled as income from work
+    assert f"Monthly Household Income from Work: {p.income_bracket}" in prompt
+    assert f"S${p.monthly_household_income_sgd:,.0f}" not in prompt
+    assert "excludes pensions, CPF payouts" in prompt
+    assert "Typical Eating-Out Spend" in prompt
+    assert "not your personal limit" in prompt
+    assert "Daily Dining Budget" not in prompt
 
-    # Concept checks
-    assert concept.concept_name in prompt
-    assert "S$6.50" in prompt
+    # Concept checks: part 1 hides the seller's price everywhere, including inside the pitch text
+    assert hide_prices(concept.concept_name) in prompt
     assert "Ang Mo Kio" in prompt
+    assert "6.50" not in prompt
+    assert "Candidate Price" not in prompt
+    assert PRICE_HIDDEN in prompt
+    assert "too_expensive" in prompt
+    assert "buy_probability_pct" not in prompt
 
-    # RAG checks
+    # RAG checks: local prices stay, they are reference points rather than the seller's price
     assert "pricing_benchmarks" in prompt.lower() or "pricing norms" in prompt.lower()
     assert "Hawker kopi ranges from $1.20" in prompt
+
+
+def test_senior_lines_in_prompt_only_for_their_ages():
+    """60+ get a 'Work:' line; 65+ also get 'Living arrangement:'; under 60 the profile is unchanged."""
+    concept = decompose_query_rule_based("S$7 kopi bar in Ang Mo Kio")
+    cohort = sample_synthetic_cohort("Ang Mo Kio", n=300, seed=5)
+    seen = set()
+    for p in cohort:
+        prompt = build_price_limits_prompt(p, concept, rag_chunks=None)
+        # line starts only ("Monthly Household Income from Work:" also contains "Work:")
+        assert ("\nWork:" in prompt) == (p.age >= 60)
+        assert ("\nLiving arrangement:" in prompt) == (p.age >= 65)
+        if p.in_labour_force is True:
+            assert "Work: in the labour force (working or looking for work)" in prompt
+            seen.add("working")
+        if p.in_labour_force is False:
+            assert "Work: not in the labour force" in prompt
+            seen.add("not working")
+        if p.living_arrangement == "alone":
+            assert "Living arrangement: lives alone" in prompt
+            seen.add("alone")
+    assert {"working", "not working", "alone"} <= seen
+
+
+def test_purchase_prompt_reveals_price_and_asks_decision_only():
+    p = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=123)[0]
+    concept = decompose_query_rule_based("Artisanal Cold Brew Coffee for $6.50 in Ang Mo Kio")
+    prompt = build_purchase_prompt(p, concept)
+    assert "S$6.50" in prompt
+    assert p.persona_id in prompt
+    for field in ("buy_probability_pct", "sentiment_label", "in_character_quote", "primary_objection"):
+        assert field in prompt
+    for field in ("too_cheap", "`cheap`", "`expensive`", "too_expensive"):
+        assert field not in prompt
+
+
+@pytest.mark.parametrize(
+    "pitch",
+    [
+        "S$7 artisanal single-origin kopi bar in Ang Mo Kio with specialty cold brew and toast sets",
+        "Cold brew kiosk in Tampines for $6.50",
+        "Tonkotsu ramen in Jurong East for SGD 12.50",
+        "Bubble tea at 4.5 dollars in Outram",
+    ],
+)
+def test_price_limits_prompt_never_shows_the_pitch_price(pitch):
+    p = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=1)[0]
+    concept = decompose_query_rule_based(pitch)
+    prompt = build_price_limits_prompt(p, concept, rag_chunks=None)
+    price = concept.candidate_price_sgd
+    for shown in (f"{price:.2f}", f"{price:g}"):
+        amount = re.escape(shown) + r"(?![\d])"
+        assert not re.search(r"\$" + amount, prompt), shown
+        assert not re.search(amount + r"\s*dollars", prompt), shown
+        assert not re.search(r"SGD\s*" + amount, prompt), shown
+
+
+class _TwoPartFakeClient:
+    """Fake AsyncOpenAI: answers part 1 with price limits and part 2 with a decision, recording each call."""
+
+    def __init__(self):
+        self.calls = []
+
+        async def create(**kwargs):
+            self.calls.append(kwargs["messages"])
+            if len(kwargs["messages"]) == 2:
+                content = {"persona_id": "x", "too_cheap": 2.0, "cheap": 3.5, "expensive": 6.0, "too_expensive": 8.0}
+            else:
+                content = {"persona_id": "x", "buy_probability_pct": 35, "sentiment_label": "Neutral",
+                           "in_character_quote": "Maybe once in a while.", "primary_objection": "Price"}
+            msg = SimpleNamespace(content=json.dumps(content))
+            return SimpleNamespace(choices=[SimpleNamespace(message=msg)])
+
+        self.chat = SimpleNamespace(completions=SimpleNamespace(create=create))
+
+
+def test_two_part_interview_asks_limits_before_revealing_price():
+    persona = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=5)[0]
+    concept = decompose_query_rule_based("S$7 artisanal kopi bar in Ang Mo Kio")
+    fake = _TwoPartFakeClient()
+    result = asyncio.run(_evaluate_single_persona(
+        asyncio.Semaphore(1), fake, persona, concept, rag_chunks=None, use_mock=False, model="m"))
+
+    assert len(fake.calls) == 2
+    part1, part2 = fake.calls
+    # Part 1: system + price-hidden prompt only
+    assert [m["role"] for m in part1] == ["system", "user"]
+    assert not re.search(r"\$7(?:\.00)?(?![\d.,])", part1[1]["content"])
+    # Part 2: same conversation, with the persona's own part 1 answer, then the price
+    assert [m["role"] for m in part2] == ["system", "user", "assistant", "user"]
+    assert json.loads(part2[2]["content"])["expensive"] == 6.0
+    assert "S$7.00" in part2[3]["content"]
+
+    # Result combines part 1 limits and part 2 decision
+    assert (result.too_cheap, result.cheap, result.expensive, result.too_expensive) == (2.0, 3.5, 6.0, 8.0)
+    assert result.buy_probability_pct == 35
+    assert result.in_character_quote == "Maybe once in a while."
+
+
+@pytest.mark.parametrize("fail_on_call", [1, 2])
+def test_two_part_interview_falls_back_when_a_part_fails(fail_on_call):
+    """json_schema and json_object both fail on that call -> the persona uses the rule-based answer."""
+    persona = sample_synthetic_cohort("Ang Mo Kio", n=1, seed=5)[0]
+    concept = decompose_query_rule_based("S$7 artisanal kopi bar in Ang Mo Kio")
+
+    class AlwaysFailFrom(_TwoPartFakeClient):
+        def __init__(self):
+            super().__init__()
+            inner = self.chat.completions.create
+
+            async def create(**kwargs):
+                if len(self.calls) + 1 >= fail_on_call:
+                    self.calls.append(kwargs["messages"])
+                    raise RuntimeError("simulated AI failure")
+                return await inner(**kwargs)
+
+            self.chat = SimpleNamespace(completions=SimpleNamespace(create=create))
+
+    result = asyncio.run(_evaluate_single_persona(
+        asyncio.Semaphore(1), AlwaysFailFrom(), persona, concept, rag_chunks=None, use_mock=False, model="m"))
+    assert result == evaluate_persona_rule_based(persona, concept)
+
+
+# Ground rules taken from respondent.py, which the persona AI must always be told
+PROMPT_GROUND_RULES = [
+    "most real people say no to most new products",
+    "say you would not buy",
+    "Do not invent other facts about yourself",
+    "for the whole household, combined, not just you",
+]
+
+# Singlish markers that must not appear now that quotes are standard English
+SINGLISH = re.compile(r"\b(lah|lor|leh|wah|shiok|siao|okay-lah|kopitiam|steady)\b", re.IGNORECASE)
+
+
+@pytest.mark.parametrize("rule", PROMPT_GROUND_RULES)
+def test_system_prompt_contains_ground_rule(rule):
+    assert rule in SYSTEM_PROMPT
+
+
+def test_system_prompt_explains_income_is_from_work():
+    assert "income from work" in SYSTEM_PROMPT
+    assert "leaves out pensions, CPF payouts" in SYSTEM_PROMPT
+
+
+def test_prompt_for_lowest_band_shows_band_not_tiny_amount():
+    """A household drawn at, say, S$9.82 shows as 'below S$1,000', never as S$10."""
+    concept = decompose_query_rule_based("S$7 kopi bar in Ang Mo Kio")
+    low = next(p for p in sample_synthetic_cohort("Ang Mo Kio", n=300, seed=2) if p.income_bracket == "below S$1,000")
+    prompt = build_price_limits_prompt(low, concept, rag_chunks=None)
+    assert "Monthly Household Income from Work: below S$1,000" in prompt
+    assert f"S${low.monthly_household_income_sgd:,.0f} " not in prompt
+
+
+def test_system_prompt_has_no_speaking_style():
+    assert "linguistic style" not in SYSTEM_PROMPT.lower()
+
+
+def test_system_prompt_has_no_reference_price_anchors():
+    assert "reference price" not in SYSTEM_PROMPT.lower()
+
+
+def test_system_prompt_treats_eating_out_spend_as_guide_not_cap():
+    assert "daily dining budget" not in SYSTEM_PROMPT.lower()
+    assert "not a hard limit" in SYSTEM_PROMPT
+
+
+def _persona_with(dwelling: str, budget: float, archetype: str = "heartland_family") -> SyntheticPersona:
+    return SyntheticPersona(
+        persona_id="AMK-001", planning_area="Ang Mo Kio", age=40, age_bracket="40-44", gender="Female",
+        dwelling_type=dwelling, monthly_household_income_sgd=8000.0, income_bracket="$8,000 to $8,999",
+        archetype=archetype, daily_dining_budget_sgd=budget,
+    )
+
+
+def test_backup_budget_factor_uses_hes_average():
+    """
+    Backup fair price = base x (home factor x 0.65 + budget factor x 0.35), budget factor = budget / ~S$11.43
+    (the HES average at 2025 prices).
+    4-room (home factor 1.00) heartland family (drinks base S$3.20):
+      budget at the average -> fair price S$3.20, so 'cheap' = 0.75 x 3.20 = S$2.40.
+    """
+    concept = decompose_query_rule_based("Kopi stall in Ang Mo Kio", override_price=3.0)
+    avg = average_daily_eating_out_sgd()
+
+    at_average = evaluate_persona_rule_based(_persona_with("4 room", avg), concept)
+    assert at_average.cheap == pytest.approx(2.40, abs=0.01)
+    assert at_average.too_expensive == pytest.approx(3.20 * 1.80, abs=0.01)
+
+
+def test_backup_budget_changes_fair_price_across_census_range():
+    """
+    With census budgets (S$8.08-15.70 at 2025 prices) the budget still moves the price, instead of all
+    hitting the 0.6 floor. The 2025 price factor cancels out: 8.08 / 11.43 = 7.77 / 10.99 = 0.707.
+    """
+    concept = decompose_query_rule_based("Kopi stall in Ang Mo Kio", override_price=3.0)
+    low = evaluate_persona_rule_based(_persona_with("4 room", 7.77 * 1.04), concept)
+    high = evaluate_persona_rule_based(_persona_with("4 room", 15.10 * 1.04), concept)
+    assert low.cheap < high.cheap
+    # 0.707 -> 3.20 x (0.65 + 0.707 x 0.35) x 0.75 = S$2.15, the same as before the price adjustment
+    assert low.cheap == pytest.approx(2.15, abs=0.01)
+
+
+@pytest.mark.parametrize("price", [1.0, 4.5, 7.0, 25.0])  # covers Positive, Neutral and Negative answers
+def test_backup_quotes_are_standard_english(price):
+    """The no-key backup writes standard English quotes and objections for every persona."""
+    concept = decompose_query_rule_based("Artisanal kopi bar in Ang Mo Kio", override_price=price)
+    personas = sample_synthetic_cohort("Ang Mo Kio", n=60, seed=1)
+
+    for persona in personas:
+        result = evaluate_persona_rule_based(persona, concept)
+        assert not SINGLISH.search(result.in_character_quote), result.in_character_quote
+        assert not SINGLISH.search(result.primary_objection), result.primary_objection
+
+
+def test_simulate_output_has_no_singlish(client):
+    """A full no-key /api/simulate run: quotes, objections and grouped quotes are standard English."""
+    payload = {
+        "raw_query": "S$7 artisanal single-origin kopi bar in Ang Mo Kio with specialty cold brew and toast sets",
+        "override_town": "Ang Mo Kio",
+        "sample_size": 30,
+        "seed": 12345,
+    }
+    data = client.post("/api/simulate", json=payload).json()
+    texts = [p["quote"] for p in data["personas"]] + [p["primary_objection"] for p in data["personas"]]
+    for cluster in data["recommendations"]["clustered_objections"]:
+        texts += cluster["representative_quotes"]
+    for text in texts:
+        assert not SINGLISH.search(text), text
 
 
 # ===========================================================================

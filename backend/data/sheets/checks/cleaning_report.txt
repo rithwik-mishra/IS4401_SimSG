@@ -5,6 +5,8 @@ Wrote data/processed/household_income_dwelling.csv  (126 rows)
 Wrote data/processed/household_area_dwelling.csv  (174 rows)
 Wrote data/processed/spend_per_member_dwelling.csv  (108 rows)
 Wrote data/processed/household_dwelling_size.csv  (36 rows)
+Wrote data/processed/labour_force_rate_age_sex.csv  (24 rows)
+Wrote data/processed/senior_living_arrangement_age.csv  (30 rows)
 Wrote data/checks/published_area_totals.csv  (reference only)
 
 [PASS] Same areas in all four area tables  (29 areas)
@@ -27,5 +29,11 @@ Wrote data/checks/published_area_totals.csv  (reference only)
 [PASS] Published area totals identical in income and dwelling tables
 [INFO] Size table national households: 1,483,400; 29-area dwelling table: 1,467,100 (difference is the dropped 'Others' row + rounding)
 [PASS] Spending table has Food and Beverage Serving Services for all 6 dwellings
+[PASS] Labour force table has 12 age groups x 2 sexes, no missing values  (24 rows)
+[PASS] Population used for the rates = all residents aged 15+ (age workbook 'Total' row)  (3,632,600 residents aged 15+)
+[PASS] Labour force rates for ages 60+ (the ones the sampler uses) are between 0% and 100%  (60-64 F 52.1%, 60-64 M 73.3%, 65-69 F 31.7%, 65-69 M 50.0%, 70+ F 9.7%, 70+ M 19.4%)
+[INFO] Labour force rates above 100% (labour force and population tables come from different surveys; not used by the sampler): 25-29 Female 100.2%, 45-49 Male 100.3%
+[PASS] Living arrangements add up to each published age-group total (rounding <= 300)  (max gap 100)
+[PASS] Living arrangement table has 5 age groups x 6 arrangements, shares sum to 1
 
 ALL CHECKS PASSED

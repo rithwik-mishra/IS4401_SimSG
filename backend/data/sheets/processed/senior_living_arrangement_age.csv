@@ -1,0 +1,31 @@
+age_group,age_lo,arrangement,arrangement_text,residents,share
+65-69,65,alone,lives alone,28800.0,0.10722263588979895
+65-69,65,child_no_spouse,"lives with child(ren), without a spouse",25100.0,0.09344750558451229
+65-69,65,domestic_worker_only,lives with only a domestic worker,2000.0,0.007446016381236039
+65-69,65,others,lives with other relatives or others,18200.0,0.06775874906924795
+65-69,65,spouse_and_child,lives with spouse and at least one child,127700.0,0.47542814594192107
+65-69,65,spouse_only,"lives with spouse, no children in the household",66800.0,0.2486969471332837
+70-74,70,alone,lives alone,25100.0,0.11789572569281352
+70-74,70,child_no_spouse,"lives with child(ren), without a spouse",25300.0,0.11883513386566463
+70-74,70,domestic_worker_only,lives with only a domestic worker,2500.0,0.011742602160638797
+70-74,70,others,lives with other relatives or others,13300.0,0.0624706434945984
+70-74,70,spouse_and_child,lives with spouse and at least one child,74600.0,0.3503992484734617
+70-74,70,spouse_only,"lives with spouse, no children in the household",72100.0,0.33865664631282294
+75-79,75,alone,lives alone,17500.0,0.12052341597796143
+75-79,75,child_no_spouse,"lives with child(ren), without a spouse",21400.0,0.14738292011019283
+75-79,75,domestic_worker_only,lives with only a domestic worker,3800.0,0.026170798898071626
+75-79,75,others,lives with other relatives or others,8900.0,0.06129476584022039
+75-79,75,spouse_and_child,lives with spouse and at least one child,40500.0,0.27892561983471076
+75-79,75,spouse_only,"lives with spouse, no children in the household",53100.0,0.365702479338843
+80-84,80,alone,lives alone,10700.0,0.14738292011019283
+80-84,80,child_no_spouse,"lives with child(ren), without a spouse",17400.0,0.2396694214876033
+80-84,80,domestic_worker_only,lives with only a domestic worker,4100.0,0.05647382920110193
+80-84,80,others,lives with other relatives or others,3400.0,0.046831955922865015
+80-84,80,spouse_and_child,lives with spouse and at least one child,17400.0,0.2396694214876033
+80-84,80,spouse_only,"lives with spouse, no children in the household",19600.0,0.2699724517906336
+85+,85,alone,lives alone,6200.0,0.08946608946608947
+85+,85,child_no_spouse,"lives with child(ren), without a spouse",30700.0,0.443001443001443
+85+,85,domestic_worker_only,lives with only a domestic worker,5900.0,0.08513708513708514
+85+,85,others,lives with other relatives or others,3500.0,0.050505050505050504
+85+,85,spouse_and_child,lives with spouse and at least one child,11900.0,0.1717171717171717
+85+,85,spouse_only,"lives with spouse, no children in the household",11100.0,0.16017316017316016
