@@ -10,11 +10,51 @@ Kept strictly separate from core production routers.
 from __future__ import annotations
 
 import logging
-from typing import Any, Dict, List
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from typing import Any, Dict, List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, status
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
+
+TEST_PASSWORD = "IS4401"
+
+
+def verify_test_password(request: Request) -> str:
+    """
+    Dependency checking for authentication password 'IS4401' via:
+      a) Header X-Test-Password or X-Admin-Password
+      b) Header Authorization: Bearer IS4401
+      c) Query parameter password
+    """
+    provided_password: Optional[str] = None
+
+    # a) Headers: X-Test-Password or X-Admin-Password
+    test_header = request.headers.get("X-Test-Password") or request.headers.get("x-test-password")
+    admin_header = request.headers.get("X-Admin-Password") or request.headers.get("x-admin-password")
+    if test_header and test_header.strip():
+        provided_password = test_header.strip()
+    elif admin_header and admin_header.strip():
+        provided_password = admin_header.strip()
+
+    # b) Header: Authorization: Bearer <password>
+    if not provided_password:
+        auth_header = request.headers.get("Authorization") or request.headers.get("authorization")
+        if auth_header and auth_header.strip().lower().startswith("bearer "):
+            provided_password = auth_header.strip()[7:].strip()
+
+    # c) Query parameter: password
+    if not provided_password:
+        query_pwd = request.query_params.get("password")
+        if query_pwd and query_pwd.strip():
+            provided_password = query_pwd.strip()
+
+    if not provided_password or provided_password != TEST_PASSWORD:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Unauthorized: Access to testing and diagnostic routes requires authentication password 'IS4401'. Provide it via 'X-Test-Password' header or 'password' query parameter.",
+        )
+    return provided_password
+
 
 # Resilient imports (works when imported as app.routers or backend.app.routers)
 try:
@@ -35,6 +75,7 @@ except ImportError:
 router = APIRouter(
     prefix="/api/test",
     tags=["Testing & Diagnostics"],
+    dependencies=[Depends(verify_test_password)],
 )
 
 
@@ -81,10 +122,10 @@ def get_simulation_context_get(
             detail=str(val_err),
         ) from val_err
     except Exception as exc:
-        logger.error(f"Error retrieving simulation context: {exc}")
+        logger.exception(f"Error retrieving simulation context: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate simulation context: {exc}",
+            detail="Failed to retrieve simulation context for the specified planning area.",
         ) from exc
 
 
@@ -109,10 +150,10 @@ def get_simulation_context_post(
             detail=str(val_err),
         ) from val_err
     except Exception as exc:
-        logger.error(f"Error retrieving simulation context: {exc}")
+        logger.exception(f"Error retrieving simulation context: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to generate simulation context: {exc}",
+            detail="Failed to retrieve simulation context for the specified planning area.",
         ) from exc
 
 

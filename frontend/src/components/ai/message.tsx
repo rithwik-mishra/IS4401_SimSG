@@ -1,5 +1,5 @@
 import React from "react";
-import { formatIncomeBand, formatSGD } from "@/lib/utils";
+import { formatIncomeBand, formatSGD, getCohortColor } from "@/lib/utils";
 import { RepresentativePersona } from "@/types/api";
 import { MessageSquareQuote, DollarSign, Wallet, Building2, AlertCircle } from "lucide-react";
 
@@ -14,23 +14,6 @@ export function PersonaMessage({
   onClickDetails,
   className,
 }: PersonaMessageProps) {
-  const getCohortColor = (cohort: string) => {
-    switch (cohort) {
-      case "Senior / Retiree":
-        return "#8c79b4";
-      case "Working-Class":
-        return "#6b9a90";
-      case "Suburban Family":
-        return "#d6ad69";
-      case "Young Adult / Student":
-        return "#8fa861";
-      case "Affluent Private Property":
-        return "#7899bf";
-      default:
-        return "#6b9a90";
-    }
-  };
-
   const getSentimentDetails = (sentiment: string) => {
     switch (sentiment.toLowerCase()) {
       case "positive":
@@ -61,8 +44,7 @@ export function PersonaMessage({
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3">
           <div
-            style={{ backgroundColor: `${cohortColor}20`, color: cohortColor }}
-            className="h-11 w-11 rounded-xl flex items-center justify-center font-bold text-sm group-hover:scale-105 transition-transform"
+            className={`h-11 w-11 rounded-xl flex items-center justify-center font-bold text-sm group-hover:scale-105 transition-transform border ${cohortColor}`}
           >
             {getInitials(persona.demographic_cohort)}
           </div>
@@ -77,8 +59,7 @@ export function PersonaMessage({
             </div>
             <div className="mt-1">
               <span
-                style={{ backgroundColor: `${cohortColor}15`, color: cohortColor }}
-                className="text-[11px] font-semibold px-2 py-0.5 rounded-md inline-block"
+                className={`text-[11px] font-semibold px-2 py-0.5 rounded-md inline-block border ${cohortColor}`}
               >
                 {persona.demographic_cohort}
               </span>

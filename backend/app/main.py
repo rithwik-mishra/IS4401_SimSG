@@ -10,16 +10,22 @@ from __future__ import annotations
 import logging
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.exception_handlers import http_exception_handler, request_validation_exception_handler
 
 # Resilient imports (support both uvicorn backend.app.main:app and app.main:app)
 try:
     from app.routers import simulate, simulation, test_simulation
     from app.services.simulation_context import get_simulation_context_service
+    from app.services.rate_limiter import rate_limit_dependency
 except ImportError:
     from backend.app.routers import simulate, simulation, test_simulation
     from backend.app.services.simulation_context import get_simulation_context_service
+    from backend.app.services.rate_limiter import rate_limit_dependency
 
 logging.basicConfig(
     level=logging.INFO,
@@ -72,11 +78,37 @@ else:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_origin_regex=r"^https://simsg(-[a-zA-Z0-9_-]+)?\.vercel\.app$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    """Enforces standard HTTP security response headers."""
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    return response
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global unhandled exception handler returning sanitized JSON error response."""
+    if isinstance(exc, (HTTPException, StarletteHTTPException)):
+        return await http_exception_handler(request, exc)
+    if isinstance(exc, RequestValidationError):
+        return await request_validation_exception_handler(request, exc)
+    logger.exception(f"Unhandled error processing {request.method} {request.url.path}: {exc}")
+    return JSONResponse(
+        status_code=500,
+        content={
+            "detail": "An internal server error occurred while processing your request. Please try again shortly.",
+            "code": "INTERNAL_SERVER_ERROR",
+        },
+    )
 
 # ---------------------------------------------------------------------------
 # ROUTERS
@@ -94,6 +126,7 @@ app.add_api_route(
     simulate.simulate,
     methods=["POST"],
     response_model=simulate.SimulateResponse,
+    dependencies=[Depends(rate_limit_dependency)],
     include_in_schema=False,
 )
 app.add_api_route(

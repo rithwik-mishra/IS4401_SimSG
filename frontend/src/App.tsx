@@ -8,6 +8,7 @@ import { PersonaMessage } from "@/components/ai/message";
 import { VerdictBanner } from "@/components/features/verdict-banner";
 import { ObjectionClusters } from "@/components/features/objection-clusters";
 import { PersonaDetailDialog } from "@/components/features/persona-detail-dialog";
+import { Toast, ToastType } from "@/components/ui/toast";
 import { PSMChart } from "@/components/figures/psm-chart";
 import { CohortIntentChart } from "@/components/figures/cohort-intent-chart";
 import { SentimentGauge } from "@/components/figures/sentiment-gauge";
@@ -53,6 +54,34 @@ export function App() {
   const [results, setResults] = useState<SimulateResponse | null>(SAMPLE_SIMULATION_RESULT);
   const [selectedPersona, setSelectedPersona] = useState<RepresentativePersona | null>(null);
   const [activeStatusHint, setActiveStatusHint] = useState<string>("");
+  const [toast, setToast] = useState<{
+    isOpen: boolean;
+    title: string;
+    description?: string;
+    type?: ToastType;
+  }>({
+    isOpen: false,
+    title: "",
+    description: "",
+    type: "info",
+  });
+
+  const showToast = (
+    title: string,
+    description?: string,
+    type: ToastType = "info"
+  ) => {
+    setToast({
+      isOpen: true,
+      title,
+      description,
+      type,
+    });
+  };
+
+  const handleCloseToast = () => {
+    setToast((prev) => ({ ...prev, isOpen: false }));
+  };
 
   const activeRunIdRef = React.useRef<number>(0);
 
@@ -248,6 +277,8 @@ export function App() {
       if (apiError) throw apiError;
       if (!apiResult) throw new Error("Simulation completed without return data.");
 
+      const completedResult: SimulateResponse = apiResult;
+
       // Mark all 6 stages completed (100% complete state)
       setPipelineSteps((prev) => prev.map((s) => ({ ...s, status: "completed" })));
       setActiveStatusHint("Simulation complete! Launching analysis workspace...");
@@ -256,14 +287,26 @@ export function App() {
       await sleep(750);
       if (isCancelled()) return;
 
-      setResults(apiResult);
+      setResults(completedResult);
       setIsLoading(false);
       setActiveStatusHint("");
+
+      // Trigger Toast Dialogue (Requirement 5)
+      showToast(
+        "Simulation Plan Generated",
+        `${completedResult.recommendations.verdict_badge} verdict synthesized across ${sampleSize} resident personas with PSM price discovery.`,
+        "success"
+      );
     } catch (err: any) {
       if (isCancelled()) return;
-      setError(err.message || "An unexpected error occurred during simulation.");
+      const errorMessage = err.message || "An unexpected error occurred during simulation.";
+      setError(errorMessage);
       setIsLoading(false);
       setActiveStatusHint("");
+
+      if (err.isRateLimit || err.status === 429 || errorMessage.toLowerCase().includes("rate limit")) {
+        showToast("Rate Limit Exceeded", errorMessage, "error");
+      }
     }
   };
 
@@ -422,16 +465,24 @@ export function App() {
           <div className="max-w-4xl mx-auto rounded-xl border border-[#c87970]/40 bg-[#fff3f0] p-4 text-xs text-[#8b423b] flex items-start gap-3">
             <AlertCircle className="h-5 w-5 text-[#c87970] shrink-0 mt-0.5" />
             <div className="space-y-1">
-              <span className="font-bold text-sm block">Simulation Error</span>
+              <span className="font-bold text-sm block">
+                {error.toLowerCase().includes("rate limit") ? "Hourly Rate Limit Reached" : "Simulation Error"}
+              </span>
               <p>{error}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleRunSimulation}
-                className="mt-2 text-xs border-[#c87970]/30 hover:bg-[#c87970]/10 text-[#8b423b]"
-              >
-                Retry Simulation
-              </Button>
+              {!error.toLowerCase().includes("rate limit") ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleRunSimulation}
+                  className="mt-2 text-xs border-[#c87970]/30 hover:bg-[#c87970]/10 text-[#8b423b]"
+                >
+                  Retry Simulation
+                </Button>
+              ) : (
+                <p className="text-[11px] text-[#8b423b]/80 pt-1 font-medium">
+                  Rate limits automatically refresh on a 60-minute sliding window per unique browser session.
+                </p>
+              )}
             </div>
           </div>
         )}
@@ -580,6 +631,15 @@ export function App() {
         persona={selectedPersona}
         isOpen={!!selectedPersona}
         onClose={() => setSelectedPersona(null)}
+      />
+
+      {/* Toast Dialogue Notification */}
+      <Toast
+        isOpen={toast.isOpen}
+        title={toast.title}
+        description={toast.description}
+        type={toast.type}
+        onClose={handleCloseToast}
       />
 
       {/* Footer matching SimSG warmth */}

@@ -1,6 +1,6 @@
 import React from "react";
 import { RepresentativePersona } from "@/types/api";
-import { formatIncomeBand, formatSGD } from "@/lib/utils";
+import { formatIncomeBand, formatSGD, getCohortColor } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -33,23 +33,6 @@ export function PersonaDetailDialog({
 }: PersonaDetailDialogProps) {
   if (!persona) return null;
 
-  const getCohortColor = (cohort: string) => {
-    switch (cohort) {
-      case "Senior / Retiree":
-        return "#8c79b4";
-      case "Working-Class":
-        return "#6b9a90";
-      case "Suburban Family":
-        return "#d6ad69";
-      case "Young Adult / Student":
-        return "#8fa861";
-      case "Affluent Private Property":
-        return "#7899bf";
-      default:
-        return "#214f43";
-    }
-  };
-
   const cohortColor = getCohortColor(persona.demographic_cohort);
 
   return (
@@ -62,8 +45,7 @@ export function PersonaDetailDialog({
                 Respondent: {persona.persona_id}
               </DialogTitle>
               <span
-                style={{ backgroundColor: `${cohortColor}20`, color: cohortColor }}
-                className="text-xs font-bold px-2.5 py-0.5 rounded-lg border border-[#e5e9e3]"
+                className={`text-xs font-bold px-2.5 py-0.5 rounded-lg border ${cohortColor}`}
               >
                 {persona.demographic_cohort}
               </span>

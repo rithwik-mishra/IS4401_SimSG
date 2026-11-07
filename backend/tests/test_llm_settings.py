@@ -168,12 +168,12 @@ def test_no_key_makes_no_ai_calls(client: TestClient, recorder):
 
 
 def test_preview_reports_provider_and_model(client: TestClient, monkeypatch, recorder):
-    data = client.post("/api/simulate/preview", json=PAYLOAD).json()
+    data = client.post("/api/simulate/preview", json=PAYLOAD, headers={"X-Test-Password": "IS4401"}).json()
     assert (data["persona_engine"], data["llm_provider"], data["llm_model"]) == ("rule_based", None, None)
 
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     monkeypatch.setenv("SIMSG_MODEL", "test-model-123")
-    data = client.post("/api/simulate/preview", json=PAYLOAD).json()
+    data = client.post("/api/simulate/preview", json=PAYLOAD, headers={"X-Test-Password": "IS4401"}).json()
     assert (data["persona_engine"], data["llm_provider"], data["llm_model"]) == ("llm", "openai", "test-model-123")
     assert [stage for stage, _ in recorder.calls] == ["pitch"]  # preview never calls the persona AI
 
@@ -227,7 +227,7 @@ def test_status_matches_preview(client: TestClient, monkeypatch, recorder):
     monkeypatch.setenv("OPENAI_API_KEY", "sk-test")
     monkeypatch.setenv("SIMSG_MODEL", "test-model-123")
     status = client.get("/api/ai-status").json()
-    preview = client.post("/api/simulate/preview", json=PAYLOAD).json()
+    preview = client.post("/api/simulate/preview", json=PAYLOAD, headers={"X-Test-Password": "IS4401"}).json()
     assert (status["persona_engine"], status["llm_provider"], status["llm_model"]) == (
         preview["persona_engine"], preview["llm_provider"], preview["llm_model"]
     )

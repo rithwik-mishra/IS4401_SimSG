@@ -25,6 +25,8 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 from app.main import app
 
+AUTH_HEADERS = {"X-Test-Password": "IS4401"}
+
 
 def test_root_route(client: TestClient):
     print("Testing GET / ...")
@@ -35,9 +37,50 @@ def test_root_route(client: TestClient):
     print("  [PASS] Root route OK")
 
 
+def test_diagnostics_unauthorized_without_password(client: TestClient):
+    """Accessing diagnostic endpoints without password must return 401."""
+    response = client.get("/api/test/diagnostics")
+    assert response.status_code == 401
+    assert "IS4401" in response.json()["detail"]
+
+
+def test_diagnostics_unauthorized_with_wrong_password(client: TestClient):
+    """Accessing diagnostic endpoints with incorrect password must return 401."""
+    response = client.get("/api/test/diagnostics", headers={"X-Test-Password": "wrong-password"})
+    assert response.status_code == 401
+
+
+def test_simulation_context_unauthorized_without_password(client: TestClient):
+    """Accessing simulation-context endpoints without password must return 401."""
+    response = client.get("/api/test/simulation-context", params={"planning_area": "Ang Mo Kio", "user_pitch": "cafe"})
+    assert response.status_code == 401
+
+    post_resp = client.post("/api/test/simulation-context", json={"planning_area": "Ang Mo Kio", "user_pitch": "cafe"})
+    assert post_resp.status_code == 401
+
+
+def test_diagnostics_route_auth_variations(client: TestClient):
+    """Test the 4 accepted auth methods: X-Test-Password, X-Admin-Password, Bearer token, query param."""
+    # 1. X-Test-Password
+    r1 = client.get("/api/test/diagnostics", headers={"X-Test-Password": "IS4401"})
+    assert r1.status_code == 200
+
+    # 2. X-Admin-Password
+    r2 = client.get("/api/test/diagnostics", headers={"X-Admin-Password": "IS4401"})
+    assert r2.status_code == 200
+
+    # 3. Authorization Bearer
+    r3 = client.get("/api/test/diagnostics", headers={"Authorization": "Bearer IS4401"})
+    assert r3.status_code == 200
+
+    # 4. Query param
+    r4 = client.get("/api/test/diagnostics", params={"password": "IS4401"})
+    assert r4.status_code == 200
+
+
 def test_diagnostics_route(client: TestClient):
     print("Testing GET /api/test/diagnostics ...")
-    response = client.get("/api/test/diagnostics")
+    response = client.get("/api/test/diagnostics", headers=AUTH_HEADERS)
     assert response.status_code == 200, f"Expected 200, got {response.status_code}"
     data = response.json()
     assert data["status"] == "healthy"
@@ -57,7 +100,7 @@ def test_simulation_context_get(client: TestClient):
         "planning_area": "Ang Mo Kio",
         "user_pitch": "S$7 specialty coffee for retiree residents",
     }
-    response = client.get("/api/test/simulation-context", params=params)
+    response = client.get("/api/test/simulation-context", params=params, headers=AUTH_HEADERS)
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     data = response.json()
 
@@ -77,7 +120,7 @@ def test_simulation_context_post(client: TestClient):
         "planning_area": "Bukit Timah",
         "user_pitch": "artisanal sourdough bakery and pour-over coffee",
     }
-    response = client.post("/api/test/simulation-context", json=payload)
+    response = client.post("/api/test/simulation-context", json=payload, headers=AUTH_HEADERS)
     assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
     data = response.json()
 
@@ -158,7 +201,11 @@ def test_corpus_json_matches_chroma():
 
 
 def test_simulation_context_area_is_case_insensitive(client: TestClient):
-    response = client.get("/api/test/simulation-context", params={"planning_area": "ang mo kio", "user_pitch": "kopi"})
+    response = client.get(
+        "/api/test/simulation-context",
+        params={"planning_area": "ang mo kio", "user_pitch": "kopi"},
+        headers=AUTH_HEADERS,
+    )
     assert response.status_code == 200, response.text
     assert response.json()["planning_area"] == "Ang Mo Kio"
 
@@ -191,7 +238,7 @@ def test_unknown_planning_area_404(client: TestClient):
         "planning_area": "Atlantis",
         "user_pitch": "underwater cafe",
     }
-    response = client.get("/api/test/simulation-context", params=params)
+    response = client.get("/api/test/simulation-context", params=params, headers=AUTH_HEADERS)
     assert response.status_code == 404, f"Expected 404, got {response.status_code}"
     error_detail = response.json().get("detail", "")
     assert "Atlantis" in error_detail

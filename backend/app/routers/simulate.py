@@ -58,6 +58,8 @@ try:
     )
     from app.agents.synthesis_agent import generate_macro_synthesis
     from app.services.llm_settings import describe_missing_provider, get_llm_settings
+    from app.services.rate_limiter import rate_limit_dependency
+    from app.routers.test_simulation import verify_test_password
 except ImportError:
     from backend.app.schemas import (
         DecomposedConcept,
@@ -93,6 +95,8 @@ except ImportError:
     )
     from backend.app.agents.synthesis_agent import generate_macro_synthesis
     from backend.app.services.llm_settings import describe_missing_provider, get_llm_settings
+    from backend.app.services.rate_limiter import rate_limit_dependency
+    from backend.app.routers.test_simulation import verify_test_password
 
 router = APIRouter(
     prefix="/api",
@@ -160,10 +164,10 @@ def _prepare_inputs(
             f"Step 1 Complete: Concept='{concept.concept_name}' in {concept.target_planning_area} @ S${concept.candidate_price_sgd:.2f}"
         )
     except Exception as exc:
-        logger.error(f"Query decomposition failed: {exc}")
+        logger.exception(f"Query decomposition failed: {exc}")
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=f"Query decomposition failed: {exc}",
+            detail="Failed to decompose query. Please provide a clearer business pitch or specify target town and price.",
         ) from exc
 
     # -----------------------------------------------------------------------
@@ -214,15 +218,16 @@ def _prepare_inputs(
             f"(seed={seed}, {'given' if req.seed is not None else 'generated'})"
         )
     except ValueError as val_err:
+        logger.warning(f"Cohort sampling validation error: {val_err}")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(val_err),
         ) from val_err
     except Exception as exc:
-        logger.error(f"Cohort sampling failed: {exc}")
+        logger.exception(f"Cohort sampling failed: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Persona sampling failed: {exc}",
+            detail="Failed to generate demographic personas for the requested planning area.",
         ) from exc
 
     return concept, rag_chunks, seed, personas
@@ -231,6 +236,7 @@ def _prepare_inputs(
 @router.post(
     "/simulate",
     response_model=SimulateResponse,
+    dependencies=[Depends(rate_limit_dependency)],
     summary="Execute Complete Focus Group Simulation & Market Validation",
     description=(
         "Takes an unstructured user pitch, decomposes it, samples N=30 SingStat personas, "
@@ -259,10 +265,10 @@ async def simulate(
         )
         logger.info(f"Step 4 Complete: Evaluated {len(evaluations)} personas")
     except Exception as exc:
-        logger.error(f"Persona execution engine failed: {exc}")
+        logger.exception(f"Persona execution engine failed: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Persona execution failed: {exc}",
+            detail="Persona evaluation failed. An error occurred during persona simulation.",
         ) from exc
 
     # -----------------------------------------------------------------------
@@ -277,10 +283,10 @@ async def simulate(
             f"Step 5 Complete: PSM OPP=S${econometrics.psm_intersections.opp:.2f}, Mean Intent={econometrics.mean_buy_intent_pct:.1f}%, Net Sentiment={econometrics.net_sentiment_score:+.2f}"
         )
     except Exception as exc:
-        logger.error(f"Econometric computation failed: {exc}")
+        logger.exception(f"Econometric computation failed: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Econometric computation failed: {exc}",
+            detail="Econometric computation failed while analyzing simulation responses.",
         ) from exc
 
     # -----------------------------------------------------------------------
@@ -295,10 +301,10 @@ async def simulate(
         )
         logger.info(f"Step 6 Complete: Macro Verdict='{synthesis.verdict_badge}', Uplift={synthesis.simulated_post_pivot_uplift:.1f}%")
     except Exception as exc:
-        logger.error(f"Macro synthesis agent failed: {exc}")
+        logger.exception(f"Macro synthesis agent failed: {exc}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Macro synthesis failed: {exc}",
+            detail="Macro synthesis failed while generating strategic recommendations.",
         ) from exc
 
     # -----------------------------------------------------------------------
@@ -343,12 +349,14 @@ async def simulate(
 @router.post(
     "/simulate/preview",
     response_model=SimulatePreviewResponse,
+    dependencies=[Depends(verify_test_password)],
     summary="Preview the Persona Prompts Without Running the Simulation",
     description=(
         "Runs steps 1-3 of /api/simulate (pitch decomposition, ChromaDB context, seeded personas) and returns "
         "the exact prompts the persona AI would receive. Each persona is interviewed in two parts: "
         "price_limits_prompt (price hidden, asks the 4 price limits), then purchase_prompt (price revealed, "
         "asks buy %, reaction and objection) in the same conversation. No persona AI calls are made. "
+        "Requires authentication password 'IS4401' via 'X-Test-Password' header or 'password' query parameter. "
         "With an API key, step 1 still uses the AI to read the pitch, exactly as /api/simulate does."
     ),
 )

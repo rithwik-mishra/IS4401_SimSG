@@ -23,12 +23,45 @@ from app.agents.execution_engine import SYSTEM_PROMPT
 
 PITCH = "S$7 artisanal single-origin kopi bar in Ang Mo Kio with specialty cold brew and toast sets"
 SEED = 4242
+AUTH_HEADERS = {"X-Test-Password": "IS4401"}
 
 
 def _payload(**overrides) -> dict:
     payload = {"raw_query": PITCH, "override_town": "Ang Mo Kio", "sample_size": 30, "seed": SEED}
     payload.update(overrides)
     return payload
+
+
+def test_preview_unauthorized_without_password(client: TestClient):
+    """POST /api/simulate/preview without password must return 401."""
+    response = client.post("/api/simulate/preview", json=_payload())
+    assert response.status_code == 401
+    assert "IS4401" in response.json()["detail"]
+
+
+def test_preview_unauthorized_with_wrong_password(client: TestClient):
+    """POST /api/simulate/preview with incorrect password must return 401."""
+    response = client.post("/api/simulate/preview", json=_payload(), headers={"X-Test-Password": "wrong-password"})
+    assert response.status_code == 401
+
+
+def test_preview_auth_variations(client: TestClient):
+    """Test all 4 authentication methods for /api/simulate/preview."""
+    # 1. X-Test-Password
+    r1 = client.post("/api/simulate/preview", json=_payload(), headers={"X-Test-Password": "IS4401"})
+    assert r1.status_code == 200
+
+    # 2. X-Admin-Password
+    r2 = client.post("/api/simulate/preview", json=_payload(), headers={"X-Admin-Password": "IS4401"})
+    assert r2.status_code == 200
+
+    # 3. Authorization Bearer
+    r3 = client.post("/api/simulate/preview", json=_payload(), headers={"Authorization": "Bearer IS4401"})
+    assert r3.status_code == 200
+
+    # 4. Query param
+    r4 = client.post("/api/simulate/preview", json=_payload(), params={"password": "IS4401"})
+    assert r4.status_code == 200
 
 
 @pytest.fixture
@@ -67,7 +100,7 @@ def fake_ai(monkeypatch):
 
 
 def test_preview_without_key(client: TestClient, no_api_key):
-    response = client.post("/api/simulate/preview", json=_payload())
+    response = client.post("/api/simulate/preview", json=_payload(), headers=AUTH_HEADERS)
     assert response.status_code == 200, response.text
     data = response.json()
 
@@ -98,7 +131,7 @@ def test_preview_without_key(client: TestClient, no_api_key):
 
 def test_persona_prompts_have_no_style_or_language(client: TestClient, no_api_key):
     """Singlish was dropped: no speaking style or home language, quotes asked for in standard English."""
-    data = client.post("/api/simulate/preview", json=_payload()).json()
+    data = client.post("/api/simulate/preview", json=_payload(), headers=AUTH_HEADERS).json()
     for item in data["personas"]:
         prompt = item["price_limits_prompt"] + item["purchase_prompt"]
         assert "Linguistic Style" not in prompt
@@ -109,7 +142,7 @@ def test_persona_prompts_have_no_style_or_language(client: TestClient, no_api_ke
 
 def test_persona_prompts_use_town_prices_not_fixed_references(client: TestClient, no_api_key):
     """The fixed kopi S$1.30 / cafe S$6.50 line is gone; the town's ChromaDB pricing passage stays."""
-    data = client.post("/api/simulate/preview", json=_payload()).json()
+    data = client.post("/api/simulate/preview", json=_payload(), headers=AUTH_HEADERS).json()
     pricing = [c["text"] for c in data["rag_chunks"] if c["category"] == "pricing_benchmarks"]
     assert len(pricing) == 1
     for item in data["personas"]:
@@ -122,7 +155,7 @@ def test_persona_prompts_use_town_prices_not_fixed_references(client: TestClient
 
 def test_preview_shows_census_personas(client: TestClient, no_api_key):
     """Preview personas carry census fields (5-year age group, income band, HES eating-out spend) only."""
-    data = client.post("/api/simulate/preview", json=_payload()).json()
+    data = client.post("/api/simulate/preview", json=_payload(), headers=AUTH_HEADERS).json()
     # HES 2023 daily eating-out spend (7.77, 9.77, 10.43, 11.03, 15.10, 11.83) x 1.04 for 2025 prices
     hes_daily = {"1-2 room": 8.08, "3 room": 10.16, "4 room": 10.85, "5 room/exec": 11.47, "condo": 15.70, "landed": 12.30}
     for item in data["personas"]:
@@ -137,7 +170,7 @@ def test_preview_shows_census_personas(client: TestClient, no_api_key):
 
 
 def test_preview_personas_match_simulate(client: TestClient, no_api_key):
-    preview = client.post("/api/simulate/preview", json=_payload()).json()
+    preview = client.post("/api/simulate/preview", json=_payload(), headers=AUTH_HEADERS).json()
     run = client.post("/api/simulate", json=_payload()).json()
 
     def profile(p, income_key):
@@ -149,7 +182,7 @@ def test_preview_personas_match_simulate(client: TestClient, no_api_key):
 
 
 def test_preview_prompts_match_what_simulate_sends(client: TestClient, fake_ai):
-    preview = client.post("/api/simulate/preview", json=_payload())
+    preview = client.post("/api/simulate/preview", json=_payload(), headers=AUTH_HEADERS)
     assert preview.status_code == 200, preview.text
     preview = preview.json()
     assert preview["persona_engine"] == "llm"
@@ -173,6 +206,6 @@ def test_preview_prompts_match_what_simulate_sends(client: TestClient, fake_ai):
 
 
 def test_preview_use_mock_reports_rule_based(client: TestClient, fake_ai):
-    data = client.post("/api/simulate/preview", json=_payload(use_mock=True)).json()
+    data = client.post("/api/simulate/preview", json=_payload(use_mock=True), headers=AUTH_HEADERS).json()
     assert data["persona_engine"] == "rule_based"
     assert fake_ai == []

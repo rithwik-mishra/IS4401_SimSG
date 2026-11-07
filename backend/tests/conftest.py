@@ -28,3 +28,15 @@ def no_real_ai(monkeypatch):
     for var in ("OPEN_API_KEY", "OPENAI_API_KEY", "SOCLAAS_API_KEY"):
         monkeypatch.delenv(var, raising=False)
     monkeypatch.setenv("SIMSG_PROVIDER", "openai")
+
+
+@pytest.fixture(autouse=True)
+def reset_rate_limiter_state():
+    """Reset rate limiter buckets before and after each test so tests don't exhaust each other's quota."""
+    try:
+        from app.services.rate_limiter import rate_limiter
+    except ImportError:
+        from backend.app.services.rate_limiter import rate_limiter
+    rate_limiter.reset_all()
+    yield
+    rate_limiter.reset_all()

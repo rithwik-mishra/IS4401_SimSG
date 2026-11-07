@@ -37,7 +37,14 @@ export function formatIncomeBand(
   return band;
 }
 
-export function formatPct(percent: number): string {
-  return `${percent.toFixed(1)}%`;
+export function getCohortColor(cohort: string): string {
+  const map: Record<string, string> = {
+    'Senior / Retiree': 'bg-amber-100 text-amber-800 border-amber-300',
+    'Working-Class': 'bg-blue-100 text-blue-800 border-blue-300',
+    'Suburban Family': 'bg-emerald-100 text-emerald-800 border-emerald-300',
+    'Young Adult / Student': 'bg-purple-100 text-purple-800 border-purple-300',
+    'Affluent Private Property': 'bg-indigo-100 text-indigo-800 border-indigo-300',
+  };
+  return map[cohort] || 'bg-slate-100 text-slate-800 border-slate-300';
 }
 
