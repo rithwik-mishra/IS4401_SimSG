@@ -8,9 +8,9 @@ Production FastAPI Router for SimSG's complete End-to-End Simulation Pipeline:
   3. Monte Carlo Demographic Sampler (N=30 from SingStat & HES 2023)
   4. Async Batch Persona Execution Engine (configured model, Semaphore(25))
   5. Deterministic Econometric & Statistical Engine (NumPy/SciPy PSM curves & cohorts)
-  6. Macro Synthesis & Strategic Pivot Agent (configured model)
-  7. Selective Representative Personas (N=5 distinct demographic archetypes for React table)
-  8. Streamlined 3-part response: [recommendations, personas, statistics]
+  6. Format All N Demographic Resident Personas (React table schema with full demographic context)
+  7. Macro Synthesis & Strategic Pivot Agent (configured model, synthesizes all N resident voices)
+  8. Streamlined 3-part response: [recommendations, personas (all N), statistics]
 """
 
 from __future__ import annotations
@@ -290,25 +290,7 @@ async def simulate(
         ) from exc
 
     # -----------------------------------------------------------------------
-    # Step 6: Macro Synthesis & Strategic Pivot Agent
-    # -----------------------------------------------------------------------
-    try:
-        synthesis: MacroSynthesisReport = await generate_macro_synthesis(
-            concept=concept,
-            evaluations=evaluations,
-            econometrics=econometrics,
-            use_mock=req.use_mock,
-        )
-        logger.info(f"Step 6 Complete: Macro Verdict='{synthesis.verdict_badge}', Uplift={synthesis.simulated_post_pivot_uplift:.1f}%")
-    except Exception as exc:
-        logger.exception(f"Macro synthesis agent failed: {exc}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Macro synthesis failed while generating strategic recommendations.",
-        ) from exc
-
-    # -----------------------------------------------------------------------
-    # Step 7: Select N=5 Representative Personas Portraying All 5 Demographics
+    # Step 6: Format All N Resident Personas Portraying Demographics
     # (Clean flat schema ready for direct React dashboard Table mapping)
     # -----------------------------------------------------------------------
     representative_personas: List[RepresentativePersona] = format_all_demographic_personas(
@@ -317,8 +299,26 @@ async def simulate(
         concept=concept,
     )
     logger.info(
-        f"Step 7 Complete: Selected {len(representative_personas)} representative personas portraying all 5 key demographics"
+        f"Step 6 Complete: Formatted all {len(representative_personas)} resident personas portraying key demographics"
     )
+
+    # -----------------------------------------------------------------------
+    # Step 7: Macro Synthesis & Strategic Pivot Agent (Synthesizes All N Voices)
+    # -----------------------------------------------------------------------
+    try:
+        synthesis: MacroSynthesisReport = await generate_macro_synthesis(
+            concept=concept,
+            evaluations=representative_personas,
+            econometrics=econometrics,
+            use_mock=req.use_mock,
+        )
+        logger.info(f"Step 7 Complete: Macro Verdict='{synthesis.verdict_badge}', Uplift={synthesis.simulated_post_pivot_uplift:.1f}%")
+    except Exception as exc:
+        logger.exception(f"Macro synthesis agent failed: {exc}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Macro synthesis failed while generating strategic recommendations.",
+        ) from exc
 
     # -----------------------------------------------------------------------
     # Step 8: Return Clean 3-Part Output: Recommendations, Personas Table, Statistics

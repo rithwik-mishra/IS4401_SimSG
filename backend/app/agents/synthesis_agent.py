@@ -25,7 +25,7 @@ import logging
 import os
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional, Union
 
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, PrivateAttr, field_validator
@@ -209,7 +209,7 @@ Respond with a single JSON object strictly matching the requested schema. Do not
 
 def build_synthesis_prompt(
     concept: DecomposedConcept,
-    evaluations: List[PersonaEvaluationOutput],
+    evaluations: Union[List[PersonaEvaluationOutput], List[Any]],
     econometrics: EconometricAnalysisResult,
 ) -> str:
     """Constructs the prompt for the macro synthesis LLM call."""
@@ -246,17 +246,21 @@ def build_synthesis_prompt(
         )
     cohort_text = "\n".join(cohort_lines) if cohort_lines else "  No cohort breakdown available."
 
-    # Persona qualitative quotes and objections
+    # Persona qualitative quotes and objections (all N voices)
     sample_feedback_lines = []
-    for e in evaluations[:15]:  # include representative sample to manage context window
-        quote = getattr(e, "in_character_quote", "")
+    for e in evaluations:
+        quote = getattr(e, "in_character_quote", "") or getattr(e, "quote", "")
         obj = getattr(e, "primary_objection", "")
-        sentiment = getattr(e, "sentiment_label", "")
+        sentiment = getattr(e, "sentiment_label", "") or getattr(e, "sentiment", "")
         pid = getattr(e, "persona_id", "")
+        cohort = getattr(e, "demographic_cohort", "")
+
+        tag_parts = [p for p in [cohort, sentiment] if p]
+        tag_info = ", ".join(tag_parts) if tag_parts else (sentiment or "Neutral")
         sample_feedback_lines.append(
-            f"  - [{pid}] ({sentiment}): \"{quote}\" (Objection: {obj})"
+            f'  - [{pid}] ({tag_info}): "{quote}" (Objection: {obj})'
         )
-    feedback_text = "\n".join(sample_feedback_lines)
+    feedback_text = "\n".join(sample_feedback_lines) if sample_feedback_lines else "  No qualitative feedback recorded."
 
     return f"""--- PROPOSED CONCEPT ---
 Concept Name: {concept_name}
@@ -278,7 +282,7 @@ Description: {desc}
 --- COHORT SEGMENTATION ANALYSIS ---
 {cohort_text}
 
---- QUALITATIVE FOCUS GROUP FEEDBACK (30 PERSONAS) ---
+--- QUALITATIVE FOCUS GROUP FEEDBACK ({len(evaluations)} RESIDENT VOICES) ---
 {feedback_text}
 
 --- YOUR TASK ---
@@ -299,7 +303,7 @@ Perform a comprehensive strategic synthesis:
 # ---------------------------------------------------------------------------
 def generate_macro_synthesis_rule_based(
     concept: DecomposedConcept,
-    evaluations: List[PersonaEvaluationOutput],
+    evaluations: Union[List[PersonaEvaluationOutput], List[Any]],
     econometrics: EconometricAnalysisResult,
 ) -> MacroSynthesisReport:
     """
@@ -333,7 +337,8 @@ def generate_macro_synthesis_rule_based(
         else f"aligns favorably with the Optimal Price Point (OPP: S${opp:.2f})"
     )
 
-    s1 = f"The proposed concept '{concept_name}' in {area} at S${cand_price:.2f} receives a '{verdict}' viability verdict based on a 30-persona simulated cohort."
+    n_evals = max(1, len(evaluations))
+    s1 = f"The proposed concept '{concept_name}' in {area} at S${cand_price:.2f} receives a '{verdict}' viability verdict based on a {n_evals}-persona simulated cohort."
     s2 = f"Van Westendorp econometric analysis reveals an empirical Optimal Price Point of S${opp:.2f} and a Point of Marginal Expensiveness of S${pme:.2f}; current pricing {price_assessment}."
     s3 = f"While affluent private property dwellers and young adults express moderate interest, working-class and retiree cohorts exhibit substantial price sensitivity, anchoring heavily to traditional hawker alternatives."
     s4 = f"Executing a strategic pivot focused on price repositioning towards S${opp:.2f} and introducing value bundling will be essential to establish sustainable foot traffic and margin."
@@ -345,7 +350,7 @@ def generate_macro_synthesis_rule_based(
     quotes_value: List[str] = []
 
     for e in evaluations:
-        q = getattr(e, "in_character_quote", "")
+        q = getattr(e, "in_character_quote", "") or getattr(e, "quote", "")
         obj = getattr(e, "primary_objection", "")
         text = f"{q} {obj}".lower()
         if any(w in text for w in ("hawker", "kopi", "coffeeshop", "ex", "expensive", "siao", "price")):
@@ -355,7 +360,6 @@ def generate_macro_synthesis_rule_based(
         else:
             quotes_value.append(q)
 
-    n_evals = max(1, len(evaluations))
     c1_count = len(quotes_hawker)
     c2_count = len(quotes_budget)
     c3_count = len(quotes_value)
@@ -413,7 +417,7 @@ def generate_macro_synthesis_rule_based(
 # ---------------------------------------------------------------------------
 async def generate_macro_synthesis(
     concept: DecomposedConcept,
-    evaluations: list[PersonaEvaluationOutput],
+    evaluations: Union[List[PersonaEvaluationOutput], List[Any]],
     econometrics: EconometricAnalysisResult,
     use_mock: bool = False,
 ) -> MacroSynthesisReport:

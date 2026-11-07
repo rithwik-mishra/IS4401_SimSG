@@ -204,7 +204,7 @@ class SimulateResponse(BaseModel):
     """
     Unified focus group simulation response tailored for the React dashboard view:
       1. recommendations: Overall recommendations & strategic insights (verdict, summary, pivots, objections)
-      2. personas: Selective list of N=5 representative resident personas portraying all 5 unique demographics
+      2. personas: Full list of all N evaluated resident personas portraying key demographics
       3. statistics: Deterministic econometric and statistical metrics (PSM curves, intersections, sentiment, cohorts)
     """
     recommendations: MacroSynthesisReport = Field(
@@ -213,7 +213,7 @@ class SimulateResponse(BaseModel):
     )
     personas: list[RepresentativePersona] = Field(
         ...,
-        description="Selective JSON list of N=5 representative resident personas portraying all 5 unique demographics, formatted for React table rendering",
+        description="Full JSON list of all N evaluated resident personas portraying key demographics, formatted for React table rendering",
     )
     statistics: EconometricAnalysisResult = Field(
         ...,
