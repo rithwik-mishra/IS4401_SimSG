@@ -35,6 +35,18 @@ from dataclasses import replace
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field, PrivateAttr
 
+# ---------------------------------------------------------------------------
+# Input Validation & Guardrail Exceptions
+# ---------------------------------------------------------------------------
+
+class QueryRejectedError(ValueError):
+    """Raised when the raw query fails input guardrails (PII, malicious, or irrelevant)."""
+
+    def __init__(self, reason: str, rejection_type: str = "rejected") -> None:
+        self.reason = reason
+        self.rejection_type = rejection_type  # "pii", "malicious", or "irrelevant"
+        super().__init__(reason)
+
 # Provider / model come from backend/.env (SIMSG_PROVIDER, SIMSG_MODEL, ...)
 try:
     from app.services.llm_settings import (
@@ -186,6 +198,120 @@ _CATEGORY_KEYWORDS: Dict[str, List[str]] = {
         "supermarket", "mart", "goods", "merchandise", "lifestyle", "accessories"
     ],
 }
+
+
+# ---------------------------------------------------------------------------
+# Input Guardrails: PII, Malicious Content, and Relevance Checks
+# ---------------------------------------------------------------------------
+
+_PII_PATTERNS: List[Tuple[str, re.Pattern[str]]] = [
+    # Singapore NRIC / FIN: S/T/F/G/M + 7 digits + letter
+    ("NRIC/FIN number", re.compile(r"\b[STFGM]\d{7}[A-Z]\b", re.IGNORECASE)),
+    # Credit card numbers (13-19 digits, optionally separated by spaces/dashes)
+    ("credit card number", re.compile(r"\b(?:\d[ -]*?){13,19}\b")),
+    # Email addresses
+    ("email address", re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z]{2,}\b", re.IGNORECASE)),
+    # Singapore phone numbers: +65 or 65 followed by 8 digits, or standalone 8-digit starting with 6/8/9
+    ("phone number", re.compile(r"(?:\+?65[\s-]?)?\b[689]\d{7}\b")),
+    # Passport numbers (common format: 1-2 letters + 6-9 digits)
+    ("passport number", re.compile(r"\b[A-Z]{1,2}\d{6,9}\b", re.IGNORECASE)),
+]
+
+_MALICIOUS_PATTERNS: List[Tuple[str, re.Pattern[str]]] = [
+    # SQL injection fragments
+    ("SQL injection", re.compile(
+        r"(?:\b(?:SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|UNION|CREATE)\b\s+.*\b(?:FROM|INTO|TABLE|SET|ALL)\b"
+        r"|['\"]\s*(?:OR|AND)\s+['\"]?\d+['\"]?\s*=\s*['\"]?\d+|--\s*$|\b(?:xp_|sp_)\w+)",
+        re.IGNORECASE,
+    )),
+    # XSS / script injection
+    ("script injection", re.compile(
+        r"<\s*script\b|javascript\s*:|on(?:load|error|click|mouseover)\s*=",
+        re.IGNORECASE,
+    )),
+    # Prompt injection attempts (common jailbreak prefixes)
+    ("prompt injection", re.compile(
+        r"(?:ignore\s+(?:all\s+)?(?:previous|above|prior)\s+instructions"
+        r"|you\s+are\s+now\s+(?:a\s+)?(?:DAN|jailbr)"
+        r"|system\s*:\s*you\s+are"
+        r"|forget\s+(?:all\s+)?(?:your|previous)\s+(?:instructions|rules))",
+        re.IGNORECASE,
+    )),
+]
+
+# Minimum business-relevance signal: at least one keyword from any category,
+# or a price mention, or a known planning area, or common business intent words.
+_BUSINESS_INTENT_WORDS = re.compile(
+    r"\b(?:open|launch|start|sell|business|shop|store|stall|cafe|café|restaurant|bar|kiosk"
+    r"|bakery|retail|food|drink|beverage|product|service|market|price|concept|outlet|franchise"
+    r"|hawker|kopitiam|dining|menu|customer|f&b|fnb)\b",
+    re.IGNORECASE,
+)
+
+
+def validate_query_guardrails(raw_query: str) -> None:
+    """
+    Pre-decomposition guardrails. Raises QueryRejectedError if the query
+    contains PII, malicious content, or is completely irrelevant to a
+    Singapore business concept.
+
+    Called before any LLM or rule-based extraction so the full multi-agent
+    pipeline is never triggered for bad inputs.
+    """
+    if not raw_query or not raw_query.strip():
+        return  # Empty queries are handled downstream with a default concept
+
+    text = raw_query.strip()
+
+    # --- PII Detection ---
+    for pii_label, pattern in _PII_PATTERNS:
+        if pattern.search(text):
+            raise QueryRejectedError(
+                reason=(
+                    f"Your query appears to contain personally identifiable information ({pii_label}). "
+                    "Please remove any personal data and describe your business concept instead."
+                ),
+                rejection_type="pii",
+            )
+
+    # --- Malicious Content Detection ---
+    for threat_label, pattern in _MALICIOUS_PATTERNS:
+        if pattern.search(text):
+            raise QueryRejectedError(
+                reason=(
+                    f"Your query was flagged for potentially unsafe content ({threat_label}). "
+                    "Please enter a genuine Singapore business concept pitch."
+                ),
+                rejection_type="malicious",
+            )
+
+    # --- Relevance Check ---
+    # A query is considered relevant if it contains ANY of:
+    #   1. A keyword from any business category (beverage, bakery, dining, retail)
+    #   2. A price mention
+    #   3. A Singapore planning area reference
+    #   4. A general business intent word
+    has_category_signal = any(
+        re.search(r"\b" + re.escape(kw) + r"\b", text, re.IGNORECASE)
+        for kws in _CATEGORY_KEYWORDS.values()
+        for kw in kws
+    )
+    has_price_signal = any(p.search(text) for p in _PRICE_PATTERNS)
+    has_area_signal = any(pat.search(text) for _, pat in _AREA_PATTERNS)
+    has_business_intent = bool(_BUSINESS_INTENT_WORDS.search(text))
+
+    if not (has_category_signal or has_price_signal or has_area_signal or has_business_intent):
+        # Short queries with no signal at all — reject
+        # But allow longer queries (>80 chars) through; the LLM may understand them
+        if len(text) < 80:
+            raise QueryRejectedError(
+                reason=(
+                    "Your query doesn't appear to describe a Singapore business concept. "
+                    "Please include details like the type of business (e.g. café, bakery, retail shop), "
+                    "a target area (e.g. Tampines, Jurong East), or a price point (e.g. S$5)."
+                ),
+                rejection_type="irrelevant",
+            )
 
 
 def _extract_area_rule_based(text: str) -> str:
@@ -372,6 +498,11 @@ class QueryDecomposer:
         if use_mock:
             logger.info("use_mock=True: using deterministic rule-based extractor.")
             return decompose_query_rule_based(raw_query, override_price, override_town)
+
+        # --- Input Guardrails (PII / malicious / irrelevant) ---
+        # Runs before any LLM call or pipeline work.  Raises QueryRejectedError
+        # which the router converts into an HTTP 422 asking the user to try again.
+        validate_query_guardrails(raw_query)
 
         if not raw_query or not raw_query.strip():
             # Return baseline concept for empty pitch

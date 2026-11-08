@@ -40,6 +40,7 @@ try:
         SyntheticPersona,
     )
     from app.services.query_decomposer import decompose_query
+    from app.services.query_decomposer import QueryRejectedError
     from app.services.sampler import (
         sample_synthetic_cohort,
         select_representative_demographic_personas,
@@ -77,6 +78,7 @@ except ImportError:
         SyntheticPersona,
     )
     from backend.app.services.query_decomposer import decompose_query
+    from backend.app.services.query_decomposer import QueryRejectedError
     from backend.app.services.sampler import (
         sample_synthetic_cohort,
         select_representative_demographic_personas,
@@ -163,6 +165,12 @@ def _prepare_inputs(
         logger.info(
             f"Step 1 Complete: Concept='{concept.concept_name}' in {concept.target_planning_area} @ S${concept.candidate_price_sgd:.2f}"
         )
+    except QueryRejectedError as qr_exc:
+        logger.warning(f"Query rejected by guardrails ({qr_exc.rejection_type}): {qr_exc.reason}")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=qr_exc.reason,
+        ) from qr_exc
     except Exception as exc:
         logger.exception(f"Query decomposition failed: {exc}")
         raise HTTPException(

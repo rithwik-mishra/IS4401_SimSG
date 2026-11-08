@@ -9,6 +9,7 @@ try:
         DecomposedConcept,
         DecomposedQuery,
         QueryDecomposer,
+        QueryRejectedError,
         decompose_pitch,
         decompose_query,
     )
@@ -34,6 +35,7 @@ except ImportError:
         DecomposedConcept,
         DecomposedQuery,
         QueryDecomposer,
+        QueryRejectedError,
         decompose_pitch,
         decompose_query,
     )
@@ -59,6 +61,7 @@ __all__ = [
     "DecomposedConcept",
     "DecomposedQuery",
     "QueryDecomposer",
+    "QueryRejectedError",
     "decompose_pitch",
     "decompose_query",
     "SyntheticPersona",

@@ -1,12 +1,13 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
-import { ChevronDown, CheckCircle2, Loader2, Sparkles, BrainCircuit } from "lucide-react";
+import { ChevronDown, CheckCircle2, Loader2, Sparkles, BrainCircuit, AlertCircle } from "lucide-react";
 
 export interface PipelineStep {
   id: string;
   title: string;
   description: string;
-  status: "pending" | "running" | "completed";
+  status: "pending" | "running" | "completed" | "error";
+  errorMessage?: string;
 }
 
 export interface ReasoningProps {
@@ -35,6 +36,7 @@ export function Reasoning({
 
   const completedCount = steps.filter((s) => s.status === "completed").length;
   const isAllCompleted = completedCount === steps.length;
+  const hasError = steps.some((s) => s.status === "error");
   const runningStepIndex = steps.findIndex((s) => s.status === "running");
   const isRunning = runningStepIndex !== -1;
 
@@ -63,13 +65,24 @@ export function Reasoning({
         className="w-full flex items-center justify-between p-4 bg-[#f8faf7] border-b border-[#e5e9e3] hover:bg-[#f2f6f0] transition-colors cursor-pointer text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#214f43]"
       >
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#e8efdf] border border-[#d2ded0] flex items-center justify-center shrink-0">
-            <BrainCircuit
-              className={cn(
-                "h-4.5 w-4.5 text-[#214f43]",
-                !isAllCompleted ? "animate-pulse" : ""
-              )}
-            />
+          <div
+            className={cn(
+              "w-8 h-8 rounded-lg flex items-center justify-center shrink-0 border",
+              hasError
+                ? "bg-[#fbefeb] border-[#eed7d0]"
+                : "bg-[#e8efdf] border-[#d2ded0]"
+            )}
+          >
+            {hasError ? (
+              <AlertCircle className="h-4.5 w-4.5 text-[#c87970]" />
+            ) : (
+              <BrainCircuit
+                className={cn(
+                  "h-4.5 w-4.5 text-[#214f43]",
+                  !isAllCompleted ? "animate-pulse" : ""
+                )}
+              />
+            )}
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -79,19 +92,23 @@ export function Reasoning({
               <span
                 className={cn(
                   "rounded-full px-2.5 py-0.5 text-[11px] font-bold border transition-colors",
-                  isAllCompleted
+                  hasError
+                    ? "bg-[#fbefeb] text-[#8b423b] border-[#eed7d0]"
+                    : isAllCompleted
                     ? "bg-[#edf4e8] text-[#2d7a5b] border-[#cde0cf]"
                     : "bg-[#e8efdf] text-[#1b4337] border-[#cedbc3]"
                 )}
               >
-                {isAllCompleted
+                {hasError
+                  ? "Pipeline Halted"
+                  : isAllCompleted
                   ? "All 6 Stages Completed"
                   : activeIdx >= 0
                   ? `Stage ${activeIdx + 1} of ${steps.length} in Progress`
                   : `${completedCount}/${steps.length} Stages`}
               </span>
             </div>
-            {activeStatusHint && !isAllCompleted && (
+            {activeStatusHint && !isAllCompleted && !hasError && (
               <p className="text-[11px] font-medium text-[#2d4b3e] mt-1 flex items-center gap-1.5 animate-pulse">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#214f43] inline-block shrink-0" />
                 {activeStatusHint}
@@ -116,7 +133,10 @@ export function Reasoning({
       <div className="px-4 py-2 bg-[#fbfcfb] border-b border-[#edf1eb]">
         <div className="relative h-2 w-full overflow-hidden rounded-full bg-[#e3eae0]">
           <div
-            className="h-full bg-[#214f43] rounded-full transition-all duration-500 ease-out"
+            className={cn(
+              "h-full rounded-full transition-all duration-500 ease-out",
+              hasError ? "bg-[#c87970]" : "bg-[#214f43]"
+            )}
             style={{ width: `${progressPercent}%` }}
           />
         </div>
@@ -128,13 +148,16 @@ export function Reasoning({
           {steps.map((step, idx) => {
             const isStepCompleted = step.status === "completed";
             const isStepRunning = step.status === "running";
+            const isStepError = step.status === "error";
 
             return (
               <div
                 key={step.id}
                 className={cn(
                   "flex items-start gap-3.5 p-3.5 sm:px-4 transition-all",
-                  isStepRunning
+                  isStepError
+                    ? "bg-[#fff8f7] border-l-4 border-l-[#c87970]"
+                    : isStepRunning
                     ? "bg-[#f2f7f3] border-l-4 border-l-[#214f43]"
                     : isStepCompleted
                     ? "bg-white hover:bg-[#fafbfa] border-l-4 border-l-transparent"
@@ -143,7 +166,11 @@ export function Reasoning({
               >
                 {/* Step Status Icon */}
                 <div className="mt-0.5 shrink-0">
-                  {isStepCompleted ? (
+                  {isStepError ? (
+                    <div className="w-5 h-5 rounded-full bg-[#fbefeb] text-[#c87970] border border-[#eed7d0] flex items-center justify-center">
+                      <AlertCircle className="h-3.5 w-3.5 text-[#c87970]" />
+                    </div>
+                  ) : isStepCompleted ? (
                     <div className="w-5 h-5 rounded-full bg-[#edf4e8] text-[#2d7a5b] border border-[#cde0cf] flex items-center justify-center">
                       <CheckCircle2 className="h-3.5 w-3.5 text-[#2d7a5b]" />
                     </div>
@@ -164,7 +191,9 @@ export function Reasoning({
                     <span
                       className={cn(
                         "text-sm tracking-tight",
-                        isStepRunning
+                        isStepError
+                          ? "font-bold text-[#8b423b]"
+                          : isStepRunning
                           ? "font-bold text-[#143d32]"
                           : isStepCompleted
                           ? "font-semibold text-[#263c35]"
@@ -173,7 +202,11 @@ export function Reasoning({
                     >
                       {step.title}
                     </span>
-                    {isStepRunning ? (
+                    {isStepError ? (
+                      <span className="text-[10px] font-bold text-[#c87970] bg-[#fbefeb] border border-[#eed7d0] px-2 py-0.5 rounded-full shrink-0">
+                        Halted
+                      </span>
+                    ) : isStepRunning ? (
                       <span className="text-[10px] uppercase font-bold tracking-wider bg-[#214f43] text-white px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0 shadow-xs">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-ping inline-block" />
                         Active
@@ -192,7 +225,9 @@ export function Reasoning({
                   <p
                     className={cn(
                       "text-xs mt-1 leading-relaxed",
-                      isStepRunning
+                      isStepError
+                        ? "text-[#8b423b]/90 font-normal"
+                        : isStepRunning
                         ? "text-[#263c35] font-medium"
                         : isStepCompleted
                         ? "text-[#4a5e55]"
@@ -202,13 +237,18 @@ export function Reasoning({
                     {step.description}
                   </p>
 
-                  {/* Dynamic sub-hint when active */}
-                  {isStepRunning && activeStatusHint && (
+                  {/* Sub-hint when error or active */}
+                  {isStepError && step.errorMessage ? (
+                    <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-semibold text-[#8b423b] bg-[#fff0ed] border border-[#eed7d0] rounded-md px-2.5 py-1 w-fit shadow-2xs">
+                      <AlertCircle className="h-3 w-3 text-[#c87970] shrink-0" />
+                      <span>{step.errorMessage}</span>
+                    </div>
+                  ) : isStepRunning && activeStatusHint ? (
                     <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-semibold text-[#164d3d] bg-white border border-[#cde0cf] rounded-md px-2.5 py-1 w-fit shadow-2xs">
                       <Sparkles className="h-3 w-3 text-[#214f43] shrink-0 animate-spin" />
                       <span>{activeStatusHint}</span>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             );

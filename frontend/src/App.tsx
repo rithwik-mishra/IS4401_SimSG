@@ -24,7 +24,7 @@ import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { PRESET_QUERIES, PLANNING_AREAS, PresetQuery } from "@/data/presets";
 import { SAMPLE_SIMULATION_RESULT } from "@/data/sampleOutput";
-import { runSimulation } from "@/services/api";
+import { runSimulation, ApiError, ApiRejectionType } from "@/services/api";
 import { SimulateRequest, SimulateResponse, RepresentativePersona } from "@/types/api";
 import {
   SlidersHorizontal,
@@ -51,6 +51,9 @@ export function App() {
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<
+    "rate_limit" | "pii" | "malicious" | "irrelevant" | "validation" | "general" | null
+  >(null);
   const [results, setResults] = useState<SimulateResponse | null>(SAMPLE_SIMULATION_RESULT);
   const [selectedPersona, setSelectedPersona] = useState<RepresentativePersona | null>(null);
   const [activeStatusHint, setActiveStatusHint] = useState<string>("");
@@ -59,23 +62,27 @@ export function App() {
     title: string;
     description?: string;
     type?: ToastType;
+    duration?: number;
   }>({
     isOpen: false,
     title: "",
     description: "",
     type: "info",
+    duration: 5000,
   });
 
   const showToast = (
     title: string,
     description?: string,
-    type: ToastType = "info"
+    type: ToastType = "info",
+    duration?: number
   ) => {
     setToast({
       isOpen: true,
       title,
       description,
       type,
+      duration: duration ?? (type === "error" ? 8000 : 5000),
     });
   };
 
@@ -141,6 +148,7 @@ export function App() {
 
     setIsLoading(true);
     setError(null);
+    setErrorType(null);
 
     // Initial state: Step 0 is active with natural pacing
     const initialSteps = getPipelineSteps(sampleSize).map((s, idx) => ({
@@ -304,15 +312,91 @@ export function App() {
       setIsLoading(false);
       setActiveStatusHint("");
 
-      if (err.isRateLimit || err.status === 429 || errorMessage.toLowerCase().includes("rate limit")) {
-        showToast("Rate Limit Exceeded", errorMessage, "error");
+      // Classify the rejection for targeted messaging & UI
+      let detectedType: "rate_limit" | "pii" | "malicious" | "irrelevant" | "validation" | "general" = "general";
+      const lower = errorMessage.toLowerCase();
+
+      if (err.isRateLimit || err.status === 429 || lower.includes("rate limit")) {
+        detectedType = "rate_limit";
+      } else if (
+        err.rejectionType === "pii" ||
+        lower.includes("personally identifiable") ||
+        lower.includes("pii") ||
+        lower.includes("nric") ||
+        lower.includes("credit card") ||
+        lower.includes("phone number") ||
+        lower.includes("email address") ||
+        lower.includes("passport")
+      ) {
+        detectedType = "pii";
+      } else if (
+        err.rejectionType === "malicious" ||
+        lower.includes("unsafe") ||
+        lower.includes("malicious") ||
+        lower.includes("injection") ||
+        lower.includes("script")
+      ) {
+        detectedType = "malicious";
+      } else if (
+        err.rejectionType === "irrelevant" ||
+        lower.includes("doesn't appear to describe") ||
+        lower.includes("business concept") ||
+        lower.includes("failed to decompose") ||
+        lower.includes("clearer business pitch")
+      ) {
+        detectedType = "irrelevant";
+      } else if (err.isValidationError || err.status === 422) {
+        detectedType = "validation";
       }
+
+      setErrorType(detectedType);
+
+      // Halt the pipeline visually at Step 1 (Decomposition) or the active step
+      setPipelineSteps((prev) =>
+        prev.map((step, idx) => {
+          if (idx === 0 || step.status === "running") {
+            return {
+              ...step,
+              status: "error",
+              errorMessage:
+                detectedType === "rate_limit"
+                  ? "Execution halted: session rate limit reached."
+                  : detectedType === "pii"
+                  ? "Pitch rejected: PII detected."
+                  : detectedType === "malicious"
+                  ? "Pitch rejected: unsafe input detected."
+                  : detectedType === "irrelevant"
+                  ? "Pitch rejected: incomplete or unclear business concept."
+                  : "Validation guardrails rejected query.",
+            };
+          }
+          return step;
+        })
+      );
+
+      // Trigger targeted failure toast based on detected error type
+      let toastTitle = "Simulation Error";
+      if (detectedType === "rate_limit") {
+        toastTitle = "Hourly Rate Limit Reached";
+      } else if (detectedType === "pii") {
+        toastTitle = "Personal Data Detected (PII)";
+      } else if (detectedType === "malicious") {
+        toastTitle = "Potentially Unsafe Input Flagged";
+      } else if (detectedType === "irrelevant") {
+        toastTitle = "Pitch Needs More Detail";
+      } else if (detectedType === "validation") {
+        toastTitle = "Pitch Validation Notice";
+      }
+
+      showToast(toastTitle, errorMessage, "error", 8000);
     }
   };
 
   const handleReset = () => {
     setResults(null);
     setError(null);
+    setErrorType(null);
+    setPipelineSteps(getPipelineSteps(sampleSize));
   };
 
   // Automatically detect candidate price from user pitch for reference line
@@ -444,7 +528,7 @@ export function App() {
 
         {/* Live Simulation Reasoning Tracker */}
         <AnimatePresence>
-          {isLoading && (
+          {(isLoading || (error && pipelineSteps.some((s) => s.status === "error"))) && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -453,7 +537,7 @@ export function App() {
             >
               <Reasoning
                 steps={pipelineSteps}
-                currentStepIndex={pipelineSteps.findIndex((s) => s.status === "running")}
+                currentStepIndex={pipelineSteps.findIndex((s) => s.status === "running" || s.status === "error")}
                 activeStatusHint={activeStatusHint}
               />
             </motion.div>
@@ -462,29 +546,101 @@ export function App() {
 
         {/* Error Alert */}
         {error && (
-          <div className="max-w-4xl mx-auto rounded-xl border border-[#c87970]/40 bg-[#fff3f0] p-4 text-xs text-[#8b423b] flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-[#c87970] shrink-0 mt-0.5" />
-            <div className="space-y-1">
-              <span className="font-bold text-sm block">
-                {error.toLowerCase().includes("rate limit") ? "Hourly Rate Limit Reached" : "Simulation Error"}
-              </span>
-              <p>{error}</p>
-              {!error.toLowerCase().includes("rate limit") ? (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleRunSimulation}
-                  className="mt-2 text-xs border-[#c87970]/30 hover:bg-[#c87970]/10 text-[#8b423b]"
-                >
-                  Retry Simulation
-                </Button>
-              ) : (
-                <p className="text-[11px] text-[#8b423b]/80 pt-1 font-medium">
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-4xl mx-auto rounded-2xl border border-[#c87970]/40 bg-[#fff5f3] p-4 sm:p-5 text-xs text-[#8b423b] flex items-start gap-3.5 shadow-sm"
+          >
+            <div className="w-8 h-8 rounded-xl bg-[#fbefeb] border border-[#eed7d0] flex items-center justify-center shrink-0 mt-0.5">
+              <AlertCircle className="h-4.5 w-4.5 text-[#c87970]" />
+            </div>
+
+            <div className="space-y-2 flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
+                <span className="font-heading font-bold text-sm text-[#742a22]">
+                  {errorType === "rate_limit"
+                    ? "Hourly Rate Limit Reached"
+                    : errorType === "pii"
+                    ? "Personal Information Detected (PII)"
+                    : errorType === "malicious"
+                    ? "Potentially Unsafe Input Flagged"
+                    : errorType === "irrelevant"
+                    ? "Incomplete or Irrelevant Business Pitch"
+                    : errorType === "validation"
+                    ? "Pitch Input Validation Notice"
+                    : "Simulation Failed"}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-wider bg-[#fbefeb] text-[#c87970] border border-[#eed7d0] px-2 py-0.5 rounded-full">
+                  {errorType === "rate_limit" ? "HTTP 429" : errorType === "general" ? "Error" : "HTTP 422"}
+                </span>
+              </div>
+
+              <p className="text-xs text-[#8b423b] leading-relaxed font-normal">
+                {error}
+              </p>
+
+              {/* Actionable guidance and contextual buttons based on error type */}
+              {errorType === "rate_limit" ? (
+                <div className="pt-2 border-t border-[#eed7d0]/60 text-[11px] text-[#8b423b]/90 font-medium leading-relaxed">
                   Rate limits automatically refresh on a 60-minute sliding window per unique browser session.
-                </p>
+                  Please wait for your request slot to reopen before submitting again.
+                </div>
+              ) : errorType === "pii" || errorType === "malicious" || errorType === "irrelevant" || errorType === "validation" ? (
+                <div className="pt-2 border-t border-[#eed7d0]/60 space-y-2">
+                  <p className="text-[11px] text-[#8b423b]/90 font-medium">
+                    {errorType === "pii"
+                      ? "Tip: Remove any identification numbers, phone numbers, or email addresses and focus only on the business offering, location, and pricing."
+                      : errorType === "malicious"
+                      ? "Tip: Enter a clear description of an F&B, bakery, dining, or retail concept in Singapore."
+                      : "Tip: Make sure to include what you are selling, a target planning area (e.g. Ang Mo Kio, Tampines), or an expected price (e.g. S$6.50)."}
+                  </p>
+                  <div className="flex flex-wrap items-center gap-2 pt-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const el = document.getElementById("simsg-prompt-textarea");
+                        if (el) {
+                          el.focus();
+                          el.scrollIntoView({ behavior: "smooth", block: "center" });
+                        }
+                      }}
+                      className="text-xs h-7 rounded-lg border-[#c87970]/40 hover:bg-[#c87970]/10 text-[#8b423b] font-medium"
+                    >
+                      Edit Pitch
+                    </Button>
+                    <span className="text-[11px] text-[#a0524a]">or try a sample preset:</span>
+                    {PRESET_QUERIES.slice(0, 2).map((p) => (
+                      <button
+                        key={p.id}
+                        type="button"
+                        onClick={() => {
+                          setQuery(p.query);
+                          setOverrideTown(p.town);
+                          setError(null);
+                          setErrorType(null);
+                        }}
+                        className="text-[11px] px-2 py-0.5 rounded-md bg-white border border-[#eed7d0] text-[#742a22] hover:bg-[#fbefeb] transition-colors cursor-pointer"
+                      >
+                        {p.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="pt-1">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleRunSimulation}
+                    className="text-xs h-7 rounded-lg border-[#c87970]/40 hover:bg-[#c87970]/10 text-[#8b423b] font-medium"
+                  >
+                    Retry Simulation
+                  </Button>
+                </div>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Simulation Results Workspace */}
@@ -639,6 +795,7 @@ export function App() {
         title={toast.title}
         description={toast.description}
         type={toast.type}
+        duration={toast.duration}
         onClose={handleCloseToast}
       />
 

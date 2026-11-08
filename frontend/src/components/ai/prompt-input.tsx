@@ -53,6 +53,7 @@ export function PromptInput({
     >
       <div className="p-4 sm:p-5">
         <textarea
+          id="simsg-prompt-textarea"
           ref={textareaRef}
           value={value}
           onChange={(e) => onChange(e.target.value)}
