@@ -36,6 +36,41 @@ export interface AIStatus {
   reason: string | null;
 }
 
+export type ApiRejectionType =
+  | 'pii'
+  | 'malicious'
+  | 'irrelevant'
+  | 'validation'
+  | 'rate_limit'
+  | 'general';
+
+export class ApiError extends Error {
+  status: number;
+  isRateLimit: boolean;
+  isValidationError: boolean;
+  retryAfter?: number;
+  rejectionType: ApiRejectionType;
+
+  constructor(
+    message: string,
+    status: number,
+    options?: {
+      isRateLimit?: boolean;
+      isValidationError?: boolean;
+      retryAfter?: number;
+      rejectionType?: ApiRejectionType;
+    }
+  ) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.isRateLimit = options?.isRateLimit ?? (status === 429);
+    this.isValidationError = options?.isValidationError ?? (status === 422);
+    this.retryAfter = options?.retryAfter;
+    this.rejectionType = options?.rejectionType ?? (status === 429 ? 'rate_limit' : status === 422 ? 'validation' : 'general');
+  }
+}
+
 /** Which AI model the backend would use right now (or none: backup logic). */
 export async function getAIStatus(signal?: AbortSignal): Promise<AIStatus> {
   const response = await fetch(`${API_BASE_URL}/api/ai-status`, { signal });
@@ -73,21 +108,82 @@ export async function runSimulation(
       try {
         const errorJson = JSON.parse(errorText);
         if (errorJson.detail) {
-          errorDetail = typeof errorJson.detail === 'string' ? errorJson.detail : JSON.stringify(errorJson.detail);
+          if (typeof errorJson.detail === 'string') {
+            errorDetail = errorJson.detail;
+          } else if (Array.isArray(errorJson.detail)) {
+            errorDetail = errorJson.detail
+              .map((item: any) =>
+                typeof item === 'string'
+                  ? item
+                  : item?.msg
+                  ? `${item.msg}${item?.loc ? ` (${item.loc.join('.')})` : ''}`
+                  : JSON.stringify(item)
+              )
+              .join('; ');
+          } else {
+            errorDetail = JSON.stringify(errorJson.detail);
+          }
         }
       } catch {
         if (errorText) errorDetail += `: ${errorText.slice(0, 150)}`;
       }
 
-      const error = new Error(errorDetail);
-      (error as any).status = response.status;
-      if (response.status === 429) {
-        (error as any).isRateLimit = true;
-        const retryAfter = response.headers.get('Retry-After');
-        if (retryAfter) {
-          (error as any).retryAfter = parseInt(retryAfter, 10);
+      const isRateLimit = response.status === 429;
+      const isValidationError = response.status === 422;
+      let retryAfter: number | undefined;
+
+      if (isRateLimit) {
+        const retryHeader = response.headers.get('Retry-After');
+        if (retryHeader) {
+          retryAfter = parseInt(retryHeader, 10);
         }
       }
+
+      let rejectionType: ApiRejectionType = isRateLimit
+        ? 'rate_limit'
+        : isValidationError
+        ? 'validation'
+        : 'general';
+
+      const lower = errorDetail.toLowerCase();
+      if (
+        lower.includes('personally identifiable') ||
+        lower.includes('pii') ||
+        lower.includes('nric') ||
+        lower.includes('credit card') ||
+        lower.includes('email address') ||
+        lower.includes('phone number') ||
+        lower.includes('passport')
+      ) {
+        rejectionType = 'pii';
+      } else if (
+        lower.includes('unsafe') ||
+        lower.includes('malicious') ||
+        lower.includes('injection') ||
+        lower.includes('script')
+      ) {
+        rejectionType = 'malicious';
+      } else if (
+        lower.includes("doesn't appear to describe") ||
+        lower.includes('business concept') ||
+        lower.includes('failed to decompose') ||
+        lower.includes('clearer business pitch')
+      ) {
+        rejectionType = 'irrelevant';
+      }
+
+      const error = new ApiError(errorDetail, response.status, {
+        isRateLimit,
+        isValidationError,
+        retryAfter,
+        rejectionType,
+      });
+
+      // Backward-compatibility properties
+      (error as any).isRateLimit = isRateLimit;
+      (error as any).status = response.status;
+      (error as any).retryAfter = retryAfter;
+
       throw error;
     }
 
@@ -102,8 +198,14 @@ export async function runSimulation(
     if (err.name === 'AbortError') {
       throw err;
     }
-    // Never fall back to mock data if rejected by rate limiter
-    if (err.isRateLimit || err.status === 429) {
+    // Never fall back to mock data if rejected by rate limiter (429), validation guardrails (422), or any 4xx client status
+    if (
+      err.isRateLimit ||
+      err.status === 429 ||
+      err.isValidationError ||
+      err.status === 422 ||
+      (typeof err.status === 'number' && err.status >= 400 && err.status < 500)
+    ) {
       throw err;
     }
     // If fallback is permitted and backend is offline during preview, fallback gracefully with notice
