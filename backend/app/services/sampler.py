@@ -97,12 +97,12 @@ class SyntheticPersona(BaseModel):
         ...,
         ge=0.0,
         description=(
-            "Monthly household income from work in SGD, random within the census band. Internal only: "
+            "Monthly household market income in SGD, random within the census band. Internal only: "
             "the AI prompt and the app show income_bracket, since the census gives only the band"
         ),
     )
     income_bracket: str = Field(
-        ..., description="Census household income-from-work band, e.g. 'S$7,000 to S$7,999' or 'below S$1,000'"
+        ..., description="Census household market income band, e.g. 'S$7,000 to S$7,999' or 'below S$1,000'"
     )
     archetype: Literal[
         "retiree", "student", "working_class", "heartland_family", "affluent_pro"
@@ -165,11 +165,11 @@ class RepresentativePersona(BaseModel):
     )
     monthly_income_sgd: float = Field(
         ...,
-        description="Monthly household income from work in SGD (random within the census band; the app shows income_bracket)",
+        description="Monthly household market income in SGD (random within the census band; the app shows income_bracket)",
     )
     income_bracket: Optional[str] = Field(
         default=None,
-        description="Census household income-from-work band shown in the app, e.g. 'S$7,000 to S$7,999'",
+        description="Census household market income band shown in the app, e.g. 'S$7,000 to S$7,999'",
     )
     in_labour_force: Optional[bool] = Field(
         default=None,
@@ -425,7 +425,8 @@ def _draw_rows(rows: List[Dict[str, Any]], n: int, rng: np.random.Generator) -> 
 # Home type + income is drawn AFTER age, sex, labour force and living arrangement, with three rules
 # for people aged 65+ (no age-linked household data exists below 65):
 #   "alone_retired": not in the labour force AND lives alone (or only with a domestic worker)
-#       -> income band "below S$1,000" (no one in the household earns), home types weighted by the
+#       -> income band "below S$1,000" (no one earns, so market income is only savings, rent, pensions,
+#          CPF payouts or family allowances; a simplification, as some get more), home types weighted by the
 #          national share of 1-person households in each home type
 #   "alone_working": in the labour force AND lives alone (or only with a domestic worker)
 #       -> home types weighted by the share of 1-person households (income: their own pay; no rule)

@@ -514,7 +514,7 @@ RAG_TOWNS = ["Ang Mo Kio", "Tampines", "Bukit Timah", "Jurong East", "Bukit Mera
 SMALL_FLATS = ("1-2 room", "3 room")
 BIG_HOMES = ("4 room", "5 room/exec", "condo", "landed")
 # Bukit Timah: national rates predict ~2.7% of adults are retired and living alone (who must be
-# below S$1,000 from work), but the town's census puts only 1.1% below S$1,000. Even after moving
+# placed below S$1,000 of market income), but the town's census puts only 1.1% below S$1,000. Even after moving
 # every other low draw out, its lowest band runs ~1.6 points above the census.
 BUKIT_TIMAH_LOW_BAND_GAP = 0.025
 

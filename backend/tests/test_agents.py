@@ -185,10 +185,10 @@ def test_build_persona_prompt_contains_all_demographics():
     assert "Linguistic Style" not in prompt
     # Census budget is an HES average for the home type, labelled so the AI does not treat it as a cap
     assert p.age_bracket in prompt
-    # Income: the census band only (the exact drawn amount is not shown), labelled as income from work
-    assert f"Monthly Household Income from Work: {p.income_bracket}" in prompt
+    # Income: the census band only (the exact drawn amount is not shown), labelled as market income
+    assert f"Monthly Household Market Income: {p.income_bracket}" in prompt
     assert f"S${p.monthly_household_income_sgd:,.0f}" not in prompt
-    assert "excludes pensions, CPF payouts" in prompt
+    assert "excludes government support" in prompt
     assert "Typical Eating-Out Spend" in prompt
     assert "not your personal limit" in prompt
     assert "Daily Dining Budget" not in prompt
@@ -214,7 +214,7 @@ def test_senior_lines_in_prompt_only_for_their_ages():
     seen = set()
     for p in cohort:
         prompt = build_price_limits_prompt(p, concept, rag_chunks=None)
-        # line starts only ("Monthly Household Income from Work:" also contains "Work:")
+        # line starts only, so other lines that mention work do not count
         assert ("\nWork:" in prompt) == (p.age >= 60)
         assert ("\nLiving arrangement:" in prompt) == (p.age >= 65)
         if p.in_labour_force is True:
@@ -345,9 +345,10 @@ def test_system_prompt_contains_ground_rule(rule):
     assert rule in SYSTEM_PROMPT
 
 
-def test_system_prompt_explains_income_is_from_work():
-    assert "income from work" in SYSTEM_PROMPT
-    assert "leaves out pensions, CPF payouts" in SYSTEM_PROMPT
+def test_system_prompt_explains_market_income():
+    assert "market income" in SYSTEM_PROMPT
+    assert "rent, pensions, CPF payouts" in SYSTEM_PROMPT
+    assert "excludes government support" in SYSTEM_PROMPT
 
 
 def test_prompt_for_lowest_band_shows_band_not_tiny_amount():
@@ -355,7 +356,7 @@ def test_prompt_for_lowest_band_shows_band_not_tiny_amount():
     concept = decompose_query_rule_based("S$7 kopi bar in Ang Mo Kio")
     low = next(p for p in sample_synthetic_cohort("Ang Mo Kio", n=300, seed=2) if p.income_bracket == "below S$1,000")
     prompt = build_price_limits_prompt(low, concept, rag_chunks=None)
-    assert "Monthly Household Income from Work: below S$1,000" in prompt
+    assert "Monthly Household Market Income: below S$1,000" in prompt
     assert f"S${low.monthly_household_income_sgd:,.0f} " not in prompt
 
 
