@@ -1,0 +1,49 @@
+id,type,case,reader,used_ai,town,price,category,town_ok,price_ok,category_ok,all_ok
+N01,normal,standard,ai,True,Ang Mo Kio,7.0,beverage,True,True,True,True
+N01,normal,standard,rule_based,False,Ang Mo Kio,7.0,beverage,True,True,True,True
+N02,normal,standard,ai,True,Tampines,4.5,bakery,True,True,True,True
+N02,normal,standard,rule_based,False,Tampines,4.5,beverage,True,True,False,False
+N03,normal,standard,ai,True,Jurong East,13.5,full_service_dining,True,True,True,True
+N03,normal,standard,rule_based,False,Jurong East,13.5,beverage,True,True,False,False
+N04,normal,standard,ai,True,Bukit Timah,9.0,bakery,True,True,True,True
+N04,normal,standard,rule_based,False,Bukit Timah,9.0,bakery,True,True,True,True
+N05,normal,standard,ai,True,Bukit Merah,5.2,beverage,True,True,True,True
+N05,normal,standard,rule_based,False,Bukit Merah,5.2,beverage,True,True,True,True
+N06,normal,standard,ai,True,Outram,16.0,full_service_dining,True,True,True,True
+N06,normal,standard,rule_based,False,Outram,16.0,full_service_dining,True,True,True,True
+N07,normal,standard,ai,True,Tampines,12.0,retail,True,True,True,True
+N07,normal,standard,rule_based,False,Tampines,12.0,retail,True,True,True,True
+N08,normal,standard,ai,True,Outram,6.5,beverage,True,True,True,True
+N08,normal,standard,rule_based,False,Outram,6.5,beverage,True,True,True,True
+N09,normal,standard,ai,True,Bukit Timah,18.0,full_service_dining,True,True,True,True
+N09,normal,standard,rule_based,False,Bukit Timah,18.0,full_service_dining,True,True,True,True
+N10,normal,standard,ai,True,Ang Mo Kio,35.0,retail,True,True,True,True
+N10,normal,standard,rule_based,False,Ang Mo Kio,35.0,retail,True,True,True,True
+N11,normal,standard,ai,True,Tampines,7.9,beverage,True,True,True,True
+N11,normal,standard,rule_based,False,Tampines,7.9,beverage,True,True,True,True
+N12,normal,standard,ai,True,Jurong East,2.2,bakery,True,True,True,True
+N12,normal,standard,rule_based,False,Jurong East,2.2,bakery,True,True,True,True
+E01,edge,no price,ai,True,Bukit Timah,4.5,beverage,True,True,True,True
+E01,edge,no price,rule_based,False,Bukit Timah,4.5,beverage,True,True,True,True
+E02,edge,price in words,ai,True,Tampines,5.0,full_service_dining,True,True,True,True
+E02,edge,price in words,rule_based,False,Tampines,4.5,full_service_dining,True,False,True,False
+E03,edge,price range,ai,True,Ang Mo Kio,4.0,beverage,True,True,True,True
+E03,edge,price range,rule_based,False,Ang Mo Kio,4.0,beverage,True,True,True,True
+E04,edge,unsupported town,ai,True,Ang Mo Kio,14.0,beverage,True,True,True,True
+E04,edge,unsupported town,rule_based,False,Ang Mo Kio,14.0,beverage,True,True,True,True
+E05,edge,town abbreviation,ai,True,Ang Mo Kio,1.4,beverage,True,True,True,True
+E05,edge,town abbreviation,rule_based,False,Ang Mo Kio,1.4,beverage,True,True,True,True
+E06,edge,neighbourhood name,ai,True,Ang Mo Kio,19.0,full_service_dining,False,True,True,False
+E06,edge,neighbourhood name,rule_based,False,Bukit Merah,19.0,full_service_dining,True,True,True,True
+E07,edge,several prices,ai,True,Jurong East,15.0,full_service_dining,True,True,True,True
+E07,edge,several prices,rule_based,False,Jurong East,15.0,full_service_dining,True,True,True,True
+E08,edge,informal English,ai,True,Tampines,4.5,full_service_dining,True,True,True,True
+E08,edge,informal English,rule_based,False,Tampines,4.5,retail,True,True,False,False
+E09,edge,spelling mistakes,ai,True,Tampines,5.5,beverage,True,True,True,True
+E09,edge,spelling mistakes,rule_based,False,Ang Mo Kio,5.5,beverage,False,True,True,False
+E10,edge,distracting numbers,ai,True,Bukit Merah,1.8,beverage,True,True,True,True
+E10,edge,distracting numbers,rule_based,False,Bukit Merah,1.8,beverage,True,True,True,True
+E11,edge,price in cents,ai,True,Outram,0.8,bakery,True,True,True,True
+E11,edge,price in cents,rule_based,False,Outram,80.0,beverage,True,False,False,False
+E12,edge,mixed concept,ai,True,Bukit Timah,6.5,beverage,True,True,True,True
+E12,edge,mixed concept,rule_based,False,Bukit Timah,6.5,beverage,True,True,True,True

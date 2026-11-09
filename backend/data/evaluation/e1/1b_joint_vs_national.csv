@@ -1,0 +1,7 @@
+area,table,max_gap_pts,category,tvd,srmse
+all towns,income within 1-2 room,-0.89,0-999,0.015,0.0522
+all towns,income within 3 room,0.74,0-999,0.0174,0.0469
+all towns,income within 4 room,-0.26,35000+,0.007,0.0195
+all towns,income within 5 room/exec,-1.19,35000+,0.0187,0.0625
+all towns,income within condo,0.59,35000+,0.0099,0.0334
+all towns,income within landed,2.26,35000+,0.03,0.1165

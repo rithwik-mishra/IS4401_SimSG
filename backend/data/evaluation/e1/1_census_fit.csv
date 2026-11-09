@@ -1,0 +1,59 @@
+area,table,max_gap_pts,category,tvd,srmse
+Ang Mo Kio,dwelling,-0.0,3 room,0.0,0.0
+Ang Mo Kio,income_band,0.0,0-999,0.0,0.0
+Bedok,dwelling,-0.0,condo,0.0,0.0
+Bedok,income_band,0.0,0-999,0.0,0.0
+Bishan,dwelling,0.0,condo,0.0,0.0
+Bishan,income_band,0.0,25000-29999,0.0,0.0
+Bukit Batok,dwelling,0.0,condo,0.0,0.0
+Bukit Batok,income_band,0.0,15000-17499,0.0,0.0
+Bukit Merah,dwelling,-0.0,1-2 room,0.0,0.0
+Bukit Merah,income_band,0.0,4000-4999,0.0,0.0
+Bukit Panjang,dwelling,-0.0,condo,0.0,0.0
+Bukit Panjang,income_band,-0.0,20000-24999,0.0,0.0
+Bukit Timah,dwelling,0.0,landed,0.0,0.0
+Bukit Timah,income_band,-0.0,20000-24999,0.0,0.0
+Choa Chu Kang,dwelling,-0.0,condo,0.0,0.0
+Choa Chu Kang,income_band,-0.0,0-999,0.0,0.0
+Clementi,dwelling,0.0,condo,0.0,0.0
+Clementi,income_band,0.0,35000+,0.0,0.0
+Geylang,dwelling,-0.0,condo,0.0,0.0
+Geylang,income_band,0.0,0-999,0.0,0.0
+Hougang,dwelling,-0.0,condo,0.0,0.0
+Hougang,income_band,-0.0,15000-17499,0.0,0.0
+Jurong East,dwelling,0.0,3 room,0.0,0.0
+Jurong East,income_band,-0.0,0-999,0.0,0.0
+Jurong West,dwelling,-0.0,5 room/exec,0.0,0.0
+Jurong West,income_band,-0.0,25000-29999,0.0,0.0
+Kallang,dwelling,0.0,condo,0.0,0.0
+Kallang,income_band,0.0,0-999,0.0,0.0
+Marine Parade,dwelling,0.0,condo,0.0,0.0
+Marine Parade,income_band,-0.0,35000+,0.0,0.0
+Novena,dwelling,0.0,condo,0.0,0.0
+Novena,income_band,0.0,17500-19999,0.0,0.0
+Outram,dwelling,-0.0,1-2 room,0.0,0.0
+Outram,income_band,0.0,2000-2999,0.0,0.0
+Pasir Ris,dwelling,-0.0,condo,0.0,0.0
+Pasir Ris,income_band,0.0,20000-24999,0.0,0.0
+Punggol,dwelling,-0.0,1-2 room,0.0,0.0
+Punggol,income_band,-0.0,11000-11999,0.0,0.0
+Queenstown,dwelling,0.0,condo,0.0,0.0
+Queenstown,income_band,0.0,0-999,0.0,0.0
+Sembawang,dwelling,-0.0,1-2 room,0.0,0.0
+Sembawang,income_band,-0.0,15000-17499,0.0,0.0
+Sengkang,dwelling,-0.0,1-2 room,0.0,0.0
+Sengkang,income_band,-0.0,20000-24999,0.0,0.0
+Serangoon,dwelling,-0.0,landed,0.0,0.0
+Serangoon,income_band,0.0,0-999,0.0,0.0
+Tampines,dwelling,0.0,condo,0.0,0.0
+Tampines,income_band,0.0,20000-24999,0.0,0.0
+Tanglin,dwelling,0.0,landed,0.0,0.0
+Tanglin,income_band,0.0,35000+,0.0,0.0
+Tengah,dwelling,-0.0,1-2 room,0.0,0.0
+Tengah,income_band,0.0,13000-13999,0.0,0.0
+Toa Payoh,dwelling,-0.0,3 room,0.0,0.0
+Toa Payoh,income_band,0.0,1000-1999,0.0,0.0
+Woodlands,dwelling,0.0,1-2 room,0.0,0.0
+Woodlands,income_band,0.0,15000-17499,0.0,0.0
+Yishun,dwelling,0.0,3 room,0.0,0.0
+Yishun,income_band,-0.0,0-999,0.0,0.0

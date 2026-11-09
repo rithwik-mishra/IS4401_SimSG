@@ -165,6 +165,31 @@ def test_psm_intersections_order(synthetic_psm_records):
     assert intersections.pmc <= intersections.pme
 
 
+def test_psm_matches_hand_calculation():
+    """
+    Four respondents on a S$1 price grid, checked by hand:
+      Too cheap % (>= price):     S$4 50, S$5 25, S$6 25, S$7 0
+      Cheap % (>= price):         S$5 50, S$6 50, S$7 25
+      Expensive % (<= price):     S$4 25, S$5 25, S$6 50, S$7 50
+      Too expensive % (<= price): S$5 25, S$6 25, S$7 50
+    PMC  = too cheap meets expensive:     both 25% at S$5            -> S$5.00
+    OPP  = too cheap meets too expensive: both 25% from S$5 to S$6   -> middle, S$5.50
+    IPP  = cheap meets expensive:         both 50% at S$6            -> S$6.00
+    PME  = cheap meets too expensive:     50 vs 25 at S$6, 25 vs 50 at S$7 -> halfway, S$6.50
+    """
+    records = [
+        {"too_cheap": 2, "cheap": 3, "expensive": 4, "too_expensive": 5},
+        {"too_cheap": 3, "cheap": 4, "expensive": 6, "too_expensive": 7},
+        {"too_cheap": 4, "cheap": 6, "expensive": 8, "too_expensive": 9},
+        {"too_cheap": 6, "cheap": 7, "expensive": 9, "too_expensive": 11},
+    ]
+    intersections, curves = compute_psm(records, num_steps=15, price_bounds=(1, 15))
+    at = {pt.price: pt for pt in curves}
+    assert (at[5.0].too_cheap, at[5.0].cheap, at[5.0].expensive, at[5.0].too_expensive) == (25.0, 50.0, 25.0, 25.0)
+    assert (at[7.0].too_cheap, at[7.0].cheap, at[7.0].expensive, at[7.0].too_expensive) == (0.0, 25.0, 50.0, 50.0)
+    assert (intersections.pmc, intersections.opp, intersections.ipp, intersections.pme) == (5.0, 5.5, 6.0, 6.5)
+
+
 def test_working_senior_is_not_counted_as_senior_cohort():
     """With an archetype, only retirees (65+ not in the labour force) count as Senior / Retiree."""
     working = {"age": 70, "archetype": "heartland_family", "dwelling": "4 room", "likelihood_1_to_5": 3}

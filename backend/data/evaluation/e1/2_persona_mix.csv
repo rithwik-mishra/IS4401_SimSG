@@ -1,0 +1,117 @@
+sampler,area,table,max_gap_pts,category,tvd,srmse
+census sampler,Ang Mo Kio,dwelling,-0.57,3 room,0.0095,0.0215
+census sampler,Ang Mo Kio,income_band,0.22,"S$35,000 or more",0.0083,0.0204
+census sampler,Ang Mo Kio,age_sex,-0.19,35-39 Male,0.0125,0.0293
+census sampler,Ang Mo Kio,sex,0.31,Female,0.0031,0.0062
+census sampler,Bedok,dwelling,0.43,1-2 room,0.0074,0.0167
+census sampler,Bedok,income_band,-0.2,"S$1,000 to S$1,999",0.0081,0.0202
+census sampler,Bedok,age_sex,-0.25,35-39 Male,0.0116,0.0277
+census sampler,Bedok,sex,0.31,Female,0.0031,0.0062
+census sampler,Bishan,dwelling,0.47,1-2 room,0.0079,0.0186
+census sampler,Bishan,income_band,0.19,"S$20,000 to S$24,999",0.0078,0.0191
+census sampler,Bishan,age_sex,-0.2,40-44 Male,0.0106,0.0266
+census sampler,Bishan,sex,0.31,Female,0.0031,0.0063
+census sampler,Bukit Batok,dwelling,0.23,1-2 room,0.0038,0.009
+census sampler,Bukit Batok,income_band,0.17,"S$30,000 to S$34,999",0.0082,0.0193
+census sampler,Bukit Batok,age_sex,-0.23,35-39 Male,0.0119,0.029
+census sampler,Bukit Batok,sex,-0.34,Male,0.0034,0.0069
+census sampler,Bukit Merah,dwelling,-0.4,4 room,0.0068,0.0155
+census sampler,Bukit Merah,income_band,0.22,"below S$1,000",0.0083,0.0202
+census sampler,Bukit Merah,age_sex,0.24,50-54 Male,0.0121,0.0286
+census sampler,Bukit Merah,sex,0.3,Female,0.003,0.0061
+census sampler,Bukit Panjang,dwelling,0.35,1-2 room,0.0048,0.0124
+census sampler,Bukit Panjang,income_band,-0.26,"S$12,000 to S$12,999",0.0098,0.0242
+census sampler,Bukit Panjang,age_sex,-0.21,30-34 Male,0.0124,0.0296
+census sampler,Bukit Panjang,sex,0.3,Female,0.003,0.006
+census sampler,Bukit Timah,dwelling,-0.44,landed,0.0053,0.0139
+census sampler,Bukit Timah,income_band,1.69,"below S$1,000",0.0184,0.0845
+census sampler,Bukit Timah,age_sex,-0.2,35-39 Male,0.0114,0.0269
+census sampler,Bukit Timah,sex,0.35,Female,0.0035,0.007
+census sampler,Choa Chu Kang,dwelling,0.35,1-2 room,0.0036,0.0108
+census sampler,Choa Chu Kang,income_band,-0.15,"S$17,500 to S$19,999",0.0078,0.0182
+census sampler,Choa Chu Kang,age_sex,-0.21,30-34 Male,0.0096,0.0256
+census sampler,Choa Chu Kang,sex,0.3,Female,0.003,0.0061
+census sampler,Clementi,dwelling,-0.25,4 room,0.0032,0.0085
+census sampler,Clementi,income_band,0.21,"S$35,000 or more",0.0066,0.0175
+census sampler,Clementi,age_sex,-0.25,35-39 Male,0.013,0.0314
+census sampler,Clementi,sex,0.33,Female,0.0033,0.0067
+census sampler,Geylang,dwelling,-0.41,4 room,0.0067,0.0154
+census sampler,Geylang,income_band,-0.34,"S$2,000 to S$2,999",0.0092,0.0252
+census sampler,Geylang,age_sex,-0.23,35-39 Male,0.0132,0.0314
+census sampler,Geylang,sex,-0.28,Male,0.0028,0.0057
+census sampler,Hougang,dwelling,-0.52,4 room,0.0069,0.0169
+census sampler,Hougang,income_band,-0.2,"S$17,500 to S$19,999",0.0096,0.0242
+census sampler,Hougang,age_sex,0.24,60-64 Female,0.0117,0.0296
+census sampler,Hougang,sex,0.32,Female,0.0032,0.0064
+census sampler,Jurong East,dwelling,0.32,1-2 room,0.0039,0.0096
+census sampler,Jurong East,income_band,-0.17,"S$25,000 to S$29,999",0.0068,0.0177
+census sampler,Jurong East,age_sex,-0.21,35-39 Male,0.0102,0.0257
+census sampler,Jurong East,sex,0.33,Female,0.0033,0.0066
+census sampler,Jurong West,dwelling,0.35,1-2 room,0.0047,0.0121
+census sampler,Jurong West,income_band,0.13,"S$7,000 to S$7,999",0.0058,0.0134
+census sampler,Jurong West,age_sex,-0.2,30-34 Male,0.0123,0.0294
+census sampler,Jurong West,sex,0.27,Female,0.0027,0.0053
+census sampler,Kallang,dwelling,-0.24,3 room,0.0045,0.0096
+census sampler,Kallang,income_band,-0.19,"S$14,000 to S$14,999",0.0065,0.0159
+census sampler,Kallang,age_sex,-0.24,35-39 Male,0.0118,0.0281
+census sampler,Kallang,sex,0.29,Female,0.0029,0.0057
+census sampler,Marine Parade,dwelling,0.52,1-2 room,0.0073,0.0174
+census sampler,Marine Parade,income_band,-0.16,"S$4,000 to S$4,999",0.0078,0.019
+census sampler,Marine Parade,age_sex,-0.22,45-49 Male,0.0112,0.0282
+census sampler,Marine Parade,sex,-0.35,Male,0.0035,0.007
+census sampler,Novena,dwelling,0.38,1-2 room,0.0065,0.0145
+census sampler,Novena,income_band,-0.32,"S$30,000 to S$34,999",0.0108,0.0269
+census sampler,Novena,age_sex,-0.24,35-39 Male,0.0112,0.0276
+census sampler,Novena,sex,-0.3,Male,0.003,0.0061
+census sampler,Outram,dwelling,-0.68,3 room,0.0092,0.0217
+census sampler,Outram,income_band,-0.42,"S$3,000 to S$3,999",0.0119,0.0314
+census sampler,Outram,age_sex,-0.23,40-44 Male,0.0108,0.0277
+census sampler,Outram,sex,0.28,Female,0.0028,0.0056
+census sampler,Pasir Ris,dwelling,-0.34,5 room/exec,0.0048,0.0124
+census sampler,Pasir Ris,income_band,0.19,"S$20,000 to S$24,999",0.0072,0.0186
+census sampler,Pasir Ris,age_sex,-0.22,30-34 Male,0.0107,0.0271
+census sampler,Pasir Ris,sex,-0.32,Male,0.0032,0.0064
+census sampler,Punggol,dwelling,0.14,1-2 room,0.0023,0.0054
+census sampler,Punggol,income_band,-0.2,"S$11,000 to S$11,999",0.0087,0.0213
+census sampler,Punggol,age_sex,-0.29,35-39 Male,0.009,0.0275
+census sampler,Punggol,sex,-0.31,Male,0.0031,0.0061
+census sampler,Queenstown,dwelling,-0.31,4 room,0.0057,0.0126
+census sampler,Queenstown,income_band,0.2,"S$35,000 or more",0.0063,0.0165
+census sampler,Queenstown,age_sex,-0.25,35-39 Male,0.0109,0.0276
+census sampler,Queenstown,sex,0.35,Female,0.0035,0.0069
+census sampler,Sembawang,dwelling,0.33,1-2 room,0.0039,0.0098
+census sampler,Sembawang,income_band,0.35,"S$11,000 to S$11,999",0.0097,0.0251
+census sampler,Sembawang,age_sex,-0.24,35-39 Male,0.012,0.0298
+census sampler,Sembawang,sex,0.32,Female,0.0032,0.0065
+census sampler,Sengkang,dwelling,0.32,1-2 room,0.0036,0.0096
+census sampler,Sengkang,income_band,0.22,"S$6,000 to S$6,999",0.0073,0.0182
+census sampler,Sengkang,age_sex,-0.25,35-39 Male,0.01,0.0258
+census sampler,Sengkang,sex,-0.32,Male,0.0032,0.0065
+census sampler,Serangoon,dwelling,0.31,1-2 room,0.0044,0.0112
+census sampler,Serangoon,income_band,-0.2,"S$30,000 to S$34,999",0.0076,0.018
+census sampler,Serangoon,age_sex,-0.2,35-39 Male,0.0109,0.026
+census sampler,Serangoon,sex,0.31,Female,0.0031,0.0061
+census sampler,Tampines,dwelling,0.29,1-2 room,0.0038,0.0098
+census sampler,Tampines,income_band,-0.13,"S$30,000 to S$34,999",0.007,0.0157
+census sampler,Tampines,age_sex,-0.2,35-39 Male,0.0113,0.0276
+census sampler,Tampines,sex,0.33,Female,0.0033,0.0066
+census sampler,Tanglin,dwelling,0.08,landed,0.0008,0.0015
+census sampler,Tanglin,income_band,2.39,"S$3,000 to S$3,999",0.0248,0.1124
+census sampler,Tanglin,age_sex,-0.2,65-69 Female,0.0105,0.0276
+census sampler,Tanglin,sex,0.34,Female,0.0034,0.0067
+census sampler,Tengah,dwelling,0.35,5 room/exec,0.005,0.0106
+census sampler,Tengah,income_band,-0.13,"S$20,000 to S$24,999",0.0061,0.0138
+census sampler,Tengah,age_sex,-0.35,30-34 Male,0.0103,0.0314
+census sampler,Tengah,sex,0.3,Female,0.003,0.0061
+census sampler,Toa Payoh,dwelling,-0.46,3 room,0.0081,0.0186
+census sampler,Toa Payoh,income_band,0.21,"S$35,000 or more",0.009,0.0219
+census sampler,Toa Payoh,age_sex,-0.25,35-39 Male,0.0119,0.0296
+census sampler,Toa Payoh,sex,0.33,Female,0.0033,0.0066
+census sampler,Woodlands,dwelling,0.3,1-2 room,0.0031,0.0094
+census sampler,Woodlands,income_band,-0.17,"S$17,500 to S$19,999",0.0065,0.0165
+census sampler,Woodlands,age_sex,-0.23,35-39 Male,0.0114,0.0304
+census sampler,Woodlands,sex,0.26,Female,0.0026,0.0052
+census sampler,Yishun,dwelling,-0.48,4 room,0.0073,0.0173
+census sampler,Yishun,income_band,0.2,"S$2,000 to S$2,999",0.0093,0.0215
+census sampler,Yishun,age_sex,0.23,45-49 Male,0.0131,0.0324
+census sampler,Yishun,sex,0.3,Female,0.003,0.006

@@ -1,0 +1,25 @@
+id,type,case,pitch,town,price_lo,price_hi,category
+N01,normal,standard,S$7 artisanal single-origin kopi bar in Ang Mo Kio with specialty cold brew and toast sets,Ang Mo Kio,7,7,beverage
+N02,normal,standard,S$4.50 salted egg lava bao kiosk in Tampines Central with fresh organic soy milk sets,Tampines,4.5,4.5,bakery
+N03,normal,standard,S$13.50 high-protein keto grain bowl near Jurong East MRT with sous-vide chicken breast,Jurong East,13.5,13.5,full_service_dining
+N04,normal,standard,Sourdough bakery in Bukit Timah selling loaves at $9 each,Bukit Timah,9,9,bakery
+N05,normal,standard,"Bubble tea shop in Bukit Merah, brown sugar milk tea for $5.20",Bukit Merah,5.2,5.2,beverage
+N06,normal,standard,"Zi char restaurant near Outram Park, dishes from S$16",Outram,16,16,full_service_dining
+N07,normal,standard,"Stationery and gift shop in Tampines, notebooks priced at 12 dollars",Tampines,12,12,retail
+N08,normal,standard,"Matcha latte cart in Outram, SGD 6.50 per cup",Outram,6.5,6.5,beverage
+N09,normal,standard,"Ramen restaurant in Bukit Timah, bowls at $18++",Bukit Timah,18,18,full_service_dining
+N10,normal,standard,Florist in Ang Mo Kio selling bouquets for S$35,Ang Mo Kio,35,35,retail
+N11,normal,standard,"Cold-pressed juice bar in Tampines, juices at 7.90 SGD",Tampines,7.9,7.9,beverage
+N12,normal,standard,Neighbourhood pastry shop in Jurong East selling egg tarts for $2.20,Jurong East,2.2,2.2,bakery
+E01,edge,no price,A cosy third-wave coffee cafe in Bukit Timah,Bukit Timah,4.5,4.5,beverage
+E02,edge,price in words,"Hawker-style chicken rice stall in Tampines, five bucks a plate",Tampines,5,5,full_service_dining
+E03,edge,price range,"Bubble tea kiosk in Ang Mo Kio, drinks between $4 and $6",Ang Mo Kio,4,6,beverage
+E04,edge,unsupported town,"Craft beer bar in Bedok, pints at S$14",Ang Mo Kio,14,14,beverage
+E05,edge,town abbreviation,Kopi stall in AMK selling kopi-o at $1.40,Ang Mo Kio,1.4,1.4,beverage
+E06,edge,neighbourhood name,Brunch restaurant in Tiong Bahru with eggs benedict at $19,Bukit Merah,19,19,full_service_dining
+E07,edge,several prices,"Ramen shop in Jurong East: ramen bowls at $15, side gyoza $6",Jurong East,15,15,full_service_dining
+E08,edge,informal English,"wanna open a lor mee stall at tampines, sell 1 bowl $4.50 can?",Tampines,4.5,4.5,full_service_dining
+E09,edge,spelling mistakes,Bubbel tea shop in Tampenis for 5.50,Tampines,5.5,5.5,beverage
+E10,edge,distracting numbers,"Opening 2 outlets in Bukit Merah: a kopi kiosk selling kopi at $1.80, open 24 hours",Bukit Merah,1.8,1.8,beverage
+E11,edge,price in cents,"Traditional kueh stall in Outram, kueh at 80 cents each",Outram,0.8,0.8,bakery
+E12,edge,mixed concept,"Cafe-bookstore in Bukit Timah selling books and lattes, latte $6.50",Bukit Timah,6.5,6.5,beverage

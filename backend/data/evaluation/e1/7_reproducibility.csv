@@ -1,0 +1,7 @@
+area,same_seed_identical,different_seed_differs,first_30_kept_when_n_100
+Ang Mo Kio,True,True,True
+Bukit Merah,True,True,True
+Bukit Timah,True,True,True
+Jurong East,True,True,True
+Outram,True,True,True
+Tampines,True,True,True

@@ -1,0 +1,19 @@
+area,table,panel_size,panels,mean_tvd,p90_tvd
+Ang Mo Kio,dwelling,30,500,0.152,0.214
+Ang Mo Kio,income_coarse,30,500,0.157,0.233
+Ang Mo Kio,age_coarse,30,500,0.143,0.214
+Bukit Merah,dwelling,30,500,0.143,0.204
+Bukit Merah,income_coarse,30,500,0.157,0.228
+Bukit Merah,age_coarse,30,500,0.143,0.219
+Bukit Timah,dwelling,30,500,0.109,0.176
+Bukit Timah,income_coarse,30,500,0.118,0.176
+Bukit Timah,age_coarse,30,500,0.139,0.203
+Jurong East,dwelling,30,500,0.137,0.208
+Jurong East,income_coarse,30,500,0.159,0.227
+Jurong East,age_coarse,30,500,0.144,0.219
+Outram,dwelling,30,500,0.138,0.212
+Outram,income_coarse,30,500,0.158,0.229
+Outram,age_coarse,30,500,0.137,0.215
+Tampines,dwelling,30,500,0.144,0.214
+Tampines,income_coarse,30,500,0.152,0.232
+Tampines,age_coarse,30,500,0.141,0.205
